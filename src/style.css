@@ -1,0 +1,253 @@
+@font-face {
+    font-family: rain;
+    src: url("assets/wenzi.ttf");
+}
+*{
+    padding: 0px;
+    margin: 0px;
+    font-family: rain;
+    box-sizing: border-box;
+}
+::selection {
+    background: #fefac7;
+    color: #e67474;
+}
+/* mozilla firefox（火狐浏览器） */
+::-moz-selection {
+    background: #fefac7;
+    color: #e67474;
+}
+
+b,p,h1,a,input,button,h2,img,li,h3,h4,h5,h6{
+    user-select: none;
+}
+div{
+    user-select:none;
+}
+code{
+    user-select: text;
+}
+
+
+
+
+
+
+/* markdown样式 */
+.entryContent {
+    position: relative;
+}
+
+.hljs {
+    background-color: rgb(33,37,43);
+    padding-top: 30px;
+    border-radius: 5px;
+    position: relative;
+    overflow: hidden;
+}
+.hljs::before{
+    content: "";
+    position: absolute;
+    border-radius: 50%;
+    background: #fc625d;
+    width: 17px;
+    height: 17px;
+    left: 15px;
+    margin-top: -22px;
+    box-shadow: 30px 0 #fdbc40,60px 0 #35cd4b;
+}
+.hljs code{
+    overflow-x: auto;
+    display: block;
+    background-color: rgb(29,31,33);
+}
+.hljs code::-webkit-scrollbar{
+    width: 8px;
+    height: 8px;
+}
+.hljs code::-webkit-scrollbar-thumb{
+    border-radius: 5px;
+    background-color: rgb(202,202,202);
+}
+.hljs ol {
+    background-color: rgb(29,31,33);
+    margin-top: 10px;
+    list-style: none;
+    padding-bottom: 10px;
+    width: 100%;
+}
+.hljs ol li{
+    position: relative;
+}
+.hljs ol li .line-num {
+    display: inline-block;
+    user-select: none;
+    text-align: center;
+    background-color: rgb(29,31,33);
+    position: relative;
+    top: 0;
+    width: 40px;
+    height: 100%;
+    color: rgb(171,178,191);
+    font-size: 17px;
+    font-family: normal;
+}
+.hljs ol li .item{
+    display: inline-block;
+    width: calc(100% - 40px);
+    padding: 2px 0 2px 0;
+}
+.hljs ol li .item:hover{
+    background-color: rgb(52,54,56);
+}
+.hljs ol li .item,span{
+    font-family: normal;
+    font-size: 15px;
+    letter-spacing: 1px;
+    user-select: text;
+}
+.hljs b.name {
+    font-family: normal;
+    position: absolute;
+    top: 2px;
+    right: 12px;
+    z-index: 10;
+    color: #999;
+    pointer-events: none;
+}
+
+p code{
+    background: #fefac7;
+    color: #e67474;
+    white-space: pre-wrap;
+    word-break: break-word;
+    font-family: normal;
+    border-radius: 5px;
+    padding: 0 5px 0 5px;
+    text-indent: unset;
+}
+
+.entryContent ul {
+    list-style: disc;
+    padding: 0 10px 0 35px;
+    color: grey;
+    border-radius: 10px;
+}
+
+.entryContent ul li {
+    Letter-spacing: 1px;
+    line-height: 24px;
+}
+
+
+
+.entryContent h3 {
+    padding-bottom: 8px;
+    border-bottom: 1px dashed #ddd;
+}
+
+.entryContent h1,
+.entryContent h2,
+.entryContent h2,
+.entryContent h3,
+.entryContent h4 {
+    margin-top: 30px;
+    margin-bottom: 20px;
+}
+
+.entryContent h2 {
+    padding-left: 40px;
+}
+
+.entryContent h3 {
+    padding-left: 20px;
+    font-size: 22px;
+}
+
+.entryContent h4 {
+    padding-left: 20px;
+    font-size: 20px;
+}
+
+.entryContent h5 {
+    font-size: 18px;
+    padding-left: 28px;
+}
+
+.entryContent h2:before {
+    content: "🐔";
+    position: absolute;
+    left: 0;
+    font-size: 1.03em;
+    margin-top: -2px;
+}
+
+.entryContent h3:before {
+    content: "#";
+    left: 0;
+    position: absolute;
+    margin-top: 2px;
+    color: #ff6d6d;
+}
+
+.entryContent h4:before {
+    content: "▌";
+    left: 0;
+    position: absolute;
+    color: #ff6d6d;
+}
+
+.entryContent h5:before {
+    content: "🌷";
+    left: 0;
+    position: absolute;
+}
+
+.entryContent a {
+    color: #e67474;
+    position: relative;
+    text-decoration: none;
+}
+
+.entryContent a:hover {
+    color: orange;
+}
+
+.entryContent a:after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    transform: scaleX(0);
+    height: 1.5px;
+    bottom: -2px;
+    left: 0;
+    background-color: orange;
+    transform-origin: bottom right;
+    transition: transform 0.25s ease-out;
+}
+
+.entryContent a:hover:after {
+    transform: scaleX(1);
+    transform-origin: bottom left;
+}
+
+.entryContent p {
+    color: black;
+    line-height: 35px;
+    word-break: break-word;
+    font-size: 18px;
+}
+
+.entryContent hr {
+    margin-top: 20px;
+    margin-bottom: 20px;
+    border: 0.5px dashed #fc625d;
+}
+
+.entryContent img {
+    max-width: 100%;
+    border-radius: 5px;
+}
+
+
+
