@@ -1,6 +1,7 @@
 <template>
   <div>
-    <div class="bcg">
+    <div class="body">
+      <img class="bkg" v-lazy="bkg" alt="">
       <Header class="header"></Header>
       <div class="fireBox">
         <p>留言板</p>
@@ -26,77 +27,64 @@
   </div>
 </template>
 
-<script>
+<script setup>
 import Header from "../components/header.vue";
 import {getCurrentInstance, onMounted, reactive, ref} from "vue";
 import { ElMessage } from 'element-plus'
-export default {
-  name: "message",
-  setup(){
-    const {proxy} = getCurrentInstance()
-    const danmakuRef = ref(null)
-    var data = reactive({
-      danmus: [],
-      text:''
-    })
+const {proxy} = getCurrentInstance()
+const danmakuRef = ref(null)
+const bkg = proxy.$utils.getAssetsImg("liuyan.jpg")
+var data = reactive({
+  danmus: [],
+  text:''
+})
 
-    function fire(){
-      if(data.text.trim() == ""){
-        ElMessage.error('发言为空')
-      }else {
-        proxy.$http({
-          method:"POST",
-          url:"/message/send",
-          data:{message:data.text}
-        }).then(res=>{
-          if(res.data.type == "success"){
-            data.danmus.push({
-              avatar: 'data:image/png;base64,'+res.data.headImg,
-              text: res.data.text,
-            });
-          }
-          return ElMessage({
-            message: res.data.msg,
-            type: res.data.type
-          })
-        })
-      }
-      data.text = ""
-    }
-
-    function addToList(list) {
-      list.forEach((v) => {
+function fire(){
+  if(data.text.trim() == ""){
+    ElMessage.error('发言为空')
+  }else {
+    proxy.$http({
+      method:"POST",
+      url:"/message/send",
+      data:{message:data.text}
+    }).then(res=>{
+      if(res.data.type == "success"){
         data.danmus.push({
-          avatar: v.headImg,      		//头像
-          text: v.message,             	//弹幕消息
+          avatar: 'data:image/png;base64,'+res.data.headImg,
+          text: res.data.text,
         });
-      });
-      danmakuRef.value.play()
-    }
-
-    onMounted(()=>{
-      proxy.$http({
-        method:"GET",
-        url:"/message"
-      }).then(res=>{
-        var list = res.data
-        list.forEach((item,index)=>{
-          item.headImg = 'data:image/png;base64,' + item.headImg
-        })
-        addToList(list)
+      }
+      return ElMessage({
+        message: res.data.msg,
+        type: res.data.type
       })
     })
-
-    return{
-      data,
-      fire,
-      danmakuRef
-    }
-  },
-  components:{
-    Header
   }
+  data.text = ""
 }
+
+function addToList(list) {
+  list.forEach((v) => {
+    data.danmus.push({
+      avatar: v.headImg,      		//头像
+      text: v.message,             	//弹幕消息
+    });
+  });
+  danmakuRef.value.play()
+}
+
+onMounted(()=>{
+  proxy.$http({
+    method:"GET",
+    url:"/message"
+  }).then(res=>{
+    var list = res.data
+    list.forEach((item,index)=>{
+      item.headImg = 'data:image/png;base64,' + item.headImg
+    })
+    addToList(list)
+  })
+})
 </script>
 
 <style scoped>
@@ -114,13 +102,17 @@ export default {
   position: relative;
   z-index: 100;
 }
-.bcg{
+.body{
   animation: zhuye 1s ease 0s 1 normal none running;
   height: 100vh;
   width: 100%;
-  background: url("../assets/image/liuyan.jpg") no-repeat;
   position: fixed;
-  background-size: cover;
+}
+.bkg{
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
   z-index: -100000;
 }
 .fireBox{

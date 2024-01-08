@@ -86,10 +86,11 @@
       <p style="color: black;font-size: 20px;margin-top:10px;background-color: rgba(255,255,255,0.67);border-radius: 20px;padding: 3px 10px">曾玩</p>
       <div class="authorContent leafImg">
         <div class="container">
-          <div v-for="(item,index) in game" :key="index" :class="{active:active===index,'item':true}" @click="change(index)" ref="item" :style="`background-image: url(${item.image})`">
+          <div v-for="(item,index) in game" :key="index" :class="{active:active===index,'item':true}" @click="change(index)" ref="item">
+            <img class="itemImg" v-lazy="item.image" alt="">
             <div class="shadow"></div>
             <div class="contents">
-              <div class="icon" :style="`background-image: url(${item.icon})`"></div>
+              <img class="icon" v-lazy="item.icon">
               <div class="text">{{item.text}}</div>
             </div>
           </div>
@@ -107,34 +108,21 @@
   </div>
 </template>
 
-<script>
+<script setup>
 import Header from "../components/header.vue";
 import {getCurrentInstance, ref,isRef,reactive} from "vue";
-export default {
-  name: "about",
-  components:{
-    Header
-  },
-  setup(){
-    const {proxy} = getCurrentInstance()
-    var game = [
-      {text:'摩尔勇士',image:proxy.$utils.getAssetsImg('about/moer.jpg'),icon:proxy.$utils.getAssetsImg('about/moer1.png')},
-      {text:'赛尔号',image:proxy.$utils.getAssetsImg('about/saier.png'),icon:proxy.$utils.getAssetsImg('about/saier1.png')},
-      {text:'300英雄',image:proxy.$utils.getAssetsImg('about/300.png'),icon:proxy.$utils.getAssetsImg('about/3001.png')},
-      {text:'永劫无间',image:proxy.$utils.getAssetsImg('about/yjwj.png'),icon:proxy.$utils.getAssetsImg('about/yjwj1.png')},
-      {text:'崩坏3',image:proxy.$utils.getAssetsImg('about/benghuai.png'),icon:proxy.$utils.getAssetsImg('about/benghuai1.png')},
-      {text:'原神',image:proxy.$utils.getAssetsImg('about/yuanshen.png'),icon:proxy.$utils.getAssetsImg('about/yuanshen1.png')},
-    ]
-    var active = ref(0)
-    function change(index){
-      active.value = index
-    }
-    return{
-      active,
-      game,
-      change
-    }
-  }
+const {proxy} = getCurrentInstance()
+var game = [
+  {text:'摩尔勇士',image:proxy.$utils.getAssetsImg('about/moer.jpg'),icon:proxy.$utils.getAssetsImg('about/moer1.png')},
+  {text:'赛尔号',image:proxy.$utils.getAssetsImg('about/saier.png'),icon:proxy.$utils.getAssetsImg('about/saier1.png')},
+  {text:'300英雄',image:proxy.$utils.getAssetsImg('about/300.png'),icon:proxy.$utils.getAssetsImg('about/3001.png')},
+  {text:'永劫无间',image:proxy.$utils.getAssetsImg('about/yjwj.png'),icon:proxy.$utils.getAssetsImg('about/yjwj1.png')},
+  {text:'崩坏3',image:proxy.$utils.getAssetsImg('about/benghuai.png'),icon:proxy.$utils.getAssetsImg('about/benghuai1.png')},
+  {text:'原神',image:proxy.$utils.getAssetsImg('about/yuanshen.png'),icon:proxy.$utils.getAssetsImg('about/yuanshen1.png')},
+]
+var active = ref(0)
+function change(index){
+  active.value = index
 }
 </script>
 
@@ -393,8 +381,8 @@ export default {
 }
 .itemMap:hover{
   background-size: 120%;
-  background-position-x: 80%;
-  background-position-y: 36%;
+  background-position-x: 40%;
+  background-position-y: 60%;
 }
 .mapTitle {
   position: absolute;
@@ -447,10 +435,14 @@ export default {
   cursor: pointer;
   border-radius: 30px;
   margin: 10px;
-  background-size: cover;
-  background-position: center;
   transition: 0.5s cubic-bezier(0.05,0.61,0.41,0.95);
   overflow: hidden;
+}
+.itemImg{
+  object-fit: cover;
+  position: absolute;
+  width: 100%;
+  height: 100%;
 }
 .item.active{
   flex: 1;
@@ -490,8 +482,7 @@ export default {
   display: flex;
   justify-content: center;
   align-items: center;
-  background-size: cover;
-  background-position: center;
+  object-fit: cover;
 }
 .contents .text{
   display: flex;

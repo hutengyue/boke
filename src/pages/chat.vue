@@ -3,7 +3,7 @@
     <Header></Header>
     <div class="chatBox">
       <div class="friend-aside">
-        <img class="user-img" :src="data.user.headImg">
+        <img class="user-img" v-lazy="data.user.headImg">
         <p>{{data.user.username}}</p>
         <div class="friend-menu">
           <div @click="inChat()" :class="['friend-item',data.contentIndex == 0?'active':'']">
@@ -70,7 +70,7 @@
           </div>
           <div class="friend-message-body" ref="messageBody">
             <div v-for="(item,index) in data.groupMessage" :key="index" :class="[item.userId == data.user.userId ? 'friend-message-left-box':'friend-message-right-box','line']">
-              <img @click="search(item.username)" :src="item.headImg" alt="">
+              <img @click="search(item.username)" v-lazy="item.headImg" alt="">
               <div class="message">
                 {{ item.message }}
               </div>
@@ -105,7 +105,7 @@
           <div class="friend-list">
             <div @click="change(index,item)" :class="['friend-list-item',index == data.itemIndex?'active':'']"
                  v-for="(item,index) in data.friendList" :key="index">
-              <img :src="item.headImg" alt="">
+              <img v-lazy="item.headImg" alt="">
               <div>
                 <p>{{ item.username }}</p>
                 <p>{{ item.introduction }}</p>
@@ -118,7 +118,7 @@
         <div class="addFriend-message" :style="[data.contentIndex == 1 && data.itemIndex == -1?'':'display:none']">
           <div class="addFriendItem" v-for="(item,index) in data.addFriendList" :key="index">
             <p class="addFriendTime">{{item.dateTime}}</p>
-            <img :src="item.headImg" alt="">
+            <img v-lazy="item.headImg" alt="">
             <div class="addFriendText">
               <p>你好我是<span>{{item.username}}</span>,想认识一下你</p>
               <p>{{ item.introduction }}</p>
@@ -142,7 +142,7 @@
 
         <div class="friend-message" :style="[data.contentIndex != 1 || data.itemIndex == -1?'display:none':'']">
           <div class="friend-message-header">
-            <img :src="data.target.headImg">
+            <img v-lazy="data.target.headImg">
             <div style="margin-left: 10px">
               <p>{{ data.target.username }}</p>
               <p>{{ data.target.introduction }}</p>
@@ -150,7 +150,7 @@
           </div>
           <div class="friend-message-body" ref="messageBody1">
             <div v-for="(item,index) in data.messageList" :key="index" :class="[item.fromId == data.user.userId ? 'friend-message-left-box':'friend-message-right-box','line']">
-              <img @click="search(item.username)" :src="item.headImg" alt="">
+              <img @click="search(item.username)" v-lazy="item.headImg" alt="">
               <div class="message">
                 {{ item.message }}
               </div>
@@ -178,7 +178,7 @@
       <el-dialog v-model="data.friendDialog" :align-center="true"
                  title="竟然是个人" width="300" center>
         <div class="friendBox">
-          <img :src="data.friend.headImg" alt="">
+          <img v-lazy="data.friend.headImg" alt="">
           <p>{{ data.friend.username}}</p>
           <p>{{ data.friend.sex == 1?'男':'女' }}</p>
           <p>{{ data.friend.introduction }}</p>
@@ -196,7 +196,7 @@
     </div>
   </div>
 </template>
-<script>
+<script setup>
 import Header from "../components/header.vue";
 import * as THREE from 'three'
 import CLOUDS from 'vanta/src/vanta.clouds'
@@ -205,370 +205,347 @@ import {ElMessage} from "element-plus";
 import useStore from "../store/index.js";
 import {useRouter} from "vue-router";
 import global from "../util/global";
-export default {
-  name: "chat",
-  setup(){
-    const {proxy} = getCurrentInstance()
-    const all = ref(null)
-    const messageBody = ref(null)
-    const messageBody1 = ref(null)
-    let vantaEffect = null
-    const store = useStore()
-    const router = useRouter()
-    const data = reactive({
-      //主菜单位置
-      contentIndex:0,
-      //次选项
-      itemIndex:-1,
-      // 聊天列表
-      chatList:[],
-      // 好友列表
-      friendList:[],
-      // 好友申请列表
-      addFriendList:[],
-      // 群消息列表
-      groupMessage:[],
-      // 对象消息列表
-      messageList:[],
-      // 要发送得消息
-      message:'',
-      //自己
-      user:{
-        userId:'',
-        username:'',
-        headImg:''
-      },
-      //人数
-      number:'',
-      //websocket
-      ws:null,
-      //搜索
-      searchText:'',
-      //正在聊天的对象
-      target:{},
-      //好友详细对话框
-      friendDialog:false,
-      //是否为好友,
-      isFriend:false,
-      //搜索到的朋友
-      friend:{},
-      yes:'yes',
-      no:'no',
-      //当前消息为好友还是群聊
-      isGroup:true
+const {proxy} = getCurrentInstance()
+const all = ref(null)
+const messageBody = ref(null)
+const messageBody1 = ref(null)
+let vantaEffect = null
+const store = useStore()
+const router = useRouter()
+const data = reactive({
+  //主菜单位置
+  contentIndex:0,
+  //次选项
+  itemIndex:-1,
+  // 聊天列表
+  chatList:[],
+  // 好友列表
+  friendList:[],
+  // 好友申请列表
+  addFriendList:[],
+  // 群消息列表
+  groupMessage:[],
+  // 对象消息列表
+  messageList:[],
+  // 要发送得消息
+  message:'',
+  //自己
+  user:{
+    userId:'',
+    username:'',
+    headImg:''
+  },
+  //人数
+  number:'',
+  //websocket
+  ws:null,
+  //搜索
+  searchText:'',
+  //正在聊天的对象
+  target:{},
+  //好友详细对话框
+  friendDialog:false,
+  //是否为好友,
+  isFriend:false,
+  //搜索到的朋友
+  friend:{},
+  yes:'yes',
+  no:'no',
+  //当前消息为好友还是群聊
+  isGroup:true
+})
+
+//切换对象
+function change(index,friend){
+  data.message = ""
+  data.itemIndex = index
+  data.target = friend
+  proxy.$http({
+    url:'/friend/message',
+    method:'post',
+    data:{
+      fromId:data.user.userId,
+      toId:friend.userId
+    }
+  }).then(res => {
+    data.messageList = res.data.messageList
+    data.messageList.forEach((item,index)=>{
+      if(item.fromId == data.user.userId){
+        item.headImg = data.user.headImg
+        item.username = data.user.username
+      }else{
+        item.headImg = data.target.headImg
+        item.username = data.target.username
+      }
+      item.dateTime = proxy.$utils.convertTimeToHumanReadable(item.dateTime)
     })
-    //切换对象
-    function change(index,friend){
-      data.message = ""
-      data.itemIndex = index
-      data.target = friend
-      proxy.$http({
-        url:'/friend/message',
-        method:'post',
-        data:{
-          fromId:data.user.userId,
-          toId:friend.userId
-        }
-      }).then(res => {
-        data.messageList = res.data.messageList
-        data.messageList.forEach((item,index)=>{
-          if(item.fromId == data.user.userId){
-            item.headImg = data.user.headImg
-            item.username = data.user.username
-          }else{
-            item.headImg = data.target.headImg
-            item.username = data.target.username
-          }
-          item.dateTime = proxy.$utils.convertTimeToHumanReadable(item.dateTime)
-        })
-        data.isGroup = false
-        nextTick(()=>{
-          messageBody1.value.scrollTo({
-            top: messageBody1.value.scrollHeight,
-            behavior: 'auto'
-          });
-        })
-      })
-    }
-    //添加好友
-    function addFriend(){
-      data.friendDialog = false
-      proxy.$http({
-        url:'/friend/add',
-        method:'post',
-        data:{
-          fromId:data.user.userId,
-          toId:data.friend.userId
-        }
-      }).then(res => {
-        data.ws.send(JSON.stringify({
-          type:"add",
-          username:data.friend.username
-        }))
-        return ElMessage({
-          message: res.data.msg,
-          type: res.data.type
-        });
-      })
-    }
-    //好友列表及申请列表
-    function showAddFriendList(){
-      proxy.$http({
-        url:'/friend/addList',
-        method:'get',
-      }).then(res => {
-        res.data.addList.forEach((item,index)=>{
-          item.headImg = 'data:image/png;base64,' + item.headImg
-          item.dateTime = proxy.$utils.convertTimeToHumanReadable(item.dateTime)
-        })
-        data.addFriendList = res.data.addList
-      })
+    data.isGroup = false
+    nextTick(()=>{
+      messageBody1.value.scrollTo({
+        top: messageBody1.value.scrollHeight,
+        behavior: 'auto'
+      });
+    })
+  })
+}
 
-      proxy.$http({
-        url:'/friend',
-        method:'get',
-      }).then(res => {
-        res.data.friends.forEach((item,index)=>{
-          item.headImg = 'data:image/png;base64,' + item.headImg
-        })
-        data.friendList = res.data.friends
-      })
+//添加好友
+function addFriend(){
+  data.friendDialog = false
+  proxy.$http({
+    url:'/friend/add',
+    method:'post',
+    data:{
+      fromId:data.user.userId,
+      toId:data.friend.userId
     }
-    //处理申请
-    function handleAddFriend(applyId,status,fromId,username){
-      proxy.$http({
-        url:'/friend/handle',
-        method:'post',
-        data:{applyId:applyId,status:status,fromId:fromId}
-      }).then(res => {
-        data.addFriendList.forEach((item,index)=>{
-          if(item.applyId == applyId) {
-            item.status = status
-          }
-        })
-        data.ws.send(JSON.stringify({
-          type:"handle",
-          username:username
-        }))
-        showAddFriendList()
-        return ElMessage({
-          message: res.data.msg,
-          type: res.data.type
-        });
-      })
-    }
-    //搜索
-    function search(username){
-      if(data.searchText == '' && username == ''){
-        ElMessage.warning('不能为空')
-        return
+  }).then(res => {
+    data.ws.send(JSON.stringify({
+      type:"add",
+      username:data.friend.username
+    }))
+    return ElMessage({
+      message: res.data.msg,
+      type: res.data.type
+    });
+  })
+}
+
+//好友列表及申请列表
+function showAddFriendList(){
+  proxy.$http({
+    url:'/friend/addList',
+    method:'get',
+  }).then(res => {
+    res.data.addList.forEach((item,index)=>{
+      item.headImg = 'data:image/png;base64,' + item.headImg
+      item.dateTime = proxy.$utils.convertTimeToHumanReadable(item.dateTime)
+    })
+    data.addFriendList = res.data.addList
+  })
+
+  proxy.$http({
+    url:'/friend',
+    method:'get',
+  }).then(res => {
+    res.data.friends.forEach((item,index)=>{
+      item.headImg = 'data:image/png;base64,' + item.headImg
+    })
+    data.friendList = res.data.friends
+  })
+}
+//处理申请
+function handleAddFriend(applyId,status,fromId,username){
+  proxy.$http({
+    url:'/friend/handle',
+    method:'post',
+    data:{applyId:applyId,status:status,fromId:fromId}
+  }).then(res => {
+    data.addFriendList.forEach((item,index)=>{
+      if(item.applyId == applyId) {
+        item.status = status
       }
-      username = data.searchText || username
-      proxy.$http({
-        url:'/user/search',
-        method:'post',
-        data:{username:username}
-      }).then(res => {
-        if(res.data.type == "success"){
-          res.data.user.headImg = 'data:image/png;base64,'+res.data.user.headImg
-          data.friend = res.data.user
-          data.isFriend = data.friendList.some((item,index)=>{
-            return (item.username == username)
-          })
-          data.isFriend = data.isFriend || data.friend.userId == data.user.userId
-          data.friendDialog = true
-        }else{
-          return ElMessage({
-            message: res.data.msg,
-            type: res.data.type
-          });
-        }
+    })
+    data.ws.send(JSON.stringify({
+      type:"handle",
+      username:username
+    }))
+    showAddFriendList()
+    return ElMessage({
+      message: res.data.msg,
+      type: res.data.type
+    });
+  })
+}
+
+//搜索
+function search(username){
+  if(data.searchText == '' && username == ''){
+    ElMessage.warning('不能为空')
+    return
+  }
+  username = data.searchText || username
+  proxy.$http({
+    url:'/user/search',
+    method:'post',
+    data:{username:username}
+  }).then(res => {
+    if(res.data.type == "success"){
+      res.data.user.headImg = 'data:image/png;base64,'+res.data.user.headImg
+      data.friend = res.data.user
+      data.isFriend = data.friendList.some((item,index)=>{
+        return (item.username == username)
       })
-      data.searchText = ''
-    }
-    function inChat(){
-      data.message = ''
-      data.contentIndex = 0
-      data.itemIndex = -1
-      data.isGroup = true
-    }
-    function inFriend(){
-      data.itemIndex = -1
-      data.contentIndex = 1
-    }
-    //发送
-    function send(){
-      if(data.message == ""){
-        ElMessage.warning('发言为空')
-      }else {
-        proxy.$http({
-          url:'/user',
-          method:'get',
-        }).then(res => {
-          if(data.isGroup == true){
-            data.ws.send(JSON.stringify({
-              type:"qunliao",
-              userId:data.user.userId,
-              username:data.user.username,
-              dateTime:new Date().toLocaleString(),
-              headImg:data.user.headImg,
-              message:data.message
-            }))
-          }else{
-            data.ws.send(JSON.stringify({
-              type:"haoyou",
-              fromId:data.user.userId,
-              toName:data.target.username,
-              fromName:data.user.username,
-              toId:data.target.userId,
-              dateTime:new Date().toLocaleString(),
-              message:data.message
-            }))
-          }
-        })
-
-      }
-
-    }
-    function scrollToBottom(){
-      nextTick(() => {
-        messageBody.value.scrollTo({
-          top: messageBody.value.scrollHeight,
-          behavior: 'smooth'
-        });
-        messageBody1.value.scrollTo({
-          top: messageBody1.value.scrollHeight,
-          behavior: 'smooth'
-        });
+      data.isFriend = data.isFriend || data.friend.userId == data.user.userId
+      data.friendDialog = true
+    }else{
+      return ElMessage({
+        message: res.data.msg,
+        type: res.data.type
       });
     }
-    function init(){
-      if(window.WebSocket){
-        data.ws = new WebSocket(`ws://${global.websocketUrl}`)
-        data.ws.onopen = function (){
-          console.log("成功建立连接")
-          data.ws.send(JSON.stringify({
-            type:"dengji",
-            username:data.user.username
-          }))
-        }
-        data.ws.onmessage = (message)=>{
-          let dt = JSON.parse(message.data)
-          switch (dt.type){
-            case "ceshi":
-              break;
-            case "lianjie":
-              var list = dt.result
-              list = dt.result
-              data.number = dt.number
-              list.forEach((item)=>{
-                item.dateTime = proxy.$utils.convertTimeToHumanReadable(item.dateTime)
-                item.headImg = 'data:image/png;base64,' + item.headImg
-              })
-              data.groupMessage = list
-              nextTick(() => {
-                messageBody.value.scrollTo({
-                  top: messageBody.value.scrollHeight,
-                  behavior: 'auto'
-                });
-              });
-              break;
-            case "qunliao":
-              dt.dateTime = proxy.$utils.convertTimeToHumanReadable(dt.dateTime)
-              data.groupMessage.push(dt)
-              data.message = ''
-              scrollToBottom()
-              break;
-            case "haoyou":
-              if(dt.fromId == data.user.userId){
-                dt.headImg = data.user.headImg
-                dt.username = data.user.username
-              }else{
-                dt.headImg = data.target.headImg
-                dt.username = data.target.username
-              }
-              dt.dateTime = proxy.$utils.convertTimeToHumanReadable(dt.dateTime)
-              data.messageList.push(dt)
-              data.message = ''
-              scrollToBottom()
-              break;
-            case "add":
-              showAddFriendList()
-              break;
-            case "handle":
-              showAddFriendList()
-              break;
-            case "tuichu":
-              data.number = dt.number
-              break;
-            default:
-              break;
-          }
-        }
-        data.ws.onclose = function (){
-          console.log('onclose')
-        }
-        data.ws.onerror = function (e){
-          console.log('error');
-        }
-      }
-    }
-
-    onMounted(()=>{
-      vantaEffect = CLOUDS({
-        el:all.value,
-        mouseControls: true,
-        touchControls: true,
-        gyroControls: false,
-        minHeight: 200.00,
-        minWidth: 200.00,
-        speed:1.5,
-        THREE:THREE
-      })
-      showAddFriendList()
-      proxy.$http({
-        url:'/user',
-        method:'get',
-      }).then(res => {
-        data.user.userId = res.data.user[0].userId.toString()
-        data.user.username = res.data.user[0].username
-        data.user.headImg = 'data:image/png;base64,' + res.data.headImg
-        init()
-      })
-    })
-
-    onBeforeUnmount(()=>{
-      if (vantaEffect) {
-        vantaEffect.destroy()
-      }
-      data.ws.close()
-    })
-
-    return{
-      all,
-      data,
-      messageBody,
-      messageBody1,
-      //发送
-      send,
-      //选择对象
-      change,
-      //搜索
-      search,
-      //添加好友
-      addFriend,
-      //好友申请及好友列表
-      showAddFriendList,
-      //处理申请
-      handleAddFriend,
-      inChat,
-      inFriend
-    }
-  },
-  components:{
-    Header
-  },
+  })
+  data.searchText = ''
 }
+
+function inChat(){
+  data.message = ''
+  data.contentIndex = 0
+  data.itemIndex = -1
+  data.isGroup = true
+}
+
+function inFriend(){
+  data.itemIndex = -1
+  data.contentIndex = 1
+}
+//发送
+function send(){
+  if(data.message == ""){
+    ElMessage.warning('发言为空')
+  }else {
+    proxy.$http({
+      url:'/user',
+      method:'get',
+    }).then(res => {
+      if(data.isGroup == true){
+        data.ws.send(JSON.stringify({
+          type:"qunliao",
+          userId:data.user.userId,
+          username:data.user.username,
+          dateTime:new Date().toLocaleString(),
+          headImg:data.user.headImg,
+          message:data.message
+        }))
+      }else{
+        data.ws.send(JSON.stringify({
+          type:"haoyou",
+          fromId:data.user.userId,
+          toName:data.target.username,
+          fromName:data.user.username,
+          toId:data.target.userId,
+          dateTime:new Date().toLocaleString(),
+          message:data.message
+        }))
+      }
+    })
+  }
+}
+
+function scrollToBottom(){
+  nextTick(() => {
+    messageBody.value.scrollTo({
+      top: messageBody.value.scrollHeight,
+      behavior: 'smooth'
+    });
+    messageBody1.value.scrollTo({
+      top: messageBody1.value.scrollHeight,
+      behavior: 'smooth'
+    });
+  });
+}
+
+function init(){
+  if(window.WebSocket){
+    data.ws = new WebSocket(`ws://${global.websocketUrl}`)
+    data.ws.onopen = function (){
+      console.log("成功建立连接")
+      data.ws.send(JSON.stringify({
+        type:"dengji",
+        username:data.user.username
+      }))
+    }
+    data.ws.onmessage = (message)=>{
+      let dt = JSON.parse(message.data)
+      switch (dt.type){
+        case "ceshi":
+          break;
+        case "lianjie":
+          data.number = dt.number
+          dt.result.forEach((item)=>{
+            item.dateTime = proxy.$utils.convertTimeToHumanReadable(item.dateTime)
+            item.headImg = 'data:image/png;base64,' + item.headImg
+          })
+          data.groupMessage = dt.result
+          nextTick(() => {
+            messageBody.value.scrollTo({
+              top: messageBody.value.scrollHeight,
+              behavior: 'auto'
+            });
+          });
+          break;
+        case "qunliao":
+          dt.dateTime = proxy.$utils.convertTimeToHumanReadable(dt.dateTime)
+          data.groupMessage.push(dt)
+          data.message = ''
+          scrollToBottom()
+          break;
+        case "haoyou":
+          if(dt.fromId == data.user.userId){
+            dt.headImg = data.user.headImg
+            dt.username = data.user.username
+          }else{
+            dt.headImg = data.target.headImg
+            dt.username = data.target.username
+          }
+          dt.dateTime = proxy.$utils.convertTimeToHumanReadable(dt.dateTime)
+          data.messageList.push(dt)
+          data.message = ''
+          scrollToBottom()
+          break;
+        case "add":
+          showAddFriendList()
+          break;
+        case "handle":
+          showAddFriendList()
+          break;
+        case "tuichu":
+          data.number = dt.number
+          break;
+        default:
+          break;
+      }
+    }
+    data.ws.onclose = function (){
+      console.log('onclose')
+    }
+    data.ws.onerror = function (e){
+      console.log('error');
+    }
+  }
+}
+
+onMounted(()=>{
+  vantaEffect = CLOUDS({
+    el:all.value,
+    mouseControls: true,
+    touchControls: true,
+    gyroControls: false,
+    minHeight: 200.00,
+    minWidth: 200.00,
+    speed:1.5,
+    THREE:THREE
+  })
+  proxy.$http({
+    url:'/user',
+    method:'get',
+  }).then(res => {
+    data.user.userId = res.data.user[0].userId.toString()
+    data.user.username = res.data.user[0].username
+    data.user.headImg = 'data:image/png;base64,' + res.data.headImg
+    showAddFriendList()
+    init()
+  })
+})
+
+onBeforeUnmount(()=>{
+  if (vantaEffect) {
+    vantaEffect.destroy()
+  }
+  if(data.ws){
+    data.ws.close()
+  }
+})
 </script>
 
 <style scoped>

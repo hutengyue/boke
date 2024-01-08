@@ -2,6 +2,7 @@ import axios from 'axios'
 import global from './global'
 import useStore from "../store";
 import router from "../router/index.js";
+import {ElMessage} from "element-plus";
 
 axios.defaults.baseURL = `http://${global.httpUrl}`
 axios.defaults.headers.common['Authorization'] = ''
@@ -34,25 +35,26 @@ axios.interceptors.response.use(
                 // 未登录则跳转登录页面，并携带当前页面的路径
                 // 在登录成功后返回当前页面，这一步需要在登录页操作。
                 case 401:
-                    if(router.currentRoute.value.fullPath == '/user'){
-                        router.go(0)
-                    }else{
-                        router.replace({ //跳转到登录页面
-                            path: '/user',
-                            // 将跳转的路由path作为参数，登录成功后跳转到该路由
-                            query: { redirect: router.currentRoute.value.fullPath }
-                        });
-                    }
                     if(store.getToken != ''){
                         store.delToken()
                         store.delHeadImg()
-                        alert('请重新登陆')
+                        ElMessage.warning('请重新登录')
                     }else{
-                        alert('请登录')
+                        ElMessage.warning('请登录')
                     }
+                    if(router.currentRoute.value.fullPath == '/user'){
+                        return router.go(0)
+                    }else {
+                        return router.replace({ //跳转到登录页面
+                            path: '/user',
+                            // 将跳转的路由path作为参数，登录成功后跳转到该路由
+                            query: {redirect: router.currentRoute.value.fullPath}
+                        });
+                    }
+                default:
             }
-            return Promise.reject(error.response);
         }
+        return Promise.reject(error.response);
     }
 );
 export default axios

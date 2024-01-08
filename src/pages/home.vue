@@ -16,70 +16,55 @@
   </div>
 </template>
 
-<script>
+<script setup>
 import homeBody from "../components/homeBody.vue";
 import Header from "../components/Header.vue";
 import {reactive,ref,watch,onMounted} from "vue";
 import version from "danmaku-vue";
-export default {
-  name: "home",
-  components:{
-    homeBody,
-    Header
-  },
-  setup(){
-    const String = '影孤怜夜永，永夜怜孤影'
-    const zhu = ref(null)
-    const data = reactive({
-      inP:0,
-      outString:'',
-    })
-    var start,reverse;
+const String = '影孤怜夜永，永夜怜孤影'
+const zhu = ref(null)
+const data = reactive({
+  inP:0,
+  outString:'',
+})
+var start,reverse;
 
-    function inTimer(){
-      data.outString += String.charAt(data.inP)
-      data.inP += 1
-    }
-
-    function outTimer(){
-      data.outString = data.outString.slice(0, data.outString.length - 1)
-      data.inP -= 1
-    }
-
-    function gotoBody(){
-      scrollTo({
-        top:zhu.value.offsetHeight,
-        behavior:'smooth'
-      })
-    }
-
-    watch(()=>data.inP,(newVal)=>{
-      if(newVal == String.length){
-        clearInterval(start)
-        setTimeout(()=>{
-          reverse = setInterval(outTimer,100)
-        },1000)
-      }else if(data.inP == 0 || newVal == 0){
-        clearInterval(reverse)
-        setTimeout(()=>{
-          start = setInterval(inTimer,200)
-        },500)
-      }
-    })
-
-    onMounted(()=>{
-      start = setInterval(inTimer,200)
-      let version = '1.0.0'
-      console.log(`%c cavalry-boke %c V${version} `, "padding: 2px 1px; border-radius: 3px 0 0 3px; color: #fff; background: #606060; font-weight: bold;", "padding: 2px 1px; border-radius: 0 3px 3px 0; color: #fff; background: #42c02e; font-weight: bold;");
-    })
-
-    return{
-      gotoBody,
-      data,
-      zhu
-    }
-  }
+function inTimer(){
+  data.outString += String.charAt(data.inP)
+  data.inP += 1
 }
+
+function outTimer(){
+  data.outString = data.outString.slice(0, data.outString.length - 1)
+  data.inP -= 1
+}
+
+function gotoBody(){
+  scrollTo({
+    top:zhu.value.offsetHeight,
+    behavior:'smooth'
+  })
+}
+
+watch(()=>data.inP,(newVal)=>{
+  if(newVal == String.length){
+    clearInterval(start)
+    setTimeout(()=>{
+      reverse = setInterval(outTimer,100)
+    },1000)
+  }else if(data.inP == 0 || newVal == 0){
+    clearInterval(reverse)
+    setTimeout(()=>{
+      start = setInterval(inTimer,200)
+    },500)
+  }
+})
+
+onMounted(()=>{
+  start = setInterval(inTimer,200)
+  let version = '1.0.0'
+  console.log(`%c cavalry-boke %c V${version} `, "padding: 2px 1px; border-radius: 3px 0 0 3px; color: #fff; background: #606060; font-weight: bold;", "padding: 2px 1px; border-radius: 0 3px 3px 0; color: #fff; background: #42c02e; font-weight: bold;");
+})
 </script>
 
 <style scoped>

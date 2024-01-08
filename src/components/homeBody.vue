@@ -22,8 +22,8 @@
           </div>
           <button class="user-pyq">朋友圈</button>
           <div class="user-link">
-            <a href="https://www.baidu.com/"></a>
-            <a href="https://www.baidu.com/"></a>
+            <a href="http://wpa.qq.com/msgrd?v=3&amp;uin=1125469202&amp;site=qq&amp;menu=yes"></a>
+            <a href="https://space.bilibili.com/33230767?spm_id_from=333.1007.0.0"></a>
           </div>
         </div>
         <div class="aside-notice">
@@ -43,10 +43,10 @@
         <div class="article">
           <div @click="gotoArticle(item.articleId)" v-for="(item,index) in data.article" :key="index" v-slide-in class="article-container">
             <div class="article-bkg">
-              <img :src="item.articleImg">
+              <img v-lazy="item.articleImg">
             </div>
             <div :class="[index%2==0?'article-img-right':'article-img-left']">
-              <img :src="item.articleImg">
+              <img v-lazy="item.articleImg">
             </div>
             <div class="article-message-left">
               <div class="article-message-header">
@@ -81,62 +81,57 @@
   </div>
 </template>
 
-<script>
+<script setup>
 import {getCurrentInstance, onMounted, reactive, ref} from "vue";
 import {useRouter} from "vue-router";
-export default {
-  name: "homeBody",
-  setup(){
-    const router = useRouter()
-    const {proxy} = getCurrentInstance()
-    var data = reactive({
-      article:[],
-      all:[],
-      category:['全部'],
-      cateIndex:0
-    })
-    function gotoArticle(id){
-      router.push({path:'/article',query:{articleId:id}})
-    }
-    function init(){
-      proxy.$http({
-        url:'/article',
-        method:"GET"
-      }).then(res=>{
-        var list = res.data.article
-        for(let i = 0;i < list.length;i++){
-          list[i].articleImg = 'data:image/png;base64,' + list[i].articleImg
-        }
-        data.article = list
-        data.all = list
-      })
-      proxy.$http({
-        url:'/category',
-        method:"GET"
-      }).then(res=>{
-        res.data.forEach((item)=>{
-          data.category.push(item.categoryName)
-        })
-      })
-    }
-    function changeCate(index){
-      data.cateIndex = index
-      if(index == 0){
-        data.article = data.all
-        return
-      }
-      data.article = data.all.filter(item => item.categoryName == data.category[index])
-    }
-    onMounted(()=>{
-      init()
-    })
-    return{
-      data,
-      gotoArticle,
-      changeCate
-    }
-  }
+
+const router = useRouter()
+const {proxy} = getCurrentInstance()
+var data = reactive({
+  article:[],
+  all:[],
+  category:['全部'],
+  cateIndex:0
+})
+
+function gotoArticle(id){
+  router.push({path:'/article',query:{articleId:id}})
 }
+
+function init(){
+  proxy.$http({
+    url:'/article',
+    method:"GET"
+  }).then(res=>{
+    var list = res.data.article
+    for(let i = 0;i < list.length;i++){
+      list[i].articleImg = 'data:image/png;base64,' + list[i].articleImg
+    }
+    data.article = list
+    data.all = list
+  })
+  proxy.$http({
+    url:'/category',
+    method:"GET"
+  }).then(res=>{
+    res.data.forEach((item)=>{
+      data.category.push(item.categoryName)
+    })
+  })
+}
+
+function changeCate(index){
+  data.cateIndex = index
+  if(index == 0){
+    data.article = data.all
+    return
+  }
+  data.article = data.all.filter(item => item.categoryName == data.category[index])
+}
+
+onMounted(()=>{
+  init()
+})
 </script>
 
 <style scoped>

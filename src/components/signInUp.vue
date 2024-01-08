@@ -42,152 +42,140 @@
   </div>
 </template>
 
-<script>
+<script setup>
 import {getCurrentInstance, onBeforeUnmount, onMounted, reactive, watch} from "vue";
 import { ElMessage } from 'element-plus'
 import useStore from "../store/index.js";
 import {useRouter} from "vue-router";
-export default {
-  name: "signInUp",
-  setup(){
-    const {proxy} = getCurrentInstance()
-    const store = useStore()
-    const router = useRouter()
-    var data = reactive({
-      logEmail:'',
-      logPsd:'',
-      logCode:'',
-      captcha:'',
-      //注册
-      email:'',
-      regName:'',
-      regPsd:'',
-      regCode:'',
-      code:true,
-      count:60,
-      active:false,
-      countTimer:null
-    })
+const {proxy} = getCurrentInstance()
+const store = useStore()
+const router = useRouter()
+var data = reactive({
+  logEmail:'',
+  logPsd:'',
+  logCode:'',
+  captcha:'',
+  //注册
+  email:'',
+  regName:'',
+  regPsd:'',
+  regCode:'',
+  code:true,
+  count:60,
+  active:false,
+  countTimer:null
+})
 
-    function init(){
-      proxy.$http({
-        url:'/login/captcha',
-        method:"get"
-      }).then(res=>{
-        data.captcha = res.data.captcha
+function init(){
+  proxy.$http({
+    url:'/login/captcha',
+    method:"get"
+  }).then(res=>{
+    data.captcha = res.data.captcha
+  })
+}
+
+function start(){
+  data.countTimer = setInterval(() => {
+    data.count -= 1
+  }, 1000)
+}
+
+function reqEmail(){
+  var re = /^[a-zA-Z0-9]+([-_.][A-Za-zd]+)*@([a-zA-Z0-9]+[-.])+[A-Za-zd]{2,5}$/;
+  if(re.test(data.email)){
+    proxy.$http({
+      url:'/register/email',
+      method:'post',
+      data: {email:data.email}
+    }).then(res => {
+      if(res.data.type != "error"){
+        data.code = false;
+        start()
+      }
+      return ElMessage({
+        type: res.data.type,
+        message: res.data.msg
       })
-    }
-
-    function start(){
-      data.countTimer = setInterval(() => {
-        data.count -= 1
-      }, 1000)
-    }
-
-    function reqEmail(){
-      var re = /^[a-zA-Z0-9]+([-_.][A-Za-zd]+)*@([a-zA-Z0-9]+[-.])+[A-Za-zd]{2,5}$/;
-      if(re.test(data.email)){
-        proxy.$http({
-          url:'/register/email',
-          method:'post',
-          data: {email:data.email}
-        }).then(res => {
-          if(res.data.type != "error"){
-            data.code = false;
-            start()
-          }
-          return ElMessage({
-            type: res.data.type,
-            message: res.data.msg
-          })
-        })
-      }else {
-        ElMessage.warning('邮箱格式错误')
-      }
-    }
-
-    function register(){
-      var re = /^[a-z0-9]+$/i
-      if(!re.test(data.regPsd)){
-        ElMessage.warning("密码只能是数字和字母")
-      }
-      if(data.regName == '' || data.regPsd == ''){
-        ElMessage.warning("用户名或密码为空")
-      }else{
-        proxy.$http({
-          url:'/register',
-          method:'post',
-          data: {
-            username:data.regName,
-            password:data.regPsd,
-            email:data.email,
-            createTime:new Date().toLocaleString(),
-            regCode:data.regCode
-          }
-        }).then(res => {
-          if(res.data.type != "error"){
-            data.email = '';data.regName='';data.regPsd='';data.regCode='';
-            data.active = false
-          }
-          return ElMessage({
-            message: res.data.msg,
-            type: res.data.type
-          });
-        })
-      }
-    }
-
-    function login(){
-      if(data.logEmail == '' && data.logPsd == ''){
-        ElMessage.warning("邮箱与密码不能为空")
-      }else {
-        proxy.$http({
-          url:'/login',
-          method:'post',
-          data: {
-            email:data.logEmail,
-            password:data.logPsd,
-            logCode:data.logCode
-          }
-        }).then(res => {
-          if(Object.hasOwn(res.data, "token")){
-            store.setToken(res.data.token)
-            store.setUserInfo(res.data.username)
-            store.setHeadImg('data:image/png;base64,'+res.data.headImg)
-            router.push('/')
-          }else {
-            return ElMessage({
-              message: res.data.msg,
-              type: res.data.type
-            });
-          }
-        })
-      }
-    }
-
-    watch(()=>data.count,(newVal)=>{
-      if(newVal == 0){
-        data.code = true
-        data.count = 60
-        clearInterval(data.countTimer)
-      }
     })
-
-    onMounted(()=>{
-      init()
-    })
-    onBeforeUnmount(()=>{
-      clearInterval(data.countTimer)
-    })
-    return{
-      data,
-      reqEmail,
-      register,
-      login,
-      init
-    }
+  }else {
+    ElMessage.warning('邮箱格式错误')
   }
 }
+
+function register(){
+  var re = /^[a-z0-9]+$/i
+  if(!re.test(data.regPsd)){
+    ElMessage.warning("密码只能是数字和字母")
+  }
+  if(data.regName == '' || data.regPsd == ''){
+    ElMessage.warning("用户名或密码为空")
+  }else{
+    proxy.$http({
+      url:'/register',
+      method:'post',
+      data: {
+        username:data.regName,
+        password:data.regPsd,
+        email:data.email,
+        createTime:new Date().toLocaleString(),
+        regCode:data.regCode
+      }
+    }).then(res => {
+      if(res.data.type != "error"){
+        data.email = '';data.regName='';data.regPsd='';data.regCode='';
+        data.active = false
+      }
+      return ElMessage({
+        message: res.data.msg,
+        type: res.data.type
+      });
+    })
+  }
+}
+
+function login(){
+  if(data.logEmail == '' && data.logPsd == ''){
+    ElMessage.warning("邮箱与密码不能为空")
+  }else {
+    proxy.$http({
+      url:'/login',
+      method:'post',
+      data: {
+        email:data.logEmail,
+        password:data.logPsd,
+        logCode:data.logCode
+      }
+    }).then(res => {
+      if(Object.hasOwn(res.data, "token")){
+        store.setToken(res.data.token)
+        store.setUserInfo(res.data.username)
+        store.setHeadImg('data:image/png;base64,'+res.data.headImg)
+        router.push('/')
+      }else {
+        return ElMessage({
+          message: res.data.msg,
+          type: res.data.type
+        });
+      }
+    })
+  }
+}
+
+watch(()=>data.count,(newVal)=>{
+  if(newVal == 0){
+    data.code = true
+    data.count = 60
+    clearInterval(data.countTimer)
+  }
+})
+
+onMounted(()=>{
+  init()
+})
+onBeforeUnmount(()=>{
+  clearInterval(data.countTimer)
+})
 </script>
 
 <style scoped>

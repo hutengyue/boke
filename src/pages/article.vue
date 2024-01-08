@@ -42,7 +42,7 @@
   </div>
 </template>
 
-<script>
+<script setup>
 import 'highlight.js/styles/atom-one-dark.css'
 import Header from "../components/header.vue";
 import {getCurrentInstance,reactive,onMounted } from "vue";
@@ -50,137 +50,125 @@ import useStore from "../store/index.js";
 import {useRoute} from "vue-router";
 import MarkdownIt from 'markdown-it'
 import hljs from 'highlight.js'
-export default {
-  name: "Article",
-  setup(){
-    const {proxy} = getCurrentInstance()
-    const store = useStore()
-    const route = useRoute()
-    const data = reactive({
-      article:{
-        articleId:'',
-        articleMessage:'',
-        articleTitle:'',
-        articleImg:'',
-        dateTime:'',
-        heat:'',
-        articleLabel:''
-      },
-      message:'',
-      comments:[]
-    })
+const {proxy} = getCurrentInstance()
+const store = useStore()
+const route = useRoute()
+const data = reactive({
+  article:{
+    articleId:'',
+    articleMessage:'',
+    articleTitle:'',
+    articleImg:'',
+    dateTime:'',
+    heat:'',
+    articleLabel:''
+  },
+  message:'',
+  comments:[]
+})
 
-    function init(){
-      proxy.$http({
-        url:'/article/require',
-        method:"POST",
-        data:{articleId:route.query.articleId}
-      }).then(res=>{
-        var md = new MarkdownIt({
-          html: true,
-          linkify: true,
-          typographer: true,
-          highlight: function (str, lang,options) {
-            // 此处判断是否有添加代码语言
-            if (lang && hljs.getLanguage(lang)) {
-              try {
-                // 得到经过highlight.js之后的html代码
-                const preCode = hljs.highlight(lang, str, true).value
-                // 以换行进行分割
-                const lines = preCode.split(/\n/).slice(0, -1)
-                // 添加自定义行号
-                let html = lines.map((item, index) => {
-                  return '<li><span class="line-num" data-line="' + (index + 1) + '">' + (index + 1) + '</span>'+'<div class="item">' + item + '</div>'+'</li>'
-                }).join('')
-                html = '<ol>' + html + '</ol>'
-                // 添加代码语言
-                if (lines.length) {
-                  html += '<b class="name">' + lang + '</b>'
-                }
-                return '<pre class="hljs"><code>' +
-                    html +
-                    '</code></pre>'
-              } catch (__) {
-              }
-            }
-            // 未添加代码语言，此处与上面同理
-            const preCode = md.utils.escapeHtml(str)
+function init(){
+  proxy.$http({
+    url:'/article/require',
+    method:"POST",
+    data:{articleId:route.query.articleId}
+  }).then(res=>{
+    var md = new MarkdownIt({
+      html: true,
+      linkify: true,
+      typographer: true,
+      highlight: function (str, lang,options) {
+        // 此处判断是否有添加代码语言
+        if (lang && hljs.getLanguage(lang)) {
+          try {
+            // 得到经过highlight.js之后的html代码
+            const preCode = hljs.highlight(lang, str, true).value
+            // 以换行进行分割
             const lines = preCode.split(/\n/).slice(0, -1)
+            // 添加自定义行号
             let html = lines.map((item, index) => {
               return '<li><span class="line-num" data-line="' + (index + 1) + '">' + (index + 1) + '</span>'+'<div class="item">' + item + '</div>'+'</li>'
             }).join('')
             html = '<ol>' + html + '</ol>'
+            // 添加代码语言
+            if (lines.length) {
+              html += '<b class="name">' + lang + '</b>'
+            }
             return '<pre class="hljs"><code>' +
                 html +
                 '</code></pre>'
+          } catch (__) {
           }
-        })
-        data.article = res.data.article
-        data.article.articleMessage = md.render(`${data.article.articleMessage}`)
-        data.article.articleImg = 'data:image/png;base64,' + data.article.articleImg
-
-        initComment()
-      })
-
-    }
-    function initComment(){
-      proxy.$http({
-        url:'/comment',
-        method:"GET",
-        data:{
-          message:data.message,
-          articleId:data.article.articleId,
-          dateTime:new Date().toLocaleString()
         }
-      }).then(res=>{
-        let a = res.data.filter(item=>item.articleId == data.article.articleId.toString());
-        for(let i = 0;i < a.length;i++){
-          a[i].headImg = 'data:image/png;base64,' + a[i].headImg
-        }
-        a.forEach((item)=>{
-          item.dueTime = Date.parse(item.dateTime)
-          item.dateTime = proxy.$utils.convertTimeToHumanReadable(item.dateTime)
-        })
-        a.sort(function (a,b){
-          return b.dueTime - a.dueTime
-        })
-        data.comments = a
-      })
-    }
-    function submit(){
-      proxy.$http({
-        url:'/comment/submit',
-        method:"POST",
-        data:{
-          message:data.message,
-          articleId:data.article.articleId,
-          dateTime:new Date().toLocaleString()
-        }
-      }).then(res=>{
-        data.message = ''
-        var comment = res.data.comment
-        comment.headImg = 'data:image/png;base64,' + comment.headImg
-        comment.dateTime = proxy.$utils.convertTimeToHumanReadable(comment.dateTime)
-        data.comments.unshift(comment)
-        return ElMessage({
-          message: res.data.msg,
-          type: res.data.type
-        })
-      })
-    }
-
-    onMounted(()=>{
-      init()
+        // 未添加代码语言，此处与上面同理
+        const preCode = md.utils.escapeHtml(str)
+        const lines = preCode.split(/\n/).slice(0, -1)
+        let html = lines.map((item, index) => {
+          return '<li><span class="line-num" data-line="' + (index + 1) + '">' + (index + 1) + '</span>'+'<div class="item">' + item + '</div>'+'</li>'
+        }).join('')
+        html = '<ol>' + html + '</ol>'
+        return '<pre class="hljs"><code>' +
+            html +
+            '</code></pre>'
+      }
     })
-    return{
-      data,
-      submit
-    }
-  },
-  components:{
-    Header,
-  }
+    data.article = res.data.article
+    data.article.articleMessage = md.render(`${data.article.articleMessage}`)
+    data.article.articleImg = 'data:image/png;base64,' + data.article.articleImg
+
+    initComment()
+  })
+
 }
+function initComment(){
+  proxy.$http({
+    url:'/comment',
+    method:"GET",
+    data:{
+      message:data.message,
+      articleId:data.article.articleId,
+      dateTime:new Date().toLocaleString()
+    }
+  }).then(res=>{
+    let a = res.data.filter(item=>item.articleId == data.article.articleId.toString());
+    for(let i = 0;i < a.length;i++){
+      a[i].headImg = 'data:image/png;base64,' + a[i].headImg
+    }
+    a.forEach((item)=>{
+      item.dueTime = Date.parse(item.dateTime)
+      item.dateTime = proxy.$utils.convertTimeToHumanReadable(item.dateTime)
+    })
+    a.sort(function (a,b){
+      return b.dueTime - a.dueTime
+    })
+    data.comments = a
+  })
+}
+function submit(){
+  proxy.$http({
+    url:'/comment/submit',
+    method:"POST",
+    data:{
+      message:data.message,
+      articleId:data.article.articleId,
+      dateTime:new Date().toLocaleString()
+    }
+  }).then(res=>{
+    data.message = ''
+    var comment = res.data.comment
+    comment.headImg = 'data:image/png;base64,' + comment.headImg
+    comment.dateTime = proxy.$utils.convertTimeToHumanReadable(comment.dateTime)
+    data.comments.unshift(comment)
+    return ElMessage({
+      message: res.data.msg,
+      type: res.data.type
+    })
+  })
+}
+
+onMounted(()=>{
+  init()
+})
 </script>
 
 <style scoped>

@@ -12,7 +12,7 @@ import 'element-plus/dist/index.css'
 
 import common from "./util/common";
 import http from "./util/http";
-import slideIn from "./util/slideIn.js";
+import directive from "./util/directive.js"
 
 
 const pinia = createPinia()
@@ -28,6 +28,6 @@ app.use(router)
 // app.use(ElementPlus, {
 //     locale: zhCn
 // })
-app.directive('slide-in', slideIn)
+app.use(directive)
 
 app.mount('#app')

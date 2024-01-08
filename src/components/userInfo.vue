@@ -58,85 +58,74 @@
   </div>
 </template>
 
-<script>
+<script setup>
 import {getCurrentInstance, reactive, toRef,onMounted} from "vue";
 import global from '../util/global.js'
 import useStore from "../store/index.js";
 import {useRouter} from "vue-router";
-export default {
-  name: "userInfo",
-  props:['user','id'],
-  setup(props,context){
-    const {proxy} = getCurrentInstance()
-    const store = useStore()
-    const router = useRouter()
-    const user = toRef(props,'user')
-    const data = reactive({
-      headers: {enctype: "multipart/form-data"},
-      centerDialogVisible: false,
-      imageUrl: '',
-      httpUrl: `http://${global.httpUrl}/imgUpload`,
-      fileInfo: ''
-    });
 
-    function handleAvatarSuccess(res, file) {
-      data.imageUrl = URL.createObjectURL(file.raw);
-      data.fileInfo = res.fileInfo
-    }
-    function beforeAvatarUpload(file) {
-      const isJPG = file.type === 'image/jpeg' || 'image/png';
-      const isLt2M = file.size / 1024 / 1024 < 2;
+const props = defineProps({
+  user:Object
+})
+const {proxy} = getCurrentInstance()
+const store = useStore()
+const router = useRouter()
+const user = toRef(props,'user')
+const data = reactive({
+  headers: {enctype: "multipart/form-data"},
+  centerDialogVisible: false,
+  imageUrl: '',
+  httpUrl: `http://${global.httpUrl}/imgUpload`,
+  fileInfo: ''
+});
 
-      if (!isJPG) {
-        ElMessage.error('上传头像图片只能是 JPG或PNG 格式!')
-      }
-      if (!isLt2M) {
-        ElMessage.error('上传头像图片大小不能超过 2MB!');
-      }
-      return isJPG && isLt2M;
-    }
-    function reviseImg(){
-      data.centerDialogVisible = false;
-      proxy.$http({
-        url:'/user/reviseImg',
-        method:"POST",
-        data:{image:data.fileInfo}
-      }).then(res=>{
-        data.fileInfo = ''
-        router.go(0)
-      })
-    }
-    function submit(){
-      if(user.value.username === ""){
-        ElMessage.warning('用户名不能为空');
-        return;
-      }
-      proxy.$http({
-        url:'/user/revise',
-        method:"POST",
-        data:{user:user.value}
-      }).then(res=>{
-        return ElMessage({
-          message: res.data.msg,
-          type: res.data.type
-        })
-      })
-    }
-    function exit(){
-      store.delToken()
-      store.delHeadImg()
-      router.go(0)
-    }
-    return{
-      user,
-      data,
-      handleAvatarSuccess,
-      beforeAvatarUpload,
-      reviseImg,
-      submit,
-      exit
-    }
+function handleAvatarSuccess(res, file) {
+  data.imageUrl = URL.createObjectURL(file.raw);
+  data.fileInfo = res.fileInfo
+}
+function beforeAvatarUpload(file) {
+  const isJPG = file.type === 'image/jpeg' || 'image/png';
+  const isLt2M = file.size / 1024 / 1024 < 2;
+
+  if (!isJPG) {
+    ElMessage.error('上传头像图片只能是 JPG或PNG 格式!')
   }
+  if (!isLt2M) {
+    ElMessage.error('上传头像图片大小不能超过 2MB!');
+  }
+  return isJPG && isLt2M;
+}
+function reviseImg(){
+  data.centerDialogVisible = false;
+  proxy.$http({
+    url:'/user/reviseImg',
+    method:"POST",
+    data:{image:data.fileInfo}
+  }).then(res=>{
+    data.fileInfo = ''
+    router.go(0)
+  })
+}
+function submit(){
+  if(user.value.username === ""){
+    ElMessage.warning('用户名不能为空');
+    return;
+  }
+  proxy.$http({
+    url:'/user/revise',
+    method:"POST",
+    data:{user:user.value}
+  }).then(res=>{
+    return ElMessage({
+      message: res.data.msg,
+      type: res.data.type
+    })
+  })
+}
+function exit(){
+  store.delToken()
+  store.delHeadImg()
+  router.go(0)
 }
 </script>
 

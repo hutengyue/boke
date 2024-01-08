@@ -9,6 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@vueuse/core": "^10.7.0",
     "axios": "^1.6.2",
     "danmaku-vue": "^1.0.2",
     "element-plus": "^2.4.3",

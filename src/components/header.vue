@@ -16,57 +16,44 @@
   </div>
 </template>
 
-<script scoped>
+<script scoped setup>
 import {getCurrentInstance,ref,onMounted,onBeforeUnmount} from "vue";
 import {useRouter} from 'vue-router';
 import useStore from "../store/index.js";
+const {proxy} = getCurrentInstance()
+const router = useRouter()
+const store = useStore()
+var headImg = ref('')
 
-export default {
-  name: "Header",
-  setup(){
-    const {proxy} = getCurrentInstance()
-    const router = useRouter()
-    const store = useStore()
-    var headImg = ref('')
-    function gotoHome(){
-      router.push('/')
-    }
-    function gotoChat(){
-      router.push('/chat')
-    }
-    function gotoMessage(){
-      router.push('/message')
-    }
-    function gotoUser(){
-      router.push('/user')
-    }
-    function gotoCount(){
-      router.push('/count')
-    }
-    function gotoAbout(){
-      router.push('/about')
-    }
-    onMounted(()=>{
-      headImg.value = store.getHeadImg
-      proxy.$bus.on('headImg',()=>{
-        headImg.value = store.getHeadImg
-      })
-    })
-    onBeforeUnmount(()=>{
-      proxy.$bus.off('headImg')
-    })
-    return{
-      gotoHome,
-      gotoMessage,
-      gotoUser,
-      gotoAbout,
-      gotoChat,
-      gotoCount,
-      proxy,
-      headImg
-    }
-  }
+function gotoHome(){
+  router.push('/')
 }
+function gotoChat(){
+  router.push('/chat')
+}
+function gotoMessage(){
+  router.push('/message')
+}
+function gotoUser(){
+  router.push('/user')
+}
+function gotoCount(){
+  router.push('/count')
+}
+function gotoAbout(){
+  router.push('/about')
+}
+
+onMounted(()=>{
+  headImg.value = store.getHeadImg
+  proxy.$bus.on('headImg',()=>{
+    headImg.value = store.getHeadImg
+  })
+})
+onBeforeUnmount(()=>{
+  proxy.$bus.off('headImg')
+})
+
 </script>
 
 <style scoped>
