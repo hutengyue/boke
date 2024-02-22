@@ -1,3 +1,15 @@
+<script setup>
+import { ArrowLeft } from '@element-plus/icons-vue'
+import {useRouter,useRoute} from 'vue-router';
+import {ref} from 'vue'
+const router = useRouter()
+const route = useRoute()
+const path = ref(null)
+function gotoUsers(){
+  router.push('/admin/users')
+}
+</script>
+
 <template>
   <div class="sidebar">
     <div class="title">
@@ -6,6 +18,7 @@
     <el-menu
         active-text-color="#409eff"
         background-color="#304156"
+        active-background-color="#263445"
         class="el-menu-vertical-demo"
         default-active="1"
         text-color="#fff"
@@ -13,13 +26,20 @@
       <el-menu-item index="1">
         <span>首页</span>
       </el-menu-item>
-      <el-menu-item index="2">
-        <el-icon><icon-menu /></el-icon>
-        <template #title>Navigator Two</template>
-      </el-menu-item>
-      <el-menu-item index="3">
-        <span>文章管理</span>
-      </el-menu-item>
+      <el-sub-menu index="2">
+        <template #title>
+          <span>系统管理</span>
+        </template>
+        <el-menu-item index="2-1" @click="gotoUsers">用户管理</el-menu-item>
+        <el-menu-item index="2-2">评论管理</el-menu-item>
+      </el-sub-menu>
+      <el-sub-menu index="3">
+        <template #title>
+          <span>文章管理</span>
+        </template>
+        <el-menu-item index="3-1">文章列表</el-menu-item>
+        <el-menu-item index="3-2">文章发布</el-menu-item>
+      </el-sub-menu>
       <el-menu-item index="4">
         <span>留言管理</span>
       </el-menu-item>
@@ -27,19 +47,21 @@
   </div>
   <div class="container">
     <div class="device">
-      <div class="navbar"></div>
-      <div class="tags"></div>
+      <div class="navbar">
+      </div>
+      <div class="tags">
+
+      </div>
     </div>
+  </div>
+  <div class="main">
+    <router-view></router-view>
   </div>
 </template>
 
-<script setup>
-
-</script>
-
-<style scoped>
+<style>
 *{
-  font-family: "黑体";
+  font-family:  Helvetica, sans-serif;
 }
 .sidebar{
   position: fixed;
@@ -62,16 +84,20 @@
   border-right-width: 0;
 }
 .container{
-  background-color: black;
-  height: 100%;
   margin-left: 210px;
 }
 .device{
 }
 .navbar{
   height: 50px;
+  border-bottom: 1px solid rgb(228,231,237);
 }
 .tags{
-  height: 34px;
+  height: 34px;border-bottom: 1px solid rgb(228,231,237);
+}
+.main{
+  margin-left: 210px;
+  height: calc(100vh - 84px);
+  background-color: rgb(242,243,245);
 }
 </style>

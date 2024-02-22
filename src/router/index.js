@@ -37,7 +37,17 @@ const routes = [
     },
     {
         path: '/admin',
-        component:()=>import("../pages/admin.vue")
+        component:()=>import("../pages/admin.vue"),
+        children:[
+            {
+                path:'users',
+                component:()=>import("../pages/backstage/users.vue")
+            },
+            {
+                path:'comments',
+                component:()=>import("../pages/backstage/comments.vue")
+            }
+        ]
     },
     {
         path: '/admin/articlePublic',
