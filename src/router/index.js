@@ -46,12 +46,12 @@ const routes = [
             {
                 path:'comments',
                 component:()=>import("../pages/backstage/comments.vue")
+            },
+            {
+                path: '/admin/public',
+                component:()=>import("../pages/backstage/public.vue")
             }
         ]
-    },
-    {
-        path: '/admin/articlePublic',
-        component:()=>import("../pages/articlePublic.vue")
     }
 ]
 

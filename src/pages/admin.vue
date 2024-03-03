@@ -8,6 +8,9 @@ const path = ref(null)
 function gotoUsers(){
   router.push('/admin/users')
 }
+function gotoPublic(){
+  router.push('/admin/public')
+}
 </script>
 
 <template>
@@ -38,7 +41,7 @@ function gotoUsers(){
           <span>文章管理</span>
         </template>
         <el-menu-item index="3-1">文章列表</el-menu-item>
-        <el-menu-item index="3-2">文章发布</el-menu-item>
+        <el-menu-item index="3-2" @click="gotoPublic">文章发布</el-menu-item>
       </el-sub-menu>
       <el-menu-item index="4">
         <span>留言管理</span>
