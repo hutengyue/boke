@@ -1,6 +1,6 @@
 <template>
-  <div class="content" ref="con">
-    <h2>Cavalry</h2>
+  <div class="content">
+    <h1>Cavalry</h1>
     <div class="content-background">
     </div>
     <div class="content-menu">
@@ -10,6 +10,7 @@
         <li @click="gotoChat()" >🐔聊天</li>
         <li @click="gotoMessage()">🐔留言</li>
         <li @click="gotoCount()">🐔日志</li>
+        <li @click="gotoVisit()">🐔统计</li>
         <li @click="gotoAbout()">🐔关于</li>
       </ul>
     </div>
@@ -38,7 +39,10 @@ function gotoUser(){
   router.push('/user')
 }
 function gotoCount(){
-  router.push('/count')
+  router.push('/log')
+}
+function gotoVisit(){
+  router.push('/visit')
 }
 function gotoAbout(){
   router.push('/about')
@@ -70,20 +74,21 @@ onBeforeUnmount(()=>{
   opacity: 0;
   width: 100%;
   height:70px;
-  transition: 1s;
+  transition: .5s;
   z-index: -1;
 }
 .content:hover .content-background{
   opacity: 0.3;
 }
-.content h2{
+.content h1{
   float: left;
   font-family: windy;
-  font-size: 39px;
+  font-size: 30px;
   margin: 10px 0 0 30px;
   cursor: pointer;
   user-select: none;
   color: white;
+  mix-blend-mode: difference;
 }
 .content-menu{
   float: right;
@@ -91,7 +96,7 @@ onBeforeUnmount(()=>{
 .content-menu ul{
   display: flex;
   margin-top: 20px;
-  width: 600px;
+  width: 500px;
   justify-content: space-between;
 }
 .content-menu li{
@@ -99,7 +104,7 @@ onBeforeUnmount(()=>{
   flex-direction: row;
   height: 50px;
   list-style: none;
-  font-size: 25px;
+  font-size: 22px;
   cursor: pointer;
   user-select: none;
   border: 0px solid #ee7752;

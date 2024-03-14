@@ -2,6 +2,7 @@ import { createApp } from 'vue'
 import './style.css'
 import App from './App.vue'
 import {createPinia} from "pinia";
+import piniaPersist from 'pinia-plugin-persist'
 import router from "./router"
 import mitt from 'mitt'
 import Danmaku from 'danmaku-vue'
@@ -13,14 +14,17 @@ import 'element-plus/dist/index.css'
 import common from "./util/common";
 import http from "./util/http";
 import directive from "./util/directive.js"
+import echarts from './util/echarts.js'
 
 
 const pinia = createPinia()
+pinia.use(piniaPersist)
 const app = createApp(App)
 
 app.config.globalProperties.$utils = common
 app.config.globalProperties.$http = http
 app.config.globalProperties.$bus = mitt()
+app.config.globalProperties.$echarts = echarts
 
 app.use(Danmaku)
 app.use(pinia)

@@ -1,6 +1,9 @@
 import {createRouter,createWebHashHistory} from 'vue-router'
 import storage from "../util/storage.js";
 import useStore from "../store";
+import cookie from "js-cookie";
+import axios from "../util/http.js";
+import common from '../util/common.js'
 
 
 const routes = [
@@ -24,8 +27,13 @@ const routes = [
         component:()=>import("../pages/message.vue")
     },
     {
-        path: '/count',
-        component:()=>import("../pages/count.vue")
+        path: '/log',
+        component:()=>import("../pages/log.vue")
+    },
+    {
+        path: '/visit',
+        component:()=>import("../pages/visit.vue")
+
     },
     {
         path: '/about',
@@ -39,6 +47,7 @@ const routes = [
         path: '/admin',
         component:()=>import("../pages/admin.vue"),
         children:[
+
             {
                 path:'users',
                 component:()=>import("../pages/backstage/users.vue")
@@ -61,6 +70,26 @@ const router = createRouter({
 })
 router.beforeEach((to, from, next) => {
     const store = useStore()
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+    let flag = !cookie.get('visit')?true:false
+    axios({
+        url:'/visit',
+        method:'POST',
+        data:{
+            flag:flag,
+            city:store.getVisit.city,
+            device:isMobile?'MB':'PC',
+            browser:common.browserType()
+        }
+    }).then((res)=>{
+        if(flag == true){
+            store.setVisit({
+                ip:res.data.ip,
+                city:res.data.map.city
+            })
+            cookie.set('visit',res.data.map.city,{expires:0.25})
+        }
+    })
     if (storage.get("token")) {
         store.setToken(storage.get("token"))
     }

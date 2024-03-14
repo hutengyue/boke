@@ -32,7 +32,7 @@
             公告
           </p>
           <div class="notice-message">
-            <a>欢迎来自   的人来到cavalry的小站</a>
+            <a>欢迎来自{{store.getVisit.city}}的人来到cavalry的小站</a>
           </div>
         </div>
       </div>
@@ -84,7 +84,9 @@
 <script setup>
 import {getCurrentInstance, onMounted, reactive, ref} from "vue";
 import {useRouter} from "vue-router";
+import useStore from "../store/index.js";
 
+const store = useStore()
 const router = useRouter()
 const {proxy} = getCurrentInstance()
 var data = reactive({
@@ -99,10 +101,7 @@ function gotoArticle(id){
 }
 
 function init(){
-  proxy.$http({
-    url:'/article',
-    method:"GET"
-  }).then(res=>{
+  proxy.$http.get('/article').then(res=>{
     var list = res.data.article
     for(let i = 0;i < list.length;i++){
       list[i].articleImg = 'data:image/png;base64,' + list[i].articleImg
@@ -110,10 +109,7 @@ function init(){
     data.article = list
     data.all = list
   })
-  proxy.$http({
-    url:'/category',
-    method:"GET"
-  }).then(res=>{
+  proxy.$http.get('/category').then(res=>{
     res.data.forEach((item)=>{
       data.category.push(item.categoryName)
     })

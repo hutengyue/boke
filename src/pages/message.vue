@@ -43,11 +43,7 @@ function fire(){
   if(data.text.trim() == ""){
     ElMessage.error('发言为空')
   }else {
-    proxy.$http({
-      method:"POST",
-      url:"/message/send",
-      data:{message:data.text}
-    }).then(res=>{
+    proxy.$http.post("/message/send", {message:data.text}).then(res=>{
       if(res.data.type == "success"){
         data.danmus.push({
           avatar: 'data:image/png;base64,'+res.data.headImg,
@@ -74,10 +70,7 @@ function addToList(list) {
 }
 
 onMounted(()=>{
-  proxy.$http({
-    method:"GET",
-    url:"/message"
-  }).then(res=>{
+  proxy.$http.get('/message').then(res=>{
     var list = res.data
     list.forEach((item,index)=>{
       item.headImg = 'data:image/png;base64,' + item.headImg

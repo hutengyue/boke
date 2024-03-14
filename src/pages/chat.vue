@@ -3,7 +3,7 @@
     <Header></Header>
     <div class="chatBox">
       <div class="friend-aside">
-        <img class="user-img" v-lazy="data.user.headImg">
+        <img class="user-img" :src="data.user.headImg">
         <p>{{data.user.username}}</p>
         <div class="friend-menu">
           <div @click="inChat()" :class="['friend-item',data.contentIndex == 0?'active':'']">

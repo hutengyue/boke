@@ -5,9 +5,7 @@
 </template>
 
 <script setup>
-export default {
-  name: "public"
-}
+
 </script>
 
 <style scoped>
@@ -18,7 +16,5 @@ export default {
   flex-direction: column;
   align-items: center;
 }
-.title{
-  height: ;
-}
+
 </style>

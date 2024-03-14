@@ -12,8 +12,10 @@
     "@vueuse/core": "^10.7.0",
     "axios": "^1.6.2",
     "danmaku-vue": "^1.0.2",
+    "echarts": "^5.5.0",
     "element-plus": "^2.4.3",
     "highlight.js": "^11.9.0",
+    "js-cookie": "^3.0.5",
     "markdown-it": "^13.0.2",
     "mitt": "^3.0.1",
     "pinia": "^2.1.7",
@@ -24,6 +26,7 @@
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^4.5.0",
+    "pinia-plugin-persist": "^1.0.0",
     "unplugin-auto-import": "^0.17.1",
     "unplugin-vue-components": "^0.25.2",
     "vite": "^5.0.0"

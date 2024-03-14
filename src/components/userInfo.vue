@@ -63,7 +63,6 @@ import {getCurrentInstance, reactive, toRef,onMounted} from "vue";
 import global from '../util/global.js'
 import useStore from "../store/index.js";
 import {useRouter} from "vue-router";
-
 const props = defineProps({
   user:Object
 })
@@ -143,7 +142,7 @@ function exit(){
 .all{
   position: relative;
   align-items: center;
-  background: #e9e9e9 url("../assets/image/111.png") no-repeat fixed center;
+  background: #e9e9e9 url("../assets/image/nv.jpg") no-repeat fixed center;
   background-size: cover;
   display: grid;
   height: 100vh;

@@ -67,10 +67,7 @@ var data = reactive({
 })
 
 function init(){
-  proxy.$http({
-    url:'/login/captcha',
-    method:"get"
-  }).then(res=>{
+  proxy.$http.get('/login/captcha').then(res=>{
     data.captcha = res.data.captcha
   })
 }
@@ -84,11 +81,8 @@ function start(){
 function reqEmail(){
   var re = /^[a-zA-Z0-9]+([-_.][A-Za-zd]+)*@([a-zA-Z0-9]+[-.])+[A-Za-zd]{2,5}$/;
   if(re.test(data.email)){
-    proxy.$http({
-      url:'/register/email',
-      method:'post',
-      data: {email:data.email}
-    }).then(res => {
+    proxy.$http.post('/register/email', {email:data.email}
+    ).then(res => {
       if(res.data.type != "error"){
         data.code = false;
         start()

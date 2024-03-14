@@ -12,12 +12,12 @@
         <video class="index-video" autoplay="autoplay" loop="loop" muted="muted" src="../assets/video/hutao.mp4"></video>
       </div>
     </div>
-    <homeBody/>
+    <HomeBody/>
   </div>
 </template>
 
 <script setup>
-import homeBody from "../components/homeBody.vue";
+import HomeBody from "../components/homeBody.vue";
 import Header from "../components/Header.vue";
 import {reactive,ref,watch,onMounted} from "vue";
 import version from "danmaku-vue";
@@ -61,7 +61,6 @@ watch(()=>data.inP,(newVal)=>{
 })
 
 onMounted(()=>{
-  console.log(window.location)
   start = setInterval(inTimer,200)
   let version = '1.0.0'
   console.log(`%c cavalry-boke %c V${version} `, "padding: 2px 1px; border-radius: 3px 0 0 3px; color: #fff; background: #606060; font-weight: bold;", "padding: 2px 1px; border-radius: 0 3px 3px 0; color: #fff; background: #42c02e; font-weight: bold;");

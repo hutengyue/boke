@@ -28,10 +28,7 @@ var user = reactive({
 })
 function init(){
   if(store.getToken != ''){
-    proxy.$http({
-      url:'/user',
-      method:'get'
-    }).then(res => {
+    proxy.$http.get('/user').then(res => {
       var resData = res.data
       if(resData.type == "success"){
         user.userId = resData.user[0].userId.toString()

@@ -1,11 +1,19 @@
 import { defineStore} from 'pinia'
 import storage from "../util/storage";
 
+
 const useStore = defineStore('boke',{
+    persist:{
+        enabled:true
+    },
     state:()=>({
         token:"",
         userName:"",
-        headImg:""
+        headImg:"",
+        visit:{
+            city:"",
+            ip:""
+        }
     }),
     getters:{
         getToken(){
@@ -13,6 +21,9 @@ const useStore = defineStore('boke',{
         },
         getHeadImg(){
             return this.headImg || storage.get("headImg") || ""
+        },
+        getVisit(){
+            return this.visit
         }
     },
     actions:{
@@ -23,6 +34,9 @@ const useStore = defineStore('boke',{
         setHeadImg(headImg){
             this.headImg = headImg;
             storage.set('headImg',headImg)
+        },
+        setVisit(visit){
+            this.visit = visit;
         },
         delToken(){
             this.token = "";

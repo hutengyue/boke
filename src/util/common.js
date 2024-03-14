@@ -32,5 +32,25 @@ export default {
         } else {
             return _date.getFullYear() + "年" + _date.getMonth() + "月" + _date.getDate() + "日";
         }
+    },
+    browserType() {
+        var ua = navigator.userAgent.toLocaleLowerCase();
+        if (ua.indexOf('green') > -1) return '绿色浏览器';
+        if (ua.indexOf('qq') > -1) return 'QQ浏览器';
+        if (ua.indexOf('bidu') > -1) return '百度浏览器';
+        if (ua.indexOf('lb') > -1) return '猎豹浏览器';
+        if (ua.indexOf('world') > -1) return '世界之窗浏览器';
+        if (ua.indexOf('2345') > -1) return '2345浏览器';
+        if (ua.indexOf('maxthon') > -1) return '傲游浏览器';
+        if (ua.indexOf('tao') > -1) return '淘宝浏览器';
+        if (ua.indexOf('ubrowser') > -1) return 'UC浏览器';
+        if (ua.indexOf('coolnovo') > -1) return '枫叶浏览器';
+        if (ua.indexOf('opr') > -1) return 'opera浏览器';
+        if (ua.indexOf('se') > -1) return '搜狗浏览器';
+        if (ua.indexOf('firefox') > -1) return 'firefox浏览器';
+        if (ua.indexOf('safari') > -1 && ua.indexOf("version") > -1) return ('safari浏览器');
+        if (window.navigator.mimeTypes[40] || !window.navigator.mimeTypes.length) return '360浏览器';
+        if (ua.indexOf("chrome") > -1 && window.chrome) return ('chrome浏览器');
+        return '未记录浏览器';
     }
 }
