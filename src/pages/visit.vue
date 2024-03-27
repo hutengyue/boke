@@ -7,35 +7,36 @@
       <div class="statistic">
         <div class="statistic-detail">
           <p>昨日IP</p>
-          <p>100</p>
+          <p>{{ data.yesterday.ip }}</p>
         </div>
         <div class="statistic-detail">
           <p>昨日浏览量</p>
-          <p>100</p>
+          <p>{{ data.yesterday.number }}</p>
         </div>
         <div class="statistic-detail">
           <p>今日IP</p>
-          <p>100</p>
+          <p>{{ data.today.ip }}</p>
         </div>
         <div class="statistic-detail">
           <p>今日浏览量</p>
-          <p>100</p>
+          <p>{{ data.today.number }}</p>
         </div>
         <div class="statistic-detail">
           <p>总浏览量</p>
-          <p>1000</p>
+          <p>{{ data.total }}</p>
         </div>
       </div>
-      <Line/>
+      <Line v-if="data.line.length" :lineData="data.line"/>
     </div>
     <div class="allocation">
-      <ChinaMap v-if="data.visitList.length" :visitList="data.visitList"/>
-      <Pie/>
+      <ChinaMap v-if="data.list.length" :visitList="data.list"/>
+      <Pie v-if="data.list.length" :visitList="data.list"/>
     </div>
   </div>
 </template>
 
 <script setup>
+import moment from 'moment';
 import Header from "../components/header.vue";
 import Line from '../components/statistic/line.vue'
 import ChinaMap from '../components/statistic/chinaMap.vue'
@@ -43,12 +44,57 @@ import Pie from '../components/statistic/pie.vue'
 import {onMounted,getCurrentInstance,reactive} from "vue";
 const {proxy} = getCurrentInstance()
 var data = reactive({
-  visitList:[]
+  line:[],
+  all:[],//总
+  total:0,
+  list:[],//选择列表
+  today:{
+    ip:0,
+    number:0
+  },
+  yesterday:{
+    ip:0,
+    number:0
+  }
 })
 function init(){
   proxy.$http.get('/visit/detail').then((res)=>{
-    data.visitList = res.data
+    data.total = res.data[0]
+    data.all = res.data[1]
+    let list = data.all.reduce((pre, cur) => {
+      (pre[cur.time.substring(0, 10)] || (pre[cur.time.substring(0, 10)] = [])).push(cur);
+      return pre
+    }, [])
+    for(let item in list){
+      if(item == getDay()){
+        data.list = list[item]
+        data.today.ip = computeIp(list[item])
+        data.today.number = list[item].length
+      }
+      if(item == getDay(1)){
+        data.yesterday.ip = computeIp(list[item])
+        data.yesterday.number = list[item].length
+      }
+      data.line.unshift({name:item,number:list[item].length,ip:computeIp(list[item])})
+    }
   })
+}
+function getDay(index = 0) {
+  var yesterday = moment().subtract(index, 'days');
+  var year = yesterday.format('YYYY');
+  var month = yesterday.format('MM');
+  var day = yesterday.format('DD');
+  return year + "-" + month + "-" + day
+}
+function computeIp(list){
+  let number = []
+  list.forEach((item)=>{
+    if(!number[item.clientIp]){
+      number[item.clientIp] = true
+      number.length++
+    }
+  })
+  return number.length
 }
 onMounted(()=>{
   init()
@@ -117,6 +163,6 @@ onMounted(()=>{
   flex-direction: row;
   justify-content: space-around;
   align-items: center;
-  padding: 50px 0px;
+  padding: 35px 0px;
 }
 </style>

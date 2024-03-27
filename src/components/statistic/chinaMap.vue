@@ -1,5 +1,8 @@
 <template>
-  <div id="china"></div>
+  <div style="width:50%;height:400px;">
+    <p>分布</p>
+    <div id="china"></div>
+  </div>
 </template>
 
 <script setup>
@@ -76,7 +79,6 @@ function init(){
       mapList.push({name:location,value:citys[location]})
     }
   })
-  console.log(mapList)
   option.series[0].data = mapList
   proxy.$echarts.registerMap('china', china);
   map.setOption(option, true);
@@ -93,7 +95,7 @@ onMounted(()=>{
 #china{
   display: flex;
   align-items: center;
-  width:50%;
-  height:400px;
+  width:100%;
+  height:100%;
 }
 </style>

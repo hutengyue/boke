@@ -3,10 +3,39 @@
 </template>
 
 <script setup>
-import {onMounted,getCurrentInstance} from "vue";
+import {onMounted, getCurrentInstance, reactive, toRefs, watch, toRef} from "vue";
+import moment from "moment";
 const {proxy} = getCurrentInstance()
+const props = defineProps({
+  lineData:Object
+})
+const line = toRef(props,'lineData')
+const data = reactive({
+  ipList:[],
+  numberList:[]
+})
 
+function getDate(index = 0) {
+  var yesterday = moment().subtract(index, 'days');
+  var year = yesterday.format('YYYY');
+  var month = yesterday.format('MM');
+  var day = yesterday.format('DD');
+  return year + "-" + month + "-" + day
+}
 onMounted(()=>{
+  const day = [getDate(6), getDate(5), getDate(4), getDate(3), getDate(2), getDate(1), getDate()]
+  let index = 0
+  for(let i = 0;i < 7;i++){
+    if(day[i] == line.value[index].name){
+      data.ipList.push(line.value[index].ip)
+      data.numberList.push(line.value[index].number)
+      index++
+    }else{
+      data.ipList.push(0)
+      data.numberList.push(0)
+    }
+
+  }
   const visit = proxy.$echarts.init(document.getElementById('main'))
   const option = {
     tooltip: {
@@ -36,7 +65,7 @@ onMounted(()=>{
       {
         type: 'category',
         boundaryGap: false,
-        data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+        data: day
       }
     ],
     yAxis: [
@@ -70,7 +99,7 @@ onMounted(()=>{
         emphasis: {
           focus: 'series'
         },
-        data: [140, 232, 101, 264, 90, 340, 250]
+        data: data.ipList
       },
       {
         name: '今日浏览量',
@@ -97,7 +126,7 @@ onMounted(()=>{
         emphasis: {
           focus: 'series'
         },
-        data: [120, 282, 111, 234, 220, 340, 310]
+        data: data.numberList
       }
     ]
   };

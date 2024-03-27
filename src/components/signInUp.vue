@@ -132,16 +132,20 @@ function login(){
   if(data.logEmail == '' && data.logPsd == ''){
     ElMessage.warning("邮箱与密码不能为空")
   }else {
-    proxy.$http({
-      url:'/login',
-      method:'post',
-      data: {
+    proxy.$http.post('/login',{
         email:data.logEmail,
         password:data.logPsd,
         logCode:data.logCode
-      }
     }).then(res => {
       if(Object.hasOwn(res.data, "token")){
+        // proxy.$http.get('/user').then(res => {
+        //   if(res.data.user[0].identity == 'admin'){
+        //   }
+        //   store.setToken(res.data.token)
+        //   store.setUserInfo(res.data.username)
+        //   store.setHeadImg('data:image/png;base64,'+res.data.headImg)
+        //   router.push('/')
+        // })
         store.setToken(res.data.token)
         store.setUserInfo(res.data.username)
         store.setHeadImg('data:image/png;base64,'+res.data.headImg)

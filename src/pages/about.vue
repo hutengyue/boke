@@ -70,16 +70,22 @@
       </ul>
       <div class="authorContent">
         <div class="itemMask">
-          <p>追求</p>
+          <div class="self">
+            <div>
+              <p>专业</p>
+              <p>软件工程</p>
+            </div>
+            <div>
+              <p>身份</p>
+              <p>2024届毕业生</p>
+            </div>
+          </div>
         </div>
         <div class="itemGroup">
           <div class="itemMap">
-          <span class="mapTitle">
-            我现在位于中国浙江省
-          </span>
-          </div>
-          <div class="itemSelf">
-            <div class=""></div>
+            <span class="mapTitle">
+              孤影独行至杭州 披星戴月临安寂 家山回首两百里 不见温岭见尘雾
+            </span>
           </div>
         </div>
       </div>
@@ -372,17 +378,19 @@ function change(index){
   max-height: 400px;
   overflow: hidden;
   margin-bottom: 0.5rem;
-  height: 60%;
+  height: 100%;
   border-radius: 24px;
   position: relative;
   background: url("../assets/image/zj.png") no-repeat;
-  background-size: 100%;
-  transition: 3s ease-in-out;
+  background-size: 130%;
+  transition: 1.5s ease-in-out;
+  background-position-x: 40%;
+  background-position-y: 10%;
 }
 .itemMap:hover{
-  background-size: 120%;
-  background-position-x: 40%;
-  background-position-y: 60%;
+  background-size: 150%;
+  background-position-x: 100%;
+  background-position-y: 75%;
 }
 .mapTitle {
   position: absolute;
@@ -397,19 +405,6 @@ function change(index){
 }
 .itemMap:hover .mapTitle{
   bottom: -100%;
-}
-.itemSelf{
-  height: 40%;
-  min-height: 100px;
-  max-height: 400px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  width: 100%;
-  padding: 1.5rem 2.5rem;
-  background: rgba(255,253,253,0.67);
-  border-radius: 24px;
 }
 .leafImg{
   margin-top: 0;

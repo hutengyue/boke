@@ -53,6 +53,7 @@ onMounted(()=>{
   proxy.$bus.on('headImg',()=>{
     headImg.value = store.getHeadImg
   })
+
 })
 onBeforeUnmount(()=>{
   proxy.$bus.off('headImg')
@@ -96,7 +97,7 @@ onBeforeUnmount(()=>{
 .content-menu ul{
   display: flex;
   margin-top: 20px;
-  width: 500px;
+  width: 600px;
   justify-content: space-between;
 }
 .content-menu li{

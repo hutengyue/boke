@@ -34,7 +34,9 @@ function gotoPublic(){
           <span>系统管理</span>
         </template>
         <el-menu-item index="2-1" @click="gotoUsers">用户管理</el-menu-item>
-        <el-menu-item index="2-2">评论管理</el-menu-item>
+        <el-menu-item index="2-2" >评论管理</el-menu-item>
+        <el-menu-item index="2-3">留言管理</el-menu-item>
+        <el-menu-item index="2-4" @click="router.push('/admin/logs')">日志管理</el-menu-item>
       </el-sub-menu>
       <el-sub-menu index="3">
         <template #title>
@@ -44,7 +46,9 @@ function gotoPublic(){
         <el-menu-item index="3-2" @click="gotoPublic">文章发布</el-menu-item>
       </el-sub-menu>
       <el-menu-item index="4">
-        <span>留言管理</span>
+        <template #title>
+          <span>常用组件</span>
+        </template>
       </el-menu-item>
     </el-menu>
   </div>
