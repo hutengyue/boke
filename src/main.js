@@ -10,11 +10,17 @@ import Danmaku from 'danmaku-vue'
 // import ElementPlus from 'element-plus'
 import 'element-plus/dist/index.css'
 // import zhCn from 'element-plus/dist/locale/zh-cn.mjs'
+if(localStorage.getItem('identity') == `"admin"`){
+    route.forEach((item)=>{
+        router.addRoute('admin',item)
+    })
+}
 
 import common from "./util/common";
 import http from "./util/http";
 import directive from "./util/directive.js"
 import echarts from './util/echarts.js'
+import route from "./router/route.js";
 
 
 const pinia = createPinia()

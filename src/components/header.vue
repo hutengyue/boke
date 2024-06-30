@@ -1,18 +1,19 @@
 <template>
-  <div class="content">
+  <div class="content" :class="[props.active==true?'active':'']" :style="{'opacity':display}">
     <h1>Cavalry</h1>
     <div class="content-background">
     </div>
     <div class="content-menu">
-      <img class="content-head" @click="gotoUser" :src="headImg || proxy.$utils.getAssetsImg('Tom.jpg')">
       <ul>
         <li @click="gotoHome()" >🐔首页</li>
         <li @click="gotoChat()" >🐔聊天</li>
         <li @click="gotoMessage()">🐔留言</li>
+        <li @click="gotoTag()">🐔标签</li>
         <li @click="gotoCount()">🐔日志</li>
         <li @click="gotoVisit()">🐔统计</li>
         <li @click="gotoAbout()">🐔关于</li>
       </ul>
+      <img class="content-head" @click="gotoUser" :src="headImg || proxy.$utils.getAssetsImg('Tom.jpg')">
     </div>
   </div>
 </template>
@@ -24,7 +25,13 @@ import useStore from "../store/index.js";
 const {proxy} = getCurrentInstance()
 const router = useRouter()
 const store = useStore()
+
+let props = defineProps({
+  active:Boolean
+})
 var headImg = ref('')
+let lastScrollPosition = ref(window.pageYOffset)
+let display = ref('1')
 
 function gotoHome(){
   router.push('/')
@@ -47,12 +54,26 @@ function gotoVisit(){
 function gotoAbout(){
   router.push('/about')
 }
+function gotoTag(){
+  router.push('/tag')
+}
 
 onMounted(()=>{
+  window.addEventListener('scroll', () => {
+    const pageY = window.pageYOffset// 滚动条距离顶部的长度
+    if (lastScrollPosition.value < pageY) {
+      display.value = '0'
+    } else {
+      display.value = '1'
+    }
+    lastScrollPosition.value = pageY
+  },true)
   headImg.value = store.getHeadImg
   proxy.$bus.on('headImg',()=>{
     headImg.value = store.getHeadImg
   })
+
+
 
 })
 onBeforeUnmount(()=>{
@@ -62,56 +83,74 @@ onBeforeUnmount(()=>{
 </script>
 
 <style scoped>
+@font-face {
+  font-family: rain;
+  src: url("../assets/wenzi.ttf");
+}
+*{
+  font-family: rain;
+}
 .content{
   top: 0;
   left: 0;
   position: fixed;
   width: 100%;
-  height: 70px;
+  height: 60px;
+  transition:all .3s ease-in-out;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  /*color: #363636;*/
+  color:white;
+}
+.content:hover,.content.active{
+  color: #363636;
 }
 .content-background{
-  position: fixed;
-  background-color: black;
+  position: absolute;
   opacity: 0;
   width: 100%;
-  height:70px;
-  transition: .5s;
+  height: 100%;
+  transition: .3s;
   z-index: -1;
 }
-.content:hover .content-background{
-  opacity: 0.3;
+.content:hover .content-background,.content.active .content-background{
+  opacity: 1;
+  background-color: rgba(247,249,254,0.9);
 }
 .content h1{
   float: left;
   font-family: windy;
   font-size: 30px;
-  margin: 10px 0 0 30px;
+  margin-left: 30px;
   cursor: pointer;
   user-select: none;
-  color: white;
-  mix-blend-mode: difference;
 }
 .content-menu{
-  float: right;
+  height: 100%;
+  display: flex;
+  align-items: center;
 }
 .content-menu ul{
   display: flex;
-  margin-top: 20px;
-  width: 600px;
   justify-content: space-between;
+  height: 100%;
 }
 .content-menu li{
   position: relative;
   flex-direction: row;
-  height: 50px;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   list-style: none;
-  font-size: 22px;
+  font-size: 20px;
   cursor: pointer;
   user-select: none;
   border: 0px solid #ee7752;
-  transition: 0.5s;
   box-sizing: border-box;
-  color: white;
+  margin-left: 15px;
+  margin-right: 15px;
 }
 .content-menu li::after{
   content: "";
@@ -135,7 +174,8 @@ onBeforeUnmount(()=>{
   width: 34px;
   height: 34px;
   border-radius: 100%;
-  margin: 20px 30px 0 30px;
+  margin-left: 15px;
+  margin-right: 30px;
   cursor: pointer;
   user-select: none;
 }

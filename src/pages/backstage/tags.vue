@@ -4,18 +4,17 @@
       <template #header>
         <div class="card-header">
           <el-button type="success" @click="data.dialog = true;data.type = 1;">新增</el-button>
-          <el-button type="danger" :disabled="data.select.length==0" @click="del()">删除</el-button>
+          <el-button type="danger" :disabled="data.selectTags==0" @click="del()">删除</el-button>
         </div>
       </template>
-      <el-table :data="data.list" style="width: 100%" :border="true"
+      <el-table :border="true" :data="data.list" style="width: 100%"
                 @selection-change="select">
-        <el-table-column width="80" type="selection" />
-        <el-table-column fixed prop="commentId" label="编号" min-width="10%" />
-        <el-table-column prop="articleTitle" label="文章标题" min-width="10%" />
-        <el-table-column prop="username" label="评论者" min-width="10%" />
-        <el-table-column prop="message" label="内容" min-width="30%" />
-        <el-table-column prop="createTime" label="时间" min-width="20%" />
-        <el-table-column fixed="right" align="center" label="操作" width="150">
+        <el-table-column width="80" type="selection"/>
+        <el-table-column prop="tagId" label="编号" min-width="10%" />
+        <el-table-column prop="tagName" label="标签名" min-width="10%" />
+        <el-table-column prop="number" label="数量" min-width="10%" />
+        <el-table-column prop="createTime" label="创建时间" min-width="20%" />
+        <el-table-column fixed="right" label="操作" width="200">
           <template v-slot="scope">
             <el-button type="primary" size="small" @click="edit(scope.row)">修改</el-button>
             <el-button type="danger" size="small" @click="del(scope.row)">删除</el-button>
@@ -29,28 +28,15 @@
             :page-size="pageSize"
             :small="false"
             layout="total,prev, pager, next, jumper"
-            :total="data.comments.length"
+            :total="data.tags.length"
             @current-change="handleCurrentChange"
         />
       </template>
     </el-card>
-
-
-    <el-dialog v-model="data.dialog" title="日志" width="500" align-center>
-      <el-form :model="data.target">
-        <el-form-item label="标题" :label-width="'120px'">
-          <el-input v-model="data.target.title" />
-        </el-form-item>=
-        <el-form-item label="内容" :label-width="'120px'">
-          <el-input
-              type="textarea"
-              maxlength="30"
-              show-word-limit
-              placeholder="请输入内容"
-              v-model="data.target.content">
-          </el-input>
-        </el-form-item>
-      </el-form>
+    <el-dialog v-model="data.dialog" title="标签" width="500" align-center>
+      <el-form-item label="标签名" :label-width="'120px'">
+        <el-input v-model="data.tagName" />
+      </el-form-item>
       <template #footer>
         <div class="dialog-footer">
           <el-button @click="data.dialog = false">取消</el-button>
@@ -69,9 +55,9 @@ import {getCurrentInstance, onMounted, reactive} from "vue";
 const {proxy} = getCurrentInstance()
 const pageSize = 12
 var data = reactive({
-  comments:[],
-  target:{},
-  select:[],
+  tags:[],
+  tagName:'',
+  selectTags:[],
   list:[],
   type:1,
   dialog:false,
@@ -79,19 +65,39 @@ var data = reactive({
 })
 function edit(){}
 function del(){
+  ElMessageBox.confirm('是否确认此操作?', '提示', {
+    confirmButtonText: '确定',
+    cancelButtonText: '取消',
+    type: 'warning'
+  }).then(()=>{
+  })
 }
 function select(val){
+  data.selectTags = val
 }
-function handleCurrentChange(){}
-function add(){}
+function handleCurrentChange(val){
+  data.list = data.tags.slice((val-1)*pageSize,val * pageSize)
+}
+function add(){
+  proxy.$http.post('/tag',{
+    tagName:data.tagName,
+    createTime:new Date().toLocaleString(),
+  }).then((res)=>{
+    data.dialog = false
+    return ElMessage({
+      message: res.data.msg,
+      type: res.data.type
+    })
+  })
+}
 onMounted(()=>{
-  proxy.$http.get('/comments').then(res=>{
-    console.log(res.data)
-    data.comments = res.data
-    data.list = data.comments.slice((data.currentPage-1)*pageSize,data.currentPage * pageSize)
+  proxy.$http.get('/tag').then(res=>{
+    data.tags = res.data
+    data.list = data.tags.slice((data.currentPage-1)*pageSize,data.currentPage * pageSize)
   })
 })
 </script>
+
 <style scoped>
 .body{
   width: 100%;
@@ -102,6 +108,6 @@ onMounted(()=>{
 }
 .box-card{
   margin-top: 20px;
-  width: 95%;
+  width: 93%;
 }
 </style>

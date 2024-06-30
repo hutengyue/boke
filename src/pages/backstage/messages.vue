@@ -10,11 +10,14 @@
       <el-table :data="data.list" style="width: 100%" :border="true"
                 @selection-change="select">
         <el-table-column width="80" type="selection" />
-        <el-table-column fixed prop="commentId" label="编号" min-width="10%" />
-        <el-table-column prop="articleTitle" label="文章标题" min-width="10%" />
-        <el-table-column prop="username" label="评论者" min-width="10%" />
-        <el-table-column prop="message" label="内容" min-width="30%" />
-        <el-table-column prop="createTime" label="时间" min-width="20%" />
+        <el-table-column fixed prop="messageId" label="编号" min-width="10%" />
+        <el-table-column prop="userId" label="发送者编号" min-width="10%" />
+        <el-table-column prop="username" label="发送者头像" min-width="10%" >
+          <template v-slot="scope">
+            <img style="width: 60px;height: 60px" :src="scope.row.headImg" alt="">
+          </template>
+        </el-table-column>
+        <el-table-column prop="message" label="留言" min-width="20%" />
         <el-table-column fixed="right" align="center" label="操作" width="150">
           <template v-slot="scope">
             <el-button type="primary" size="small" @click="edit(scope.row)">修改</el-button>
@@ -29,7 +32,7 @@
             :page-size="pageSize"
             :small="false"
             layout="total,prev, pager, next, jumper"
-            :total="data.comments.length"
+            :total="data.messages.length"
             @current-change="handleCurrentChange"
         />
       </template>
@@ -69,7 +72,7 @@ import {getCurrentInstance, onMounted, reactive} from "vue";
 const {proxy} = getCurrentInstance()
 const pageSize = 12
 var data = reactive({
-  comments:[],
+  messages:[],
   target:{},
   select:[],
   list:[],
@@ -79,19 +82,45 @@ var data = reactive({
 })
 function edit(){}
 function del(){
+  ElMessageBox.confirm('是否确认此操作?', '提示', {
+    confirmButtonText: '确定',
+    cancelButtonText: '取消',
+    type: 'warning'
+  }).then(()=>{
+    var list
+    if(val == undefined){
+      list = data.selectUsers.map((item)=>{
+        return item.userId
+      })
+    }else{
+      list = val.userId
+    }
+    proxy.$http({
+      url:'/user/delete',
+      method:'post',
+      data:{userId:list}
+    }).then(res => {
+      init()
+      return ElMessage({
+        message: res.data.msg,
+        type: res.data.type
+      })
+    })
+  })
 }
 function select(val){
+  data.selectUsers = val
 }
 function handleCurrentChange(){}
 function add(){}
 onMounted(()=>{
-  proxy.$http.get('/comments').then(res=>{
-    console.log(res.data)
-    data.comments = res.data
-    data.list = data.comments.slice((data.currentPage-1)*pageSize,data.currentPage * pageSize)
+  proxy.$http.get('/message').then(res=>{
+    data.messages = res.data
+    data.list = data.messages.slice((data.currentPage-1)*pageSize,data.currentPage * pageSize)
   })
 })
 </script>
+
 <style scoped>
 .body{
   width: 100%;

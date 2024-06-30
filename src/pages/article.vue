@@ -11,9 +11,9 @@
         <a>创建时间:2023-05-21</a>
       </div>
     </div>
+    <div v-html="data.toc"></div>
     <div class="articleBody">
-      <div class="entryContent">
-        <div v-html="data.article.articleMessage"></div>
+      <div class="entryContent" v-html="data.article.articleMessage">
       </div>
     </div>
     <div class="comment">
@@ -24,18 +24,36 @@
       <textarea class="commentTextarea" v-model="data.message" maxlength="100" placeholder="写下点什么吧"></textarea>
       <button class="commentButton" @click="submit()">提交</button>
       <div class="commentsHeader">
-        <p>评论 | {{data.comments.length}}条评论</p>
+        <p id="commit">评论 | {{data.comments.length}}条评论</p>
       </div>
       <div class="comments" v-for="(item,index) in data.comments" :key="index">
         <img :src="item.headImg" class="commentsImg">
         <div class="commentsBody">
           <div class="commentsTop">
-            <a>{{ item.username }}</a>
-            <a>{{ item.dateTime }}</a>
+            <div>
+              <a>{{ item.username }}</a>
+              <a>{{ item.dateTime }}</a>
+            </div>
+            <p>回复</p>
           </div>
           <div class="commentsMessage">
             <p>{{ item.message }}</p>
           </div>
+<!--          <div class="answer" v-for="(item,index) in data.comments" :key="index">-->
+<!--            <img :src="item.headImg" class="commentsImg">-->
+<!--            <div class="commentsBody">-->
+<!--              <div class="commentsTop">-->
+<!--                <div>-->
+<!--                  <a>{{ item.username }}</a>-->
+<!--                  <a>{{ item.dateTime }}</a>-->
+<!--                </div>-->
+<!--                <p>回复</p>-->
+<!--              </div>-->
+<!--              <div class="commentsMessage">-->
+<!--                <p>{{ item.message }}</p>-->
+<!--              </div>-->
+<!--            </div>-->
+<!--          </div>-->
         </div>
       </div>
     </div>
@@ -44,27 +62,24 @@
 
 <script setup>
 import 'highlight.js/styles/atom-one-dark.css'
+import MarkdownIt from 'markdown-it'
+import markdownItAnchor from 'markdown-it-anchor'
+import markdownItTocDoneRight from 'markdown-it-toc-done-right'
+import uslug from 'uslug'
+import hljs from 'highlight.js'
 import Header from "../components/header.vue";
 import {getCurrentInstance,reactive,onMounted } from "vue";
 import useStore from "../store/index.js";
 import {useRoute} from "vue-router";
-import MarkdownIt from 'markdown-it'
-import hljs from 'highlight.js'
 const {proxy} = getCurrentInstance()
 const store = useStore()
 const route = useRoute()
 const data = reactive({
-  article:{
-    articleId:'',
-    articleMessage:'',
-    articleTitle:'',
-    articleImg:'',
-    dateTime:'',
-    heat:'',
-    articleLabel:''
-  },
+  article:{},
+  toc:'',
   message:'',
-  comments:[]
+  comments:[],
+  active:0
 })
 
 function init(){
@@ -73,9 +88,12 @@ function init(){
     method:"POST",
     data:{articleId:route.query.articleId}
   }).then(res=>{
+    const uslugify = s => uslug(`/article?articleId=${route.query.articleId}/#`+s,{
+      allowedChars: ['/','#','=','?'],
+      lower:false
+    })
     var md = new MarkdownIt({
       html: true,
-      linkify: true,
       typographer: true,
       highlight: function (str, lang,options) {
         // 此处判断是否有添加代码语言
@@ -111,54 +129,105 @@ function init(){
             html +
             '</code></pre>'
       }
+    }).use(markdownItAnchor,{
+      permalink:true,
+      permalinkSymbol:"",
+      slugify:uslugify
+    }).use(markdownItTocDoneRight,{
+      level:1,
+      slugify:uslugify,
+      containerClass:'toc',
+      listClass:'toc-list',
+      itemClass:'toc-list-item',
+      linkClass:'toc-link',
+      callback(){
+      }
     })
     data.article = res.data.article
-    data.article.articleMessage = md.render(`${data.article.articleMessage}`)
-    data.article.articleImg = 'data:image/png;base64,' + data.article.articleImg
-
+    data.article.articleMessage = md.render("${toc}\n"+data.article.articleMessage)
+    // let tokens = md.parse("${toc}"+data.article.articleMessage, {})
+    // console.log(tokens)
+    // tokens.forEach(token => {
+    //   console.log(token)
+    //   if (token.type === 'inline') {
+    //     const match = token.content.match(/<nav[\s\S]*?<\/nav>/);
+    //     console.log(match)
+    //     const extractedString = match ? match[0] : '';
+    //     data.toc = extractedString
+    //     console.log(extractedString)
+    //   }
+    // });
+    scrollTo()//a标签滑动
+    window.addEventListener('scroll',scroll)//监测滑动
     initComment()
   })
-
+}
+async function scrollTo() {
+  let link = await document.getElementsByClassName('toc-link')
+  link[data.active].classList.add('active')//目录突出
+  for (let i = 0; i < link.length; i++) {
+    link[i].onclick = async function (e) {
+      event.preventDefault()
+      await document.getElementById(link[i].getAttribute('href').substring(1)).scrollIntoView({
+        behavior: 'smooth',
+        block: 'center',
+        inline: 'nearest'
+      })
+    }
+  }
+}
+async function scroll() {
+  let link = await document.getElementsByClassName('toc-link')
+  for (let i = 0; i < link.length; i++) {
+    let id = link[i].getAttribute('href').substring(1)
+    let h = document.getElementById(id)
+    if (isElementInViewport(h)) {
+      link[data.active].classList.remove('active')
+      data.active = i
+      link[i].classList.add('active')
+      if(!isElementInViewport(link[i],'toc')){
+        let tocList = document.getElementsByClassName('toc-list')[0]
+        tocList.scrollTop = link[i].offsetTop + link[i].offsetHeight - tocList.clientHeight;
+      }
+    }
+  }
+}
+function isElementInViewport(element,toc) {
+  var rect = element.getBoundingClientRect();
+  if(toc){
+    let tocList = document.getElementsByClassName('toc-list')[0]
+    var parentRect = tocList.getBoundingClientRect();
+    return (
+        rect.top >= parentRect.top &&
+        rect.bottom <= parentRect.bottom
+    )
+  }else{
+    return (
+        rect.top >= 0 &&
+        rect.bottom <= (window.innerHeight || document.documentElement.clientHeight)/10*6
+    );
+  }
 }
 function initComment(){
   proxy.$http({
     url:'/comment',
     method:"GET",
     data:{
-      message:data.message,
-      articleId:data.article.articleId,
-      dateTime:new Date().toLocaleString()
+      articleId:data.article.articleId
     }
   }).then(res=>{
-    let a = res.data.filter(item=>item.articleId == data.article.articleId.toString());
-    for(let i = 0;i < a.length;i++){
-      a[i].headImg = 'data:image/png;base64,' + a[i].headImg
-    }
-    a.forEach((item)=>{
-      item.dueTime = Date.parse(item.dateTime)
-      item.dateTime = proxy.$utils.convertTimeToHumanReadable(item.dateTime)
-    })
-    a.sort(function (a,b){
-      return b.dueTime - a.dueTime
-    })
-    data.comments = a
+    data.comments = res.data
   })
 }
 function submit(){
-  proxy.$http({
-    url:'/comment/submit',
-    method:"POST",
-    data:{
+  proxy.$http.post('/comment/submit',{
       message:data.message,
       articleId:data.article.articleId,
       dateTime:new Date().toLocaleString()
     }
-  }).then(res=>{
+  ).then(res=>{
     data.message = ''
-    var comment = res.data.comment
-    comment.headImg = 'data:image/png;base64,' + comment.headImg
-    comment.dateTime = proxy.$utils.convertTimeToHumanReadable(comment.dateTime)
-    data.comments.unshift(comment)
+    data.comments.unshift(res.data.comment)
     return ElMessage({
       message: res.data.msg,
       type: res.data.type
@@ -172,6 +241,13 @@ onMounted(()=>{
 </script>
 
 <style scoped>
+@font-face {
+  font-family: rain;
+  src: url("../assets/wenzi.ttf");
+}
+*{
+  font-family: rain;
+}
 @keyframes zhuye {
   from{
     opacity: 0;
@@ -216,6 +292,7 @@ onMounted(()=>{
   color: white;
   text-align: center;
   font-family: normal;
+  text-shadow: 2px 2px 10px #000;
 }
 .articleHeader p{
   color: rgb(171,164,136);
@@ -229,16 +306,16 @@ onMounted(()=>{
   display: flex;
   flex-direction: column;
   align-items: center;
-  animation: bottom 1.5s ease 0s 1 normal none running;
 }
 .entryContent{
-  width: 80%;
+  width: 100%;
   max-width: 800px;
+  /*animation: bottom 1.5s ease 0s 1 normal none running;*/
 }
 .comment{
-  width: 80%;
+  width: 100%;
   max-width: 800px;
-  padding: 20px 0 50px 0;
+  padding: 20px 20px 30px 20px;
   margin: 0 auto;
   display: flex;
   flex-direction: column;
@@ -287,16 +364,20 @@ onMounted(()=>{
   display: flex;
   align-items: center;
   margin-bottom: 20px;
+  z-index:10000;
 }
 .commentsHeader p{
   color: #797979;
   font-size: 18px;
 }
-.comments{
+.comments,.answer{
   width: 100%;
   display: flex;
   flex-direction: row;
   margin-bottom: 20px;
+}
+.comments{
+  border-bottom: 1px solid rgba(0,0,0,.1);
 }
 .commentsImg{
   width: 35px;
@@ -314,10 +395,20 @@ onMounted(()=>{
   color: #797979;
   display: flex;
   flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
 }
 .commentsTop a:nth-child(1){
   font-weight: 700;
   margin-right: 10px;
+}
+.commentsTop p{
+  padding: 5px;
+  background-color: rgb(239,122,80);
+  color: white;
+  border-radius: 5px;
+  font-size: 16px;
+  cursor: pointer;
 }
 .commentsMessage{
   width: 100%;
@@ -325,5 +416,6 @@ onMounted(()=>{
   background-color: #f7f9fe;
   border-radius: 10px;
   font-size: 18px;
+  margin-bottom: 20px;
 }
 </style>

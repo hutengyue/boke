@@ -18,8 +18,6 @@
           <div class="danmu">
             <img class="danmuImg" v-if="danmu.avatar" :src="danmu.avatar" alt="">
             <div class="danmuText">{{ danmu.text }}</div>
-<!--            <div class="item" @click="handleAdd(danmu)">➕</div>-->
-<!--            <div class="item" @click="handleIndex(index)">👍</div>-->
           </div>
         </template>
       </Danmaku>
@@ -46,7 +44,7 @@ function fire(){
     proxy.$http.post("/message/send", {message:data.text}).then(res=>{
       if(res.data.type == "success"){
         data.danmus.push({
-          avatar: 'data:image/png;base64,'+res.data.headImg,
+          avatar: res.data.headImg,
           text: res.data.text,
         });
       }
@@ -58,29 +56,31 @@ function fire(){
   }
   data.text = ""
 }
-
 function addToList(list) {
   list.forEach((v) => {
     data.danmus.push({
-      avatar: v.headImg,      		//头像
-      text: v.message,             	//弹幕消息
+      avatar: v.user,      		//头像
+      text: v.content,             	//弹幕消息
     });
   });
   danmakuRef.value.play()
 }
-
 onMounted(()=>{
   proxy.$http.get('/message').then(res=>{
     var list = res.data
-    list.forEach((item,index)=>{
-      item.headImg = 'data:image/png;base64,' + item.headImg
-    })
     addToList(list)
   })
 })
 </script>
 
 <style scoped>
+@font-face {
+  font-family: rain;
+  src: url("../assets/wenzi.ttf");
+}
+*{
+  font-family: rain;
+}
 @keyframes zhuye {
   from{
     opacity: 0;

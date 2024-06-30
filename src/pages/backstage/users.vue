@@ -17,24 +17,29 @@
           <el-button type="danger" :disabled="data.selectUsers==0" @click="del()">删除</el-button>
         </div>
       </template>
-      <el-table :data="data.list" style="width: 100%"
+      <el-table :border="true" :data="data.list" style="width: 100%"
                 @selection-change="select">
-        <el-table-column width="80" type="selection" />
-        <el-table-column align="center" fixed prop="userId" label="编号" width="70" />
-        <el-table-column align="center" prop="username" label="名称" width="130" />
-        <el-table-column align="center" label="性别" width="120" >
+        <el-table-column width="80" type="selection"/>
+        <el-table-column fixed prop="userId" label="编号" width="100" />
+        <el-table-column label="头像" width="130" >
+          <template v-slot="scope">
+            <img style="width: 60px;height: 60px" :src="scope.row.headImg" alt="">
+          </template>
+        </el-table-column>
+        <el-table-column prop="username" label="名称" width="130" />
+        <el-table-column label="性别" width="120" >
           <template v-slot="scope">
             <a>{{scope.row.sex == 1?'男':'女'}}</a>
           </template>
         </el-table-column>
-        <el-table-column align="center" prop="identity" label="身份" width="150"></el-table-column>
-        <el-table-column align="center" prop="email" label="邮箱" width="200" />
-        <el-table-column align="center" prop="introduction" label="介绍" width="250" />
-        <el-table-column align="center" prop="createTime" label="创建时间" width="200" />
-        <el-table-column fixed="right" label="Operations" width="150">
+        <el-table-column prop="identity" label="身份" width="150"></el-table-column>
+        <el-table-column prop="email" label="邮箱" width="200" />
+        <el-table-column prop="introduction" label="介绍" width="250" />
+        <el-table-column prop="createTime" label="创建时间" width="250" />
+        <el-table-column fixed="right" label="操作" width="200">
           <template v-slot="scope">
-            <el-button link type="primary" size="small" @click="edit(scope.row)">修改</el-button>
-            <el-button link type="primary" size="small" @click="del(scope.row)">删除</el-button>
+            <el-button type="primary" size="small" @click="edit(scope.row)">修改</el-button>
+            <el-button type="danger" size="small" @click="del(scope.row)">删除</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -66,7 +71,7 @@
         <el-form-item label="身份" :label-width="'140px'">
           <el-select v-model="data.target.identity" placeholder="身份">
             <el-option label="admin" value="admin" />
-            <el-option label="普通用户" value="普通用户" />
+            <el-option label="user" value="user" />
           </el-select>
         </el-form-item>
         <el-form-item label="邮箱" :label-width="'120px'">
@@ -216,7 +221,7 @@ onMounted(()=>{
 .search-container{
   padding: 18px;
   background-color: white;
-  width: 90%;
+  width: 93%;
   margin-top: 20px;
   box-shadow: 0px 0px 12px rgba(0, 0, 0, .12);
   border-radius: 4px;
@@ -224,6 +229,6 @@ onMounted(()=>{
 }
 .box-card{
   margin-top: 20px;
-  width: 90%;
+  width: 93%;
 }
 </style>

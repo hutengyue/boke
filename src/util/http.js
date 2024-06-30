@@ -21,16 +21,13 @@ axios.interceptors.request.use(
 
 axios.interceptors.response.use(
     response => {
-        if (response.status === 200) {
-            return Promise.resolve(response);
-        } else {
-            return Promise.reject(response);
-        }
+        return Promise.resolve(response);
     },
     error => {
+        console.log(error)
         const store = useStore()
-        if (error.response.status) {
-            switch (error.response.status) {
+        if (error.response.statusCode) {
+            switch (error.response.statusCode) {
                 // 401: 未登录
                 // 未登录则跳转登录页面，并携带当前页面的路径
                 // 在登录成功后返回当前页面，这一步需要在登录页操作。

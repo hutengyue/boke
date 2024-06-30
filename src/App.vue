@@ -1,14 +1,20 @@
 <script setup>
+import Tool from './components/tool/index.vue'
 import {onMounted,getCurrentInstance} from "vue";
-import musicPlayer from './components/musicPlayer.vue'
+import {useRouter} from 'vue-router';
 import cookie from "js-cookie";
 import useStore from "./store";
 const {proxy} = getCurrentInstance()
 const store = useStore()
+const router = useRouter()
 
 const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 
 onMounted(()=>{
+  window.addEventListener('storage', (e) => {
+    localStorage.setItem(e.key, e.oldValue);
+  });
+
   document.title = "cavalry"
   document.addEventListener("visibilitychange", ()=>{
     if (document.hidden === true) {
@@ -20,31 +26,29 @@ onMounted(()=>{
       },3000)
     }
   });
+
   let flag = !cookie.get('visit')?true:false
-  proxy.$http({
-    url:'/visit',
-    method:'POST',
-    data:{
-      flag:flag,
-      city:store.getVisit.city||cookie.get('visit'),
-      device:isMobile?'MB':'PC',
-      browser:proxy.$utils.browserType()
-    }
-  }).then((res)=>{
-    if(flag == true){
-      store.setVisit({
-        ip:res.data.ip,
-        city:res.data.map.city
-      })
-      cookie.set('visit',res.data.map.city,{expires:0.25})
-    }
-  })
+  // proxy.$http({
+  //   url:'/visit',
+  //   method:'POST',
+  //   data:{
+  //     flag:flag,
+  //     city:store.getCity||cookie.get('visit'),
+  //     device:isMobile?'MB':'PC',
+  //     browser:proxy.$utils.browserType()
+  //   }
+  // }).then((res)=>{
+  //   if(flag == true){
+  //     store.setCity(res.data.map.city)
+  //     cookie.set('visit',res.data.map.city,{expires:0.25})
+  //   }
+  // })
 })
 </script>
 
 <template>
   <router-view></router-view>
-  <musicPlayer/>
+  <Tool></Tool>
 </template>
 
 <style scoped>

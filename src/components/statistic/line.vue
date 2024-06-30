@@ -10,10 +10,8 @@ const props = defineProps({
   lineData:Object
 })
 const line = toRef(props,'lineData')
-const data = reactive({
-  ipList:[],
-  numberList:[]
-})
+let ipList = []
+let numberList = []
 
 function getDate(index = 0) {
   var yesterday = moment().subtract(index, 'days');
@@ -27,15 +25,15 @@ onMounted(()=>{
   let index = 0
   for(let i = 0;i < 7;i++){
     if(day[i] == line.value[index].name){
-      data.ipList.push(line.value[index].ip)
-      data.numberList.push(line.value[index].number)
+      ipList.push(line.value[index].ip)
+      numberList.push(line.value[index].number)
       index++
     }else{
-      data.ipList.push(0)
-      data.numberList.push(0)
+      ipList.push(0)
+      numberList.push(0)
     }
-
   }
+  console.log(ipList,numberList)
   const visit = proxy.$echarts.init(document.getElementById('main'))
   const option = {
     tooltip: {
@@ -75,33 +73,6 @@ onMounted(()=>{
     ],
     series: [
       {
-        name: '今日ip数',
-        type: 'line',
-        stack: 'Total',
-        smooth: true,
-        lineStyle: {
-          width: 0
-        },
-        showSymbol: false,
-        areaStyle: {
-          opacity: 0.8,
-          color: new proxy.$echarts.graphic.LinearGradient(0, 0, 0, 1, [
-            {
-              offset: 0,
-              color: 'rgb(128, 255, 165)'
-            },
-            {
-              offset: 1,
-              color: 'rgb(1, 191, 236)'
-            }
-          ])
-        },
-        emphasis: {
-          focus: 'series'
-        },
-        data: data.ipList
-      },
-      {
         name: '今日浏览量',
         type: 'line',
         stack: 'Total',
@@ -126,7 +97,34 @@ onMounted(()=>{
         emphasis: {
           focus: 'series'
         },
-        data: data.numberList
+        data: numberList
+      },
+      {
+        name: '今日ip数',
+        type: 'line',
+        stack: 'Total',
+        smooth: true,
+        lineStyle: {
+          width: 0
+        },
+        showSymbol: false,
+        areaStyle: {
+          opacity: 0.8,
+          color: new proxy.$echarts.graphic.LinearGradient(0, 0, 0, 1, [
+            {
+              offset: 0,
+              color: 'rgb(128, 255, 165)'
+            },
+            {
+              offset: 1,
+              color: 'rgb(1, 191, 236)'
+            }
+          ])
+        },
+        emphasis: {
+          focus: 'series'
+        },
+        data: ipList
       }
     ]
   };
@@ -142,7 +140,6 @@ onMounted(()=>{
   margin-top: 50px;
   height: 300px;
   width: 100%;
-  max-width: 1280px;
   margin-bottom: 30px;
 }
 </style>

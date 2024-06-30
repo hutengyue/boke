@@ -1,5 +1,7 @@
 import { defineStore} from 'pinia'
 import storage from "../util/storage";
+import route from "../router/route.js";
+import router from "../router/index.js";
 
 
 const useStore = defineStore('boke',{
@@ -10,10 +12,8 @@ const useStore = defineStore('boke',{
         token:"",
         userName:"",
         headImg:"",
-        visit:{
-            city:"",
-            ip:""
-        }
+        city:"",
+        identity:""
     }),
     getters:{
         getToken(){
@@ -22,8 +22,8 @@ const useStore = defineStore('boke',{
         getHeadImg(){
             return this.headImg || storage.get("headImg") || ""
         },
-        getVisit(){
-            return this.visit
+        getCity(){
+            return this.city || storage.get("city") || ""
         }
     },
     actions:{
@@ -35,8 +35,20 @@ const useStore = defineStore('boke',{
             this.headImg = headImg;
             storage.set('headImg',headImg)
         },
-        setVisit(visit){
-            this.visit = visit;
+        setCity(city){
+            this.city = city;
+            storage.set('city',city)
+        },
+        setIdentity(identity){
+            this.identity = identity
+            storage.set('identity',identity)
+        },
+        delIdenttity(identity){
+            this.identity = identity
+            storage.remove("identity")
+            route.forEach((item)=>{
+                router.removeRoute(item)
+            })
         },
         delToken(){
             this.token = "";
@@ -45,9 +57,6 @@ const useStore = defineStore('boke',{
         delHeadImg(headImg){
             this.headImg = ""
             storage.remove("headImg")
-        },
-        setUserInfo(userName) {
-            this.userName = userName;
         }
     }
 })

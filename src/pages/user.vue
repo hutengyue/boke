@@ -14,32 +14,17 @@
 import Header from "../components/header.vue";
 import SignInUp from "../components/signInUp.vue";
 import UserInfo from "../components/userInfo.vue";
-import {getCurrentInstance, onMounted, reactive} from "vue";
+import {getCurrentInstance, onMounted, reactive,ref} from "vue";
 import useStore from "../store/index.js";
 const {proxy} = getCurrentInstance()
 const store = useStore()
-var user = reactive({
-  userId:'',
-  username:'',
-  sex:'',
-  email:'',
-  introduction:'',
-  headImg:''
-})
+var user = ref({})
 function init(){
   if(store.getToken != ''){
     proxy.$http.get('/user').then(res => {
-      var resData = res.data
-      if(resData.type == "success"){
-        user.userId = resData.user[0].userId.toString()
-        user.username = resData.user[0].username
-        user.sex = resData.user[0].sex.toString()
-        user.email = resData.user[0].email
-        user.introduction = resData.user[0].introduction
-        user.headImg = 'data:image/png;base64,' + resData.user[0].headImg
-        store.setHeadImg(user.headImg)
-        proxy.$bus.emit('headImg')
-      }
+      user.value = res.data
+      store.setHeadImg(user.value.headImg)
+      proxy.$bus.emit('headImg')
     })
   }
 }
@@ -49,6 +34,12 @@ onMounted(()=>{
 })
 </script>
 
-<style scoped>
-
+<style>
+@font-face {
+  font-family: rain;
+  src: url("../assets/wenzi.ttf");
+}
+*{
+  font-family: rain;
+}
 </style>

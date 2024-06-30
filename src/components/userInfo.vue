@@ -25,7 +25,8 @@
         </div>
       </div>
       <button class="button" @click="submit">提交</button>
-      <button class="buttonExit" @click="exit">退出登录</button>
+      <button class="exit" @click="exit">退出登录</button>
+      <button class="admin" @click="gotoAdmin()">进入后台</button>
     </div>
 
     <el-dialog
@@ -39,7 +40,7 @@
           :action="data.httpUrl"
           :show-file-list="false"
           drag
-          name="img"
+          name="file"
           :headers="data.headers"
           :on-success="handleAvatarSuccess"
           :before-upload="beforeAvatarUpload">
@@ -66,15 +67,15 @@ import {useRouter} from "vue-router";
 const props = defineProps({
   user:Object
 })
+const user = toRef(props,'user')
 const {proxy} = getCurrentInstance()
 const store = useStore()
 const router = useRouter()
-const user = toRef(props,'user')
 const data = reactive({
   headers: {enctype: "multipart/form-data"},
   centerDialogVisible: false,
   imageUrl: '',
-  httpUrl: `http://${global.httpUrl}/imgUpload`,
+  httpUrl: `http://${global.httpUrl}/upload/image`,
   fileInfo: ''
 });
 
@@ -122,9 +123,13 @@ function submit(){
   })
 }
 function exit(){
+  store.delIdenttity()
   store.delToken()
   store.delHeadImg()
   router.go(0)
+}
+function gotoAdmin(){
+  router.push('/admin')
 }
 </script>
 
@@ -142,7 +147,7 @@ function exit(){
 .all{
   position: relative;
   align-items: center;
-  background: #e9e9e9 url("../assets/image/nv.jpg") no-repeat fixed center;
+  background: #e9e9e9 url("../assets/image/user.jpg") no-repeat fixed center;
   background-size: cover;
   display: grid;
   height: 100vh;
@@ -197,10 +202,22 @@ function exit(){
   padding: 10px;
   background-color: darkviolet;
 }
-.buttonExit{
+.exit{
   position: absolute;
   top: 0;
   left: 80%;
+  color: white;
+  font-size: 20px;
+  margin-top: 40px;
+  border: none;
+  border-radius: 10px;
+  padding: 10px;
+  background-color: darkviolet;
+}
+.admin{
+  position: absolute;
+  top: 0;
+  right: 80%;
   color: white;
   font-size: 20px;
   margin-top: 40px;

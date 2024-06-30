@@ -1,7 +1,6 @@
 <template>
-  <Header style="z-index: 1000"></Header>
+  <Header :active="true" style="z-index: 1000"></Header>
   <div>
-    <img class="bkg" src="../assets/image/nv.jpg" alt="">
     <div class="body">
       <div class="page">
         <h1 class="page-title">网站更新日志</h1>
@@ -11,7 +10,7 @@
             <div class="timeline-item" v-for="(item,index) in data.logList" key="index">
               <div class="timeline-item-title">
                 <div class="item-circle">
-                  <p>{{ item.time }}</p>
+                  <p>{{ item.createAt }}</p>
                 </div>
               </div>
               <div class="timeline-item-content">
@@ -42,15 +41,30 @@ onMounted(()=>{
 </script>
 
 <style scoped>
-@keyframes init {
-
+@font-face {
+  font-family: rain;
+  src: url("../assets/wenzi.ttf");
 }
-.bkg{
-  position: fixed;
-  height: 100vh;
-  width: 100%;
-  object-fit: cover;
-  z-index: -1000;
+*{
+  font-family: rain;
+}
+@keyframes zhuye {
+  from{
+    opacity: 0;
+  }
+  to{
+    opacity: 1;
+  }
+}
+@keyframes bottom {
+  from{
+    opacity: 0;
+    transform: translate(0px,100px);
+  }
+  to{
+    opacity: 1;
+    transform: translate(0px,0px);
+  }
 }
 .body{
   width: 100%;
@@ -58,17 +72,21 @@ onMounted(()=>{
   justify-content: center;
   align-items: center;
   padding: 40px 15px;
+  background-color: rgb(247,249,254);
 }
 .page{
   margin-top: 70px;
   width: 90%;
   max-width: 1300px;
-  background-color: rgba(255,255,255,0.5);
+  background-color: #fff;
+  box-shadow: 0 8px 16px -4px #2c2d300c;
   border-radius: 20px;
+  border:1px solid #e3e8f7;
   padding: 10px 35px;
   font-weight: 700;
   font-size: 18px;
   min-height: 80%;
+  animation: bottom 1.5s ease 0s 1 normal none running;
 }
 .page-title{
   text-align: center;

@@ -47,6 +47,7 @@ import {getCurrentInstance, onBeforeUnmount, onMounted, reactive, watch} from "v
 import { ElMessage } from 'element-plus'
 import useStore from "../store/index.js";
 import {useRouter} from "vue-router";
+import route from "../router/route.js";
 const {proxy} = getCurrentInstance()
 const store = useStore()
 const router = useRouter()
@@ -55,6 +56,7 @@ var data = reactive({
   logPsd:'',
   logCode:'',
   captcha:'',
+  text:'',
   //注册
   email:'',
   regName:'',
@@ -67,8 +69,9 @@ var data = reactive({
 })
 
 function init(){
-  proxy.$http.get('/login/captcha').then(res=>{
+  proxy.$http.get('/auth/captcha').then(res=>{
     data.captcha = res.data.captcha
+    data.text = res.data.text
   })
 }
 
@@ -81,9 +84,9 @@ function start(){
 function reqEmail(){
   var re = /^[a-zA-Z0-9]+([-_.][A-Za-zd]+)*@([a-zA-Z0-9]+[-.])+[A-Za-zd]{2,5}$/;
   if(re.test(data.email)){
-    proxy.$http.post('/register/email', {email:data.email}
+    proxy.$http.post('/auth/registerEmail', {email:data.email}
     ).then(res => {
-      if(res.data.type != "error"){
+      if(res.data.type != "warning"){
         data.code = false;
         start()
       }
@@ -100,23 +103,21 @@ function reqEmail(){
 function register(){
   var re = /^[a-z0-9]+$/i
   if(!re.test(data.regPsd)){
-    ElMessage.warning("密码只能是数字和字母")
+    return ElMessage.warning("密码只能是数字和字母")
   }
   if(data.regName == '' || data.regPsd == ''){
-    ElMessage.warning("用户名或密码为空")
+    return ElMessage.warning("用户名或密码为空")
   }else{
-    proxy.$http({
-      url:'/register',
-      method:'post',
-      data: {
+    proxy.$http.post('/auth/register',{
+      regCode:data.regCode,
+      user:{
         username:data.regName,
         password:data.regPsd,
         email:data.email,
-        createTime:new Date().toLocaleString(),
-        regCode:data.regCode
       }
-    }).then(res => {
+    }).then(res=>{
       if(res.data.type != "error"){
+        data.logEmail = data.email
         data.email = '';data.regName='';data.regPsd='';data.regCode='';
         data.active = false
       }
@@ -130,25 +131,23 @@ function register(){
 
 function login(){
   if(data.logEmail == '' && data.logPsd == ''){
-    ElMessage.warning("邮箱与密码不能为空")
+    return ElMessage.warning("邮箱与密码不能为空")
+  }else if(data.logCode.toLowerCase() != data.text.toLowerCase()){
+    return ElMessage.error("验证码错误")
   }else {
-    proxy.$http.post('/login',{
+    proxy.$http.post('/auth/login',{
         email:data.logEmail,
-        password:data.logPsd,
-        logCode:data.logCode
+        password:data.logPsd
     }).then(res => {
       if(Object.hasOwn(res.data, "token")){
-        // proxy.$http.get('/user').then(res => {
-        //   if(res.data.user[0].identity == 'admin'){
-        //   }
-        //   store.setToken(res.data.token)
-        //   store.setUserInfo(res.data.username)
-        //   store.setHeadImg('data:image/png;base64,'+res.data.headImg)
-        //   router.push('/')
-        // })
+        if(res.data.identity == "admin"){
+          route.forEach((item)=>{
+            router.addRoute('admin',item)
+          })
+        }
+        store.setIdentity(res.data.identity)
+        store.setHeadImg(res.data.headImg)
         store.setToken(res.data.token)
-        store.setUserInfo(res.data.username)
-        store.setHeadImg('data:image/png;base64,'+res.data.headImg)
         router.push('/')
       }else {
         return ElMessage({

@@ -1,6 +1,5 @@
 <template>
-  <Header style="z-index: 1000"></Header>
-  <img class="bkg" src="../assets/image/visit.png" alt="">
+  <Header :active="true" style="z-index: 1000"></Header>
   <div class="body">
     <div class="page">
       <h1 class="page-title">统计</h1>
@@ -41,7 +40,7 @@ import Header from "../components/header.vue";
 import Line from '../components/statistic/line.vue'
 import ChinaMap from '../components/statistic/chinaMap.vue'
 import Pie from '../components/statistic/pie.vue'
-import {onMounted,getCurrentInstance,reactive} from "vue";
+import {onMounted,getCurrentInstance,reactive,nextTick} from "vue";
 const {proxy} = getCurrentInstance()
 var data = reactive({
   line:[],
@@ -96,18 +95,30 @@ function computeIp(list){
   })
   return number.length
 }
-onMounted(()=>{
-  init()
+onMounted(async () => {
+  nextTick(()=>{
+    init()
+  })
 })
 </script>
 
 <style scoped>
-.bkg{
-  position: fixed;
-  height: 100vh;
-  width: 100%;
-  object-fit: cover;
-  z-index: -1000;
+@font-face {
+  font-family: rain;
+  src: url("../assets/wenzi.ttf");
+}
+@keyframes bottom {
+  from{
+    opacity: 0;
+    transform: translate(0px,100px);
+  }
+  to{
+    opacity: 1;
+    transform: translate(0px,0px);
+  }
+}
+*{
+  font-family: rain;
 }
 .body{
   width: 100%;
@@ -116,19 +127,23 @@ onMounted(()=>{
   justify-content: center;
   align-items: center;
   padding: 40px 5px;
+  background-color: rgb(247,249,254);
 }
 .page{
   margin-top: 70px;
   width: 99%;
   max-width: 1300px;
-  background-color: rgba(255,255,255,0.9);
+  background-color: #fff;
+  box-shadow: 0 8px 16px -4px #2c2d300c;
   border-radius: 20px;
-  padding: 10px 35px;
+  border:1px solid #e3e8f7;
+  padding: 10px 10px;
   font-weight: 700;
   font-size: 18px;
   display: flex;
   flex-direction: column;
   align-items: center;
+  animation: bottom 1.5s ease 0s 1 normal none running;
 }
 .page-title{
   margin-top: 30px;
@@ -157,12 +172,15 @@ onMounted(()=>{
   margin-top: 70px;
   width: 99%;
   max-width: 1300px;
-  background-color: rgba(255,255,255,0.9);
+  background-color: #fff;
+  box-shadow: 0 8px 16px -4px #2c2d300c;
   border-radius: 20px;
+  border:1px solid #e3e8f7;
   display: flex;
   flex-direction: row;
   justify-content: space-around;
   align-items: center;
   padding: 35px 0px;
+  animation: bottom 1.5s ease 0s 1 normal none running;
 }
 </style>

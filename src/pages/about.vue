@@ -1,7 +1,6 @@
 <template>
   <div class="all">
-    <Header style="z-index: 1000"></Header>
-    <div class="bkg"></div>
+    <Header :active="true" style="z-index: 1000"></Header>
     <div class="aboutBox">
       <div class="authorBox">
         <div class="authorLeft">
@@ -84,12 +83,11 @@
         <div class="itemGroup">
           <div class="itemMap">
             <span class="mapTitle">
-              孤影独行至杭州 披星戴月临安寂 家山回首两百里 不见温岭见尘雾
+              我是一个来自台州的杭漂
             </span>
           </div>
         </div>
       </div>
-      <p style="color: black;font-size: 20px;margin-top:10px;background-color: rgba(255,255,255,0.67);border-radius: 20px;padding: 3px 10px">曾玩</p>
       <div class="authorContent leafImg">
         <div class="container">
           <div v-for="(item,index) in game" :key="index" :class="{active:active===index,'item':true}" @click="change(index)" ref="item">
@@ -133,6 +131,13 @@ function change(index){
 </script>
 
 <style scoped>
+@font-face {
+  font-family: rain;
+  src: url("../assets/wenzi.ttf");
+}
+*{
+  font-family: rain;
+}
 @keyframes floating {
   0%{
     transform: translate(0,-4px);
@@ -166,19 +171,8 @@ function change(index){
   display: flex;
   align-items: center;
   flex-direction: column;
-  height: 100vh;
   width: 100%;
-}
-.bkg{
-  position: fixed;
-  height: 100vh;
-  width: 100%;
-  top:0;
-  left: 0;
-  background-size: cover;
-  background: rgba(255, 255, 255, .6) url("../assets/image/about/bkg1.jpg") no-repeat;
-  background-blend-mode: multiply;
-  z-index: -100;
+  background-color: rgb(247,249,254);
 }
 .aboutBox{
   width: 100%;
@@ -220,12 +214,13 @@ function change(index){
 .authorLeft span,.authorRight span{
   transform: translate(0,-4px);
   padding: 3px 10px;
-  background-color: rgba(255,253,253,0.67);
+  background-color: #fff;
+  box-shadow: 0 8px 16px -4px #2c2d300c;
+  border:1px solid #e3e8f7;
   border-radius: 40px;
   margin-top: 6px;
   font-size: 14px;
   font-weight: bold;
-  box-shadow: 0 5px 12px -5px rgba(102, 68, 68, 0.00);
   animation: 6s ease-in-out 0s infinite normal none running floating;
 }
 .authorMiddle{
@@ -312,12 +307,16 @@ function change(index){
 .progress{
   display: inline-block;
   height: 15px;
-  background-color: hsla(0,0%,100%,.2);
+  background-color: rgb(247,249,254);
+
+  /*background-color: #fff;*/
+  box-shadow: 0 8px 16px -4px #2c2d300c;
+  border:1px solid #e3e8f7;
   border-radius: 10px;
   width: 60%;
 }
 .progressLine{
-  background-color: #fff;
+  background: linear-gradient(-45deg,#a3e9eb,#bdbdf0,#eec1ea);;
   height: 15px;
   position: relative;
   border-radius: 10px;
@@ -332,7 +331,7 @@ function change(index){
   height: 0;
   border-left: 8px solid transparent;
   border-right: 8px solid transparent;
-  border-top: 8px solid #fff;
+  border-top: 8px solid black;
 }
 .progress span{
   font-size: 12px;
@@ -364,8 +363,9 @@ function change(index){
   flex-direction: column;
   justify-content: center;
   align-items: flex-start;
-  background: rgba(255,253,253,0.67);
-  padding: 1.5rem 2.5rem;
+  background-color: #fff;
+  box-shadow: 0 8px 16px -4px #2c2d300c;
+  border:1px solid #e3e8f7;
 }
 .itemGroup{
   width: 59%;
@@ -492,8 +492,10 @@ function change(index){
   width: 100%;
   flex-direction: column;
   align-items: flex-start;
-  background: rgba(255,253,253,0.67);
+  background-color: #fff;
+  box-shadow: 0 8px 16px -4px #2c2d300c;
   border-radius: 20px;
+  border:1px solid #e3e8f7;
   padding: 1.5rem 2.5rem;
 }
 .introduce p{

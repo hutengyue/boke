@@ -1,11 +1,6 @@
-@font-face {
-    font-family: rain;
-    src: url("assets/wenzi.ttf");
-}
 *{
     padding: 0px;
     margin: 0px;
-    font-family: rain;
     box-sizing: border-box;
 }
 ::selection {
@@ -17,6 +12,19 @@
     background: #fefac7;
     color: #e67474;
 }
+::-webkit-scrollbar-thumb{
+    background-color: #49b1f5;
+    background-image: linear-gradient(45deg,hsla(0,0%,100%,.4) 25%,transparent 0,transparent 50%,
+    hsla(0,0%,100%,.4) 0,hsla(0,0%,100%,.4) 75%,transparent 0,transparent);
+    border-radius: 1em;
+}
+::-webkit-scrollbar{
+    width: 6px;
+    height: 10px;
+}
+::-webkit-scrollbar-track{
+    background-color: rgba(73,177,245,.2);
+}
 
 b,p,h1,a,input,button,h2,img,li,h3,h4,h5,h6{
     user-select: none;
@@ -27,22 +35,20 @@ div{
 code{
     user-select: text;
 }
-
+body { scroll-behavior: smooth; }
 
 
 
 
 
 /* markdown样式 */
-.entryContent {
-    position: relative;
-}
 
 .hljs {
     background-color: rgb(33,37,43);
     padding-top: 30px;
     border-radius: 5px;
     position: relative;
+    width: 100%;
     overflow: hidden;
 }
 .hljs::before{
@@ -100,7 +106,7 @@ code{
 .hljs ol li .item:hover{
     background-color: rgb(52,54,56);
 }
-.hljs ol li .item,span{
+.hljs ol li .item,.hljs ol li .item span{
     font-family: normal;
     font-size: 15px;
     letter-spacing: 1px;
@@ -173,7 +179,6 @@ p code{
     font-size: 18px;
     padding-left: 28px;
 }
-
 .entryContent h2:before {
     content: "🐔";
     position: absolute;
@@ -203,17 +208,17 @@ p code{
     position: absolute;
 }
 
-.entryContent a {
+.entryContent > p a {
     color: #e67474;
     position: relative;
     text-decoration: none;
 }
 
-.entryContent a:hover {
+.entryContent > p a:hover {
     color: orange;
 }
 
-.entryContent a:after {
+.entryContent > p a:after {
     content: '';
     position: absolute;
     width: 100%;
@@ -226,7 +231,7 @@ p code{
     transition: transform 0.25s ease-out;
 }
 
-.entryContent a:hover:after {
+.entryContent > p a:hover:after {
     transform: scaleX(1);
     transform-origin: bottom left;
 }
@@ -249,5 +254,55 @@ p code{
     border-radius: 5px;
 }
 
-
+/*目录*/
+.toc{
+    position: fixed;
+    top: 13vh;
+    right: 2%;
+    width: 250px;
+    background-color: #F7F9Fe;
+    border-radius: 8px;
+    padding:10px 10px 10px 5px;
+    color: #595a5a;
+    box-sizing: border-box;
+    z-index: 100;
+}
+.toc:before{
+    content:'🏖️目录';
+    font-size: 24px;
+    margin-left: 55px;
+}
+.toc ol ol{
+    padding-left: 20px;
+}
+.toc>.toc-list{
+    overflow: auto;
+    margin: 7px 0;
+    padding-inline-start: 10px!important;
+    position: relative;
+    display: block;
+    max-height: 50vh;
+    padding-right: 7px;
+}
+.toc-list-item{
+    text-align: -webkit-match-parent;
+    unicode-bidi: isolate;
+    display: flex;
+    flex-direction: column;
+}
+.toc-link{
+    font-size: 18px;
+    margin:4px 0;
+    scroll-behavior: smooth;
+    box-sizing: unset;
+    text-decoration: none;
+    color: rgb(100,100,100);
+}
+.toc-link.active{
+    font-weight: 700;
+    color: white;
+    background-color: rgb(131,123,199);
+    padding: 4px 8px;
+    border-radius: 5px;
+}
 

@@ -1,6 +1,10 @@
 import {createRouter,createWebHashHistory} from 'vue-router'
 import storage from "../util/storage.js";
 import useStore from "../store";
+import NProgress from 'nprogress'
+import 'nprogress/nprogress.css'
+NProgress.inc(0.2)
+NProgress.configure({ easing: 'ease', speed: 500, showSpinner: true })
 const routes = [
     {
         path:'/',
@@ -46,30 +50,26 @@ const routes = [
         component:()=>import("../pages/article.vue")
     },
     {
+        path: '/tag',
+        name: 'tag',
+        component:()=>import("../pages/tag.vue")
+    },
+    {
+        path: '/*',
+        name:'404',
+        component:()=>import("../pages/404.vue")
+    },
+    {
         path: '/admin',
         name:'admin',
         component:()=>import("../pages/admin.vue"),
-        // meta: {
-        //     requireAuth: true,
-        // },
         children:[
             {
-                path:'users',
-                component:()=>import("../pages/backstage/users.vue")
+                path: '',
+                component:()=>import('../pages/backstage/page.vue')
             },
-            {
-                path:'comments',
-                component:()=>import("../pages/backstage/comments.vue")
-            },
-            {
-                path: '/admin/public',
-                component:()=>import("../pages/backstage/public.vue")
-            },
-            {
-                path: '/admin/logs',
-                component:()=>import("../pages/backstage/logs.vue")
-            }
         ]
+
     }
 ]
 
@@ -98,8 +98,12 @@ router.beforeEach((to, from, next) => {
         // firefox
         document.documentElement.scrollTop = 0
         // safari
+        NProgress.start()
         next(); //如果无需token
     }
 });
+router.afterEach(()=>{
+    NProgress.done()
+})
 
 export default router
