@@ -1,5 +1,5 @@
 <template>
-  <Header :active="true" style="z-index: 1000"></Header>
+  <Header style="z-index: 1000"></Header>
   <div class="body">
     <div class="page">
       <h1 class="page-title">统计</h1>
@@ -56,45 +56,52 @@ var data = reactive({
     number:0
   }
 })
-function init(){
-  proxy.$http.get('/visit/detail').then((res)=>{
-    data.total = res.data[0]
-    data.all = res.data[1]
-    let list = data.all.reduce((pre, cur) => {
-      (pre[cur.time.substring(0, 10)] || (pre[cur.time.substring(0, 10)] = [])).push(cur);
-      return pre
-    }, [])
-    for(let item in list){
-      if(item == getDay()){
-        data.list = list[item]
-        data.today.ip = computeIp(list[item])
-        data.today.number = list[item].length
+function init() {
+  proxy.$http.get('/visit/detail').then((res) => {
+    data.total = res.data[0];
+    data.all = res.data[1];
+    const listMap = new Map();
+    data.all.forEach((item) => {
+      const date = item.createAt.substring(0, 10);
+      if (!listMap.has(date)) {
+        listMap.set(date, []);
       }
-      if(item == getDay(1)){
-        data.yesterday.ip = computeIp(list[item])
-        data.yesterday.number = list[item].length
+      listMap.get(date).push(item);
+    });
+    
+    const today = getDay();
+    const yesterday = getDay(1);
+
+    listMap.forEach((list, date) => {
+      const ipCount = computeIp(list);
+      const visitCount = list.length;
+
+      if (date === today) {
+        data.list = list;
+        data.today.ip = ipCount;
+        data.today.number = visitCount;
+      } else if (date === yesterday) {
+        data.yesterday.ip = ipCount;
+        data.yesterday.number = visitCount;
       }
-      data.line.unshift({name:item,number:list[item].length,ip:computeIp(list[item])})
-    }
-  })
+
+      data.line.unshift({ name: date, number: visitCount, ip: ipCount });
+    });
+  });
 }
+
 function getDay(index = 0) {
-  var yesterday = moment().subtract(index, 'days');
-  var year = yesterday.format('YYYY');
-  var month = yesterday.format('MM');
-  var day = yesterday.format('DD');
-  return year + "-" + month + "-" + day
+  return moment().subtract(index, 'days').format('YYYY-MM-DD');
 }
-function computeIp(list){
-  let number = []
-  list.forEach((item)=>{
-    if(!number[item.clientIp]){
-      number[item.clientIp] = true
-      number.length++
-    }
-  })
-  return number.length
+
+function computeIp(list) {
+  const ipSet = new Set();
+  list.forEach((item) => {
+    ipSet.add(item.clientIp);
+  });
+  return ipSet.size;
 }
+
 onMounted(async () => {
   nextTick(()=>{
     init()
@@ -127,7 +134,9 @@ onMounted(async () => {
   justify-content: center;
   align-items: center;
   padding: 40px 5px;
-  background-color: rgb(247,249,254);
+  background-image: linear-gradient(90deg,rgba(37,82,110,.1) 1px,#fff 0),
+  linear-gradient(180deg,rgba(37,82,110,.1) 1px,#fff 0);
+  background-size: 3rem 3rem;
 }
 .page{
   margin-top: 70px;

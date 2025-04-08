@@ -1,60 +1,8 @@
 <template>
-  <div class="container">
-    <div class="aside">
-      <div class="aside-user">
-        <div class="user-img"></div>
-        <p class="user-name">『Cavalry』</p>
-        <p class="user-description">穷其道者 归处亦同</p>
-        <div class="user-card">
-          <div class="user-card-item">
-            <p>文章</p>
-            <p>{{data.number[0]}}</p>
-          </div>
-          <div class="user-card-item">
-            <p>标签</p>
-            <p>{{data.number[1]}}</p>
-          </div>
-          <div class="user-card-item">
-            <p>访问</p>
-            <p>{{data.number[2]}}</p>
-          </div>
-        </div>
-        <button class="user-pyq">朋友圈</button>
-        <div class="user-link">
-          <a href="http://wpa.qq.com/msgrd?v=3&amp;uin=1125469202&amp;site=qq&amp;menu=yes"></a>
-          <a href="https://space.bilibili.com/33230767?spm_id_from=333.1007.0.0"></a>
-        </div>
-      </div>
-      <div class="aside-notice">
-        <p>
-          <svg style="width: 35px;height: 35px" t="1686830114898" class="icon" viewBox="0 0 1026 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="3355" width="200" height="200"><path d="M115.479782 1024A115.536809 115.536809 0 0 1 0 908.520218V335.284284a115.479782 115.479782 0 0 1 115.536809-115.479782H280.5731L489.805356 10.686299a34.216232 34.216232 0 0 1 7.014328-5.702705 35.470827 35.470827 0 0 1 32.790555-1.710811l1.596758 0.741351 2.566217 1.482704 0.627297 0.399189a38.436234 38.436234 0 0 1 3.991894 3.079461l1.425676 1.311622 209.17523 209.118203h161.899803A115.479782 115.479782 0 0 1 1026.48695 335.284284v573.12188a115.479782 115.479782 0 0 1-115.479782 115.479782z m-41.059478-681.758416v555.899711a50.297861 50.297861 0 0 0 50.354887 50.29786H902.738245a50.297861 50.297861 0 0 0 50.297861-50.29786V342.241584a50.297861 50.297861 0 0 0-50.297861-50.29786H821.18956l50.012725 50.012725a35.470827 35.470827 0 0 1-50.126779 50.126779l-100.139505-100.139504H308.687437L208.547932 392.083228a35.470827 35.470827 0 0 1-50.126779-50.126779l50.012725-50.012725H124.832219a50.297861 50.297861 0 0 0-50.411915 50.29786z m306.349327-122.380055h268.027148L514.783205 85.904982zM263.636065 797.716655a29.254878 29.254878 0 1 1 0-57.027053h499.499955a29.254878 29.254878 0 1 1 0 57.027053z m0-228.108211a29.254878 29.254878 0 1 1 0-57.027053h499.499955a29.254878 29.254878 0 1 1 0 57.027053z" fill="#ffffff" p-id="3356"></path></svg>
-          公告
-        </p>
-        <div class="notice-message">
-          <a>欢迎来自{{city}}的人来到cavalry的小站</a>
-        </div>
-      </div>
-      <div class="search-box">
-        <p>搜索</p>
-        <div class="search">
-          <input v-model="data.search" type="text">
-        </div>
-      </div>
-    </div>
-    <div class="container-article">
-
-      <div class="article" v-for="(category,index) in data.category" :key="index">
-        <div class="category">
-          <div>
-            <svg t="1719678096582" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="1500" width="200" height="200"><path d="M298.666667 358.4l55.552 93.866667L409.6 358.4V68.266667h452.266667a51.2 51.2 0 0 1 51.2 51.2V896a51.2 51.2 0 0 1-51.2 51.2h-682.666667A51.2 51.2 0 0 1 128 896V119.466667a51.2 51.2 0 0 1 51.2-51.2H298.666667v290.133333z m203.776 392.661333a46.933333 46.933333 0 0 0-1.749334 4.48l-0.725333 2.304-30.293333 109.269334a11.221333 11.221333 0 0 0-0.128 5.589333 10.666667 10.666667 0 0 0 12.373333 8.021333l1.109333-0.256 109.226667-30.421333c2.304-0.64 4.565333-1.493333 6.741333-2.474667a16.298667 16.298667 0 0 1-13.482666-3.370666l-1.109334-1.024-77.568-77.568-1.237333-1.365334a16.341333 16.341333 0 0 1-3.157333-13.226666z m316.8-226.304a72.917333 72.917333 0 0 0-101.418667-1.109333l-1.706667 1.706667-210.688 210.645333a45.568 45.568 0 0 0-1.450666 1.493333l-1.365334 1.578667a16.810667 16.810667 0 0 1 20.778667 0.554667l1.066667 0.981333 78.933333 78.933333 1.024 1.152c4.949333 5.930667 5.12 14.506667 0.512 20.693334l1.536-1.365334 1.493333-1.408 210.730667-210.730666a72.96 72.96 0 0 0 2.218667-101.418667l-1.664-1.706667z m-104.533334 2.005334a16.896 16.896 0 0 1 21.76-0.213334l1.109334 0.981334 78.890666 78.933333 1.066667 1.152a16.896 16.896 0 0 1-0.256 21.589333l-1.152 1.237334-0.981333 0.896a16.896 16.896 0 0 1-21.76 0.213333l-1.066667-0.981333-78.933333-78.933334-1.066667-1.152a16.896 16.896 0 0 1 0.298667-21.589333l1.152-1.237333 0.981333-0.853334z" fill="#00A183" opacity=".85" p-id="1501"></path></svg>
-            <p>{{category.categoryName}}</p>
-          </div>
-          <div>
-            <svg t="1719678360700" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="12786" id="mx_n_1719678360701" width="200" height="200"><path d="M568 826.5c-13.4 0-26.7-5.9-35.6-17.3-15.5-19.7-12.1-48.1 7.6-63.6l296.8-233.3-296.9-233.4c-19.7-15.5-23.1-43.9-7.6-63.6 15.5-19.7 44-23.1 63.6-7.6L938 476.6c10.9 8.6 17.3 21.7 17.3 35.6 0 13.9-6.4 27-17.3 35.6l-342.1 269c-8.3 6.5-18.1 9.7-27.9 9.7z m-455.3 0c-13.4 0-26.7-5.9-35.6-17.3-15.5-19.7-12.1-48.2 7.6-63.6l296.8-233.3L84.7 278.9C65 263.4 61.6 235 77.1 215.3c15.5-19.7 44-23.1 63.6-7.6l342 268.9c10.9 8.6 17.3 21.7 17.3 35.6 0 13.9-6.4 27-17.3 35.6l-342 268.9c-8.3 6.6-18.2 9.8-28 9.8z" fill="#39c5bb" p-id="12787"></path></svg>
-            <p>MORE</p>
-          </div>
-        </div>
-        <div @click="gotoArticle(item.articleId)" v-for="(item,index) in category.articles" :key="index" v-slide-in class="article-container">
+  <div class="body">
+    <div v-if="tag" class="container-article">
+      <div class="article">
+        <div @click="gotoArticle(item.articleId)" v-for="(item,index) in article" :key="index" v-slide-in class="article-container">
           <div class="article-bkg">
             <img :src="item.articleImg">
           </div>
@@ -76,259 +24,37 @@
                 <p>{{item.comment}}评论</p>
               </div>
             </div>
-            <p class="article-message-title">{{item.articleTitle}}</p>
-            <p class="article-label">{{item.articleLabel}}</p>
+            <div class="article-message-title">
+              <p>{{item.articleTitle}}</p>
+            </div>
+            <div class="article-label">
+              <p>{{item.articleLabel}}</p>
+            </div>
             <div class="article-category">
               <div>
                 <svg t="1718202121987" class="icon" viewBox="0 0 1025 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="11571" width="200" height="200"><path d="M820.839804 0l-617.805512 0c-112.132652 0-203.034315 90.901663-203.034315 203.034315l0 617.805512c0 112.131629 90.901663 203.033292 203.034315 203.033292l617.805512 0c112.133675 0 203.035338-90.901663 203.035338-203.033292l0-617.805512C1023.875143 90.901663 932.97348 0 820.839804 0zM482.643011 817.576749c0 16.567109-13.431934 29.998019-29.999043 29.998019L212.087827 847.574768c-16.567109 0-29.999043-13.430911-29.999043-29.998019L182.088784 568.55543c0-16.569155 13.431934-29.999043 29.999043-29.999043l240.555118 0c16.567109 0 29.999043 13.429887 29.999043 29.999043L482.641987 817.576749zM482.643011 455.319736c0 16.567109-13.431934 29.998019-29.999043 29.998019L212.087827 485.317756c-16.567109 0-29.999043-13.430911-29.999043-29.998019L182.088784 206.298417c0-16.569155 13.431934-29.999043 29.999043-29.999043l240.555118 0c16.567109 0 29.999043 13.429887 29.999043 29.999043L482.641987 455.319736zM841.786336 817.576749c0 16.567109-13.431934 29.998019-29.999043 29.998019L571.232175 847.574768c-16.567109 0-29.999043-13.430911-29.999043-29.998019L541.233132 568.55543c0-16.569155 13.431934-29.999043 29.999043-29.999043l240.555118 0c16.567109 0 29.999043 13.429887 29.999043 29.999043L841.786336 817.576749zM841.786336 455.319736c0 16.567109-13.431934 29.998019-29.999043 29.998019L571.232175 485.317756c-16.567109 0-29.999043-13.430911-29.999043-29.998019L541.233132 206.297394c0-16.568132 13.431934-29.999043 29.999043-29.999043l240.555118 0c16.567109 0 29.999043 13.429887 29.999043 29.999043L841.786336 455.319736z" fill="#F3C151" p-id="11572"></path><path d="M431.735296 203.157103 232.995475 203.157103c-13.686718 0-24.784665 11.095901-24.784665 24.785688l0 205.733595c0 13.687741 11.097947 24.783642 24.784665 24.783642l198.739821 0c13.687741 0 24.784665-11.095901 24.784665-24.783642L456.519961 227.942791C456.518938 214.253003 445.423037 203.157103 431.735296 203.157103z" fill="#F3C151" p-id="11573"></path></svg>
-                <p>{{category.categoryName}}</p>
+                <p>{{item.categoryName}}</p>
               </div>
               <div>
                 <svg t="1718202362866" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="18205" width="200" height="200"><path d="M531.071917 56.831751l402.814237-20.671909c37.055838 0 67.199706 30.079868 67.199706 67.071706l-18.047921 404.478231c0 31.807861-15.807931 47.039794-37.759835 68.351701l-10.047956 9.855957-398.718255 397.822259A136.959401 136.959401 0 0 1 439.040319 1023.99552a137.0874 137.0874 0 0 1-97.279574-40.127824L56.193994 698.876942a135.935405 135.935405 0 0 1-40.319823-97.151575c0-36.735839 14.207938-71.295688 40.319823-97.151575l398.718256-397.886259c5.439976-5.759975 10.239955-11.007952 14.399937-15.743931 20.799909-22.719901 31.167864-34.17585 61.69573-34.17585z m162.687288 425.598138c35.327845 0 70.527691-13.439941 97.343574-40.191824a136.319404 136.319404 0 0 0 40.447823-97.279574c0-36.67184-14.335937-71.231688-40.447823-97.087575A137.791397 137.791397 0 0 0 556.159807 344.958491c0 36.735839 14.271938 71.295688 40.319823 97.151575 26.879882 26.879882 62.079728 40.191824 97.343575 40.191824z m-41.599818-178.879217a58.751743 58.751743 0 0 1 41.599818-17.087925 58.751743 58.751743 0 0 1 58.751743 58.623743 58.879742 58.879742 0 0 1-117.503486 0c0-15.615932 6.143973-30.399867 17.215925-41.535818zM258.561109 504.765792a47.167794 47.167794 0 0 0-66.879708-0.064 47.487792 47.487792 0 0 0-0.127999 67.071706l273.470804 275.198796 0.063999 0.192a47.167794 47.167794 0 0 0 66.751708 0c18.559919-18.559919 18.559919-48.511788 0.128-67.135707l-273.406804-275.198796z" fill="#51A9FF" p-id="18206"></path></svg>
-                <p v-for="(tag,index) in item.tags" :key="index">{{ tag.tagName }}</p>
+                <p v-for="(tag,index) in item.tags" :key="index">{{ tag }}</p>
               </div>
             </div>
           </div>
         </div>
       </div>
-      <p>到底啦</p>
     </div>
   </div>
 </template>
 
 <script setup>
-import {getCurrentInstance, onMounted, reactive,watch} from "vue";
-import {useRouter} from "vue-router";
-import useStore from "../store/index.js";
-import {ElMessage} from "element-plus";
 
-const store = useStore()
-const router = useRouter()
-const {proxy} = getCurrentInstance()
-var data = reactive({
-  article:[],
-  all:[],
-  category:[],
-  cateIndex:0,
-  number:[],//文章、分类、访问
-  search:'',
-
-})
-let city = store.getCity
-function gotoArticle(id){
-  router.push({name:'article',params:{articleId:id}})
-}
-
-function init(){
-  proxy.$http.get('/article/count').then(res=>{
-    data.number[0] = res.data
-  })
-  proxy.$http.get('/category').then(res=>{
-    res.data.forEach((item)=>{
-      proxy.$http.post('/article/searchByCategory',{
-        categoryId:item.categoryId,pageNo:1,pageSize:4
-      }).then(response=>{
-        data.category.push({categoryName:item.categoryName,articles:response.data})
-      })
-    })
-    data.number[1] = res.data.length
-  })
-  proxy.$http.get('/visit/number').then(res=>{
-    data.number[2] = res.data
-  })
-}
-watch(()=>data.search,(nval,oval)=>{
-  if(nval == ''){
-    data.article = data.all
-    return
-  }
-  proxy.$http({
-    url:'/article/search',
-    method:'post',
-    data:{title:nval}
-  }).then(res => {
-    if(res.data.article){
-      data.article = res.data.article
-    }
-  })
-})
-onMounted(()=>{
-  init()
-})
 </script>
 
 <style scoped>
-@font-face {
-  font-family: rain;
-  src: url("../assets/wenzi.ttf");
-}
-.icon{
-  width: 23px;
-  height: 23px;
-  margin-right: 3px;
-}
-.container{
-  width: 100%;
-  background-image: linear-gradient(90deg,rgba(37,82,110,.1) 1px,#fff 0),
-  linear-gradient(180deg,rgba(37,82,110,.1) 1px,#fff 0);
-  background-size: 3rem 3rem;
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  min-height: 100vh;
-  padding: 30px;
-}
-.aside{
-  width: 23%;
-  max-width: 290px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 0 0px 10px 5px;
-  margin-right: 50px;
-}
-.aside-user{
-  width: 100%;
-  height: 360px;
-  display: flex;
-  align-items: center;
-  flex-direction: column;
-  border-radius: 20px;
-  background:linear-gradient(-45deg,#e8d8b9,#eccec5,#a3e9eb,#bdbdf0,#eec1ea);
-  background-size: 100% 200%;
-  color: black;
-  box-shadow: 0 1px 20px -6px rgba(0,0,0,0.5)
-}
-.user-img{
-  width: 90px;
-  height: 90px;
-  background: url("../assets/image/Tom.jpg") no-repeat;
-  background-size: 100% 100%;
-  margin-top: 20px;
-  border-radius: 15px;
-}
-.user-name{
-  margin-top: 10px;
-  font-size: 24px;
-  font-weight: bold;
-}
-.user-description{
-  font-size: 15px;
-  margin-top: 20px;
-}
-.user-card{
-  width: 80%;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: center;
-  margin-top: 20px;
-}
-.user-card-item{
-  display: flex;
-  flex-direction: column;
-  width: 33%;
-}
-.user-card-item:nth-child(2),.user-card-item:nth-child(1){
-  border-right: 1px solid rgba(255,255,255,0.85);
-}
-.user-card-item p{
-  margin-bottom: 2px;
-  text-align: center;
-}
-.user-pyq{
-  margin-top: 20px;
-  background-color: #39c5bb;
-  width: 70%;
-  padding: 10px;
-  color:white;
-  font-weight: 600;
-  text-align: center;
-  border-radius: 30px;
-  border: none;
-  font-size: 17px;
-  transition: all .5s;
-}
-.user-pyq:hover{
-  background-color: darkorchid;
-  color: white;
-}
-.user-link{
-  margin-top: 15px;
-  width: 50%;
-  display: flex;
-  flex-direction: row;
-  justify-content: space-around;
-  align-items: center;
-}
-.user-link a{
-  width: 28px;
-  height: 28px;
-}
-.user-link a:nth-child(1){
-  background: url("../assets/image/QQ.png") no-repeat;
-  background-size: 100% 100%;
-}
-.user-link a:nth-child(2){
-  background: url("../assets/image/bilibili.png") no-repeat;
-  background-size: 100% 100%;
-}
-.aside-notice{
-  margin-top: 20px;
-  width: 100%;
-  height: 150px;
-  border-radius: 20px;
-  background: url("../assets/image/notice.jpg") no-repeat;
-  background-size: 100% 100%;
-  padding: 10px;
-  box-shadow: 1px 1px 3px rgb(0,0,0,0.3);
-  color: white;
-}
-.aside-notice p{
-  display: flex;
-  font-size: 26px;
-  flex-direction: row;
-  justify-content: flex-start;
-  align-items: center;
-  text-shadow: 2px 2px 10px #000;
-}
-.notice-message {
-  margin-top: 10px;
-  width: 100%;
-  height: 85px;
-}
-.search-box{
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  padding: 15px;
-  background-color: white;
-  box-shadow: 0 1px 20px -6px rgba(0,0,0,0.5);
-  border-radius: 10px;
-  margin-top: 25px;
-}
-.search-box p{
-  color:#39c5bb;
-  font-size: 20px;
-  margin-bottom: 10px;
-}
-.search{
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-.search input{
-  width: 100%;
-  border: 2px solid #39c5bb;
-  border-radius: 40px;
-  padding: 0 14px;
-  height: 30px;
-  outline: 0;
-  background-color: white;
-  color: #595a5a;
-}
-
 .container-article{
+  font-family: rain;
+  margin-top: 30px;
   width: 60%;
   max-width: 900px;
   display: flex;
@@ -342,27 +68,13 @@ onMounted(()=>{
   flex-wrap: wrap;
   width: 100%;
 }
-.category{
-  width: 100%;
-  display: flex;
-  align-items: center;
-  padding: 10px 10px;
-  justify-content: space-between;
-  font-size: 23px;
-  margin-bottom: 18px;
-  border-bottom: 3px dashed #ddd;
-}
-.category div{
-  display: flex;
-  align-items: center;
-}
 .article-container{
   width: 100%;
   height: 200px;
   position: relative;
   border-radius: 10px;
   overflow: hidden;
-  margin-bottom: 20px;
+  margin-bottom: 30px;
   box-shadow: 0 1px 20px -6px;
   transition: all .5s;
 }
@@ -469,5 +181,4 @@ onMounted(()=>{
 .article-img-left img:hover{
   transform: scale(1.2);
 }
-
 </style>

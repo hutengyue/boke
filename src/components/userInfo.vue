@@ -37,12 +37,10 @@
         :align-center="true" >
       <el-upload
           class="avatar-uploader"
-          :action="data.httpUrl"
           :show-file-list="false"
           drag
           name="file"
           :headers="data.headers"
-          :on-success="handleAvatarSuccess"
           :before-upload="beforeAvatarUpload">
         <img v-if="data.imageUrl" :src="data.imageUrl" class="avatar">
         <div v-else>
@@ -61,7 +59,8 @@
 
 <script setup>
 import {getCurrentInstance, reactive, toRef,onMounted} from "vue";
-import global from '../util/global.js'
+import OSS from 'ali-oss';
+
 import useStore from "../store/index.js";
 import {useRouter} from "vue-router";
 const props = defineProps({
@@ -75,28 +74,61 @@ const data = reactive({
   headers: {enctype: "multipart/form-data"},
   centerDialogVisible: false,
   imageUrl: '',
-  httpUrl: `http://${global.httpUrl}/upload/image`,
-  fileInfo: ''
+  fileInfo: '',
+  ossConfig:null
 });
 
-function handleAvatarSuccess(res, file) {
-  data.imageUrl = URL.createObjectURL(file.raw);
-  data.fileInfo = res.fileInfo
-}
-function beforeAvatarUpload(file) {
+async function beforeAvatarUpload(file) {
   const isJPG = file.type === 'image/jpeg' || 'image/png';
   const isLt2M = file.size / 1024 / 1024 < 2;
 
   if (!isJPG) {
     ElMessage.error('上传头像图片只能是 JPG或PNG 格式!')
+    return false;
   }
   if (!isLt2M) {
     ElMessage.error('上传头像图片大小不能超过 2MB!');
+    return false;
   }
-  return isJPG && isLt2M;
+
+  try {
+    // 获取OSS配置
+    if (!data.ossConfig) {
+      const res = await proxy.$http.get('/upload/getOssConfig');
+      data.ossConfig = res.data;
+    }
+
+    // 初始化OSS客户端
+    const client = new OSS({
+      region: data.ossConfig.region,
+      accessKeyId: data.ossConfig.accessKeyId,
+      accessKeySecret: data.ossConfig.accessKeySecret,
+      bucket: data.ossConfig.bucket,
+      stsToken: data.ossConfig.security_token
+    });
+
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    const fileName = `boke/${year}/${month}/${day}/${Date.now()}_${file.name}`;
+    
+    const result = await client.put(fileName, file);
+
+    data.fileInfo = result.url;
+    console.log(data.fileInfo)
+    data.imageUrl = URL.createObjectURL(file);
+    ElMessage.success('上传成功');
+    return false; // 返回false阻止Element默认上传
+  } catch (error) {
+    ElMessage.error('上传失败');
+    console.error(error);
+    return false;
+  }
 }
 function reviseImg(){
   data.centerDialogVisible = false;
+  console.log(data.fileInfo) 
   proxy.$http({
     url:'/user/reviseImg',
     method:"POST",

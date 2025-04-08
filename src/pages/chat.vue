@@ -70,14 +70,14 @@
               <p>在线人数:{{data.number}}</p>
             </div>
             <div class="friend-message-body" ref="messageBody">
-              <div v-for="(item,index) in data.groupMessage" :key="index" :class="[item.userId == data.user.userId ? 'friend-message-left-box':'friend-message-right-box','line']">
-                <img @click="search(item.username)" v-lazy="item.headImg" alt="">
+              <div v-for="(item,index) in data.groupMessage" :key="index" :class="[item.user.userId == data.user.userId ? 'friend-message-left-box':'friend-message-right-box','line']">
+                <img @click="search(item.user.username)" v-lazy="item.user.headImg" alt="">
                 <div class="message">
                   {{ item.message }}
                 </div>
                 <div class="messageDetail">
-                  <a>{{ item.dateTime }}</a>
-                  <p>{{ item.username }}</p>
+                  <a>{{ item.createAt }}</a>
+                  <p>{{ item.user.username }}</p>
                 </div>
               </div>
             </div>
@@ -203,10 +203,12 @@ import Header from "../components/header.vue";
 import * as THREE from 'three'
 import CLOUDS from 'vanta/src/vanta.clouds'
 import {ref, onMounted, reactive, getCurrentInstance,nextTick,onBeforeUnmount} from "vue";
+import {io} from 'socket.io-client'
 import {ElMessage} from "element-plus";
 import useStore from "../store/index.js";
 import {useRouter} from "vue-router";
 import global from "../util/global";
+
 const {proxy} = getCurrentInstance()
 const all = ref(null)
 const messageBody = ref(null)
@@ -372,6 +374,7 @@ function search(username){
     method:'post',
     data:{username:username}
   }).then(res => {
+    console.log(res.data)
     if(res.data.type == "success"){
       res.data.user.headImg = res.data.user.headImg
       data.friend = res.data.user
@@ -406,19 +409,14 @@ function send(){
   if(data.message == ""){
     ElMessage.warning('发言为空')
   }else {
-    proxy.$http({
-      url:'/user',
-      method:'get',
-    }).then(res => {
+    proxy.$http.get('/user').then(res => {
       if(data.isGroup == true){
-        data.ws.send(JSON.stringify({
-          type:"qunliao",
+        data.ws.emit('groupMessage',{
           userId:data.user.userId,
           username:data.user.username,
-          dateTime:new Date().toLocaleString(),
           headImg:data.user.headImg,
           message:data.message
-        }))
+        })
       }else{
         data.ws.send(JSON.stringify({
           type:"haoyou",
@@ -449,71 +447,111 @@ function scrollToBottom(){
 
 function init(){
   if(window.WebSocket){
-    data.ws = new WebSocket(`ws://${global.websocketUrl}`)
-    data.ws.onopen = function (){
-      console.log("成功建立连接")
-      data.ws.send(JSON.stringify({
-        type:"dengji",
-        username:data.user.username
-      }))
-    }
-    data.ws.onmessage = (message)=>{
-      let dt = JSON.parse(message.data)
-      switch (dt.type){
-        case "ceshi":
-          break;
-        case "lianjie":
-          data.number = dt.number
-          dt.result.forEach((item)=>{
-            item.dateTime = proxy.$utils.convertTimeToHumanReadable(item.dateTime)
-            item.headImg = item.headImg
-          })
-          data.groupMessage = dt.result
-          nextTick(() => {
-            messageBody.value.scrollTo({
-              top: messageBody.value.scrollHeight,
-              behavior: 'auto'
-            });
-          });
-          break;
-        case "qunliao":
-          dt.dateTime = proxy.$utils.convertTimeToHumanReadable(dt.dateTime)
-          data.groupMessage.push(dt)
-          data.message = ''
-          scrollToBottom()
-          break;
-        case "haoyou":
-          if(dt.fromId == data.user.userId){
-            dt.headImg = data.user.headImg
-            dt.username = data.user.username
-          }else{
-            dt.headImg = data.target.headImg
-            dt.username = data.target.username
-          }
-          dt.dateTime = proxy.$utils.convertTimeToHumanReadable(dt.dateTime)
-          data.messageList.push(dt)
-          data.message = ''
-          scrollToBottom()
-          break;
-        case "add":
-          showAddFriendList()
-          break;
-        case "handle":
-          showAddFriendList()
-          break;
-        case "tuichu":
-          data.number = dt.number
-          break;
-        default:
-          break;
-      }
-    }
-    data.ws.onclose = function (){
-      console.log('onclose')
-    }
-    data.ws.onerror = function (e){
-      console.log('error');
-    }
+    data.ws = io(`ws://${global.websocketUrl}`)
+
+    data.ws.emit('come',{username:data.user.username})
+
+    data.ws.on('come',(message)=>{ //刚进入
+      data.number = message.number
+      data.groupMessage = message.groups
+      nextTick(() => {
+        messageBody.value.scrollTo({
+          top: messageBody.value.scrollHeight,
+          behavior: 'auto'
+        });
+      });
+    })
+
+    data.ws.on('groupMessage',(message)=>{ //
+      data.groupMessage.push(message)
+      data.message = ''
+      scrollToBottom()
+    })
+
+
+    data.ws.on('add',()=>{
+      showAddFriendList()
+    })
+
+    data.ws.on('handle',()=>{
+      showAddFriendList()
+    })
+
+    //退出
+    data.ws.on('quit',(message)=>{
+      data.number = message
+    })
+
+    data.ws.on('disconnect',()=>{
+      data.ws.emit('quit',{username:data.user.username})
+    })
+
+    //
+    // data.ws = new WebSocket(`ws://${global.websocketUrl}`)
+    // data.ws.onopen = function (){
+    //   console.log("成功建立连接")
+    //   data.ws.send(JSON.stringify({
+    //     type:"dengji",
+    //     username:data.user.username
+    //   }))
+    // }
+    // data.ws.onmessage = (message)=>{
+    //   let dt = JSON.parse(message.data)
+    //   switch (dt.type){
+    //     case "ceshi":
+    //       break;
+    //     case "lianjie":
+    //       data.number = dt.number
+    //       dt.result.forEach((item)=>{
+    //         item.dateTime = proxy.$utils.convertTimeToHumanReadable(item.dateTime)
+    //         item.headImg = item.headImg
+    //       })
+    //       data.groupMessage = dt.result
+    //       nextTick(() => {
+    //         messageBody.value.scrollTo({
+    //           top: messageBody.value.scrollHeight,
+    //           behavior: 'auto'
+    //         });
+    //       });
+    //       break;
+    //     case "qunliao":
+    //       dt.dateTime = proxy.$utils.convertTimeToHumanReadable(dt.dateTime)
+    //       data.groupMessage.push(dt)
+    //       data.message = ''
+    //       scrollToBottom()
+    //       break;
+    //     case "haoyou":
+    //       if(dt.fromId == data.user.userId){
+    //         dt.headImg = data.user.headImg
+    //         dt.username = data.user.username
+    //       }else{
+    //         dt.headImg = data.target.headImg
+    //         dt.username = data.target.username
+    //       }
+    //       dt.dateTime = proxy.$utils.convertTimeToHumanReadable(dt.dateTime)
+    //       data.messageList.push(dt)
+    //       data.message = ''
+    //       scrollToBottom()
+    //       break;
+    //     case "add":
+    //       showAddFriendList()
+    //       break;
+    //     case "handle":
+    //       showAddFriendList()
+    //       break;
+    //     case "tuichu":
+    //       data.number = dt.number
+    //       break;
+    //     default:
+    //       break;
+    //   }
+    // }
+    // data.ws.onclose = function (){
+    //   console.log('onclose')
+    // }
+    // data.ws.onerror = function (e){
+    //   console.log('error');
+    // }
   }
 }
 
@@ -532,8 +570,9 @@ onMounted(()=>{
     url:'/user',
     method:'get',
   }).then(res => {
-    data.user.userId = res.data.user[0].userId.toString()
-    data.user.username = res.data.user[0].username
+    console.log(res.data)
+    data.user.userId = res.data.userId.toString()
+    data.user.username = res.data.username
     data.user.headImg = res.data.headImg
     showAddFriendList()
     init()

@@ -297,6 +297,7 @@ p code{
     box-sizing: unset;
     text-decoration: none;
     color: rgb(100,100,100);
+    transition: all .1s;
 }
 .toc-link.active{
     font-weight: 700;

@@ -28,21 +28,21 @@ onMounted(()=>{
   });
 
   let flag = !cookie.get('visit')?true:false
-  // proxy.$http({
-  //   url:'/visit',
-  //   method:'POST',
-  //   data:{
-  //     flag:flag,
-  //     city:store.getCity||cookie.get('visit'),
-  //     device:isMobile?'MB':'PC',
-  //     browser:proxy.$utils.browserType()
-  //   }
-  // }).then((res)=>{
-  //   if(flag == true){
-  //     store.setCity(res.data.map.city)
-  //     cookie.set('visit',res.data.map.city,{expires:0.25})
-  //   }
-  // })
+  proxy.$http({
+    url:'/visit',
+    method:'POST',
+    data:{
+      flag:flag,
+      city:store.getCity||cookie.get('visit'),
+      device:isMobile?'MB':'PC',
+      browser:proxy.$utils.browserType()
+    }
+  }).then((res)=>{
+    if(flag == true){
+      store.setCity(res.data.map.city)
+      cookie.set('visit',res.data.map.city,{expires:0.25})
+    }
+  })
 })
 </script>
 
@@ -54,3 +54,5 @@ onMounted(()=>{
 <style scoped>
 
 </style>
+
+

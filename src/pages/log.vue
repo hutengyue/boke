@@ -1,5 +1,5 @@
 <template>
-  <Header :active="true" style="z-index: 1000"></Header>
+  <Header style="z-index: 1000"></Header>
   <div>
     <div class="body">
       <div class="page">
@@ -72,7 +72,9 @@ onMounted(()=>{
   justify-content: center;
   align-items: center;
   padding: 40px 15px;
-  background-color: rgb(247,249,254);
+  background-image: linear-gradient(90deg,rgba(37,82,110,.1) 1px,#fff 0),
+  linear-gradient(180deg,rgba(37,82,110,.1) 1px,#fff 0);
+  background-size: 3rem 3rem;
 }
 .page{
   margin-top: 70px;
@@ -102,7 +104,7 @@ onMounted(()=>{
 }
 .timeline{
   padding: 14px 20px 5px;
-  border-left: 2px solid #e67474;
+  border-left: 2px solid rgba(60,60,67,0.8);
   margin: 0 0 20px 10px;
 }
 .timeline-item{
@@ -110,7 +112,7 @@ onMounted(()=>{
 }
 .timeline-item-title{
   position: relative;
-  color: #e67474;
+  color: rgba(60,60,67,0.8);
 }
 .item-circle::before{
   position: absolute;
@@ -118,7 +120,7 @@ onMounted(()=>{
   left: -27px;
   width: 6px;
   height: 6px;
-  border: 3px solid #ff7242;
+  border: 3px solid rgba(60,60,67,0.8);
   border-radius: 50%;
   background: white;
   content:'';
@@ -136,8 +138,8 @@ onMounted(()=>{
   position: relative;
   padding: 12px 15px;
   border-radius: 8px;
-  background: rgba(254,250,199,0.8);
-  color: #e67474;
+  background: rgb(247,247,249);
+  color: black;
   font-size: 17px;
 }
 .timeline-item-content>:last-child{

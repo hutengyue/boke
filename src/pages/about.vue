@@ -172,7 +172,9 @@ function change(index){
   align-items: center;
   flex-direction: column;
   width: 100%;
-  background-color: rgb(247,249,254);
+  background-image: linear-gradient(90deg,rgba(37,82,110,.1) 1px,#fff 0),
+  linear-gradient(180deg,rgba(37,82,110,.1) 1px,#fff 0);
+  background-size: 3rem 3rem;
 }
 .aboutBox{
   width: 100%;

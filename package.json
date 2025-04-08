@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@vueuse/core": "^10.7.0",
+    "ali-oss": "^6.22.0",
     "axios": "^1.6.2",
     "danmaku-vue": "^1.0.2",
     "echarts": "^5.5.0",
@@ -24,6 +25,7 @@
     "moment": "^2.30.1",
     "nprogress": "^0.2.0",
     "pinia": "^2.1.7",
+    "socket.io-client": "^4.7.5",
     "TagCloud": "^2.5.0",
     "three": "^0.121.0",
     "uslug": "^1.0.4",

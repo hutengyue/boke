@@ -24,32 +24,29 @@ axios.interceptors.response.use(
         return Promise.resolve(response);
     },
     error => {
-        console.log(error)
         const store = useStore()
-        if (error.response.statusCode) {
-            switch (error.response.statusCode) {
-                // 401: 未登录
-                // 未登录则跳转登录页面，并携带当前页面的路径
-                // 在登录成功后返回当前页面，这一步需要在登录页操作。
-                case 401:
-                    if(store.getToken != ''){
-                        store.delToken()
-                        store.delHeadImg()
-                        ElMessage.warning('请重新登录')
-                    }else{
-                        ElMessage.warning('请登录')
-                    }
-                    if(router.currentRoute.value.fullPath == '/user'){
-                        return router.go(0)
-                    }else {
-                        return router.replace({ //跳转到登录页面
-                            path: '/user',
-                            // 将跳转的路由path作为参数，登录成功后跳转到该路由
-                            query: {redirect: router.currentRoute.value.fullPath}
-                        });
-                    }
-                default:
-            }
+        switch (error.response.data.statusCode) {
+            // 401: 未登录
+            // 未登录则跳转登录页面，并携带当前页面的路径
+            // 在登录成功后返回当前页面，这一步需要在登录页操作。
+            case 401:
+                if(store.getToken != ''){
+                    store.delToken()
+                    store.delHeadImg()
+                    ElMessage.warning('请重新登录')
+                }else{
+                    ElMessage.warning('请登录')
+                }
+                if(router.currentRoute.value.fullPath == '/user'){
+                    return router.go(0)
+                }else {
+                    return router.replace({ //跳转到登录页面
+                        path: '/user',
+                        // 将跳转的路由path作为参数，登录成功后跳转到该路由
+                        query: {redirect: router.currentRoute.value.fullPath}
+                    });
+                }
+            default:
         }
         return Promise.reject(error.response);
     }

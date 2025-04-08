@@ -1,5 +1,5 @@
 <template>
-  <div class="content" :class="[props.active==true?'active':'']" :style="{'opacity':display}">
+  <div class="content" :style="{'opacity':display}">
     <h1>Cavalry</h1>
     <div class="content-background">
     </div>
@@ -26,9 +26,9 @@ const {proxy} = getCurrentInstance()
 const router = useRouter()
 const store = useStore()
 
-let props = defineProps({
-  active:Boolean
-})
+// let props = defineProps({
+//   active:Boolean
+// })
 var headImg = ref('')
 let lastScrollPosition = ref(window.pageYOffset)
 let display = ref('1')
@@ -100,11 +100,12 @@ onBeforeUnmount(()=>{
   display: flex;
   justify-content: space-between;
   align-items: center;
-  /*color: #363636;*/
-  color:white;
+  color: #363636;
+  /*color:white;*/
 }
 .content:hover,.content.active{
-  color: #363636;
+  /*color: #363636;*/
+  color: white;
 }
 .content-background{
   position: absolute;
@@ -117,6 +118,7 @@ onBeforeUnmount(()=>{
 .content:hover .content-background,.content.active .content-background{
   opacity: 1;
   background-color: rgba(247,249,254,0.9);
+  /*background-color: rgba(8,6,1,0.6);*/
 }
 .content h1{
   float: left;
@@ -125,6 +127,8 @@ onBeforeUnmount(()=>{
   margin-left: 30px;
   cursor: pointer;
   user-select: none;
+  color: black;
+
 }
 .content-menu{
   height: 100%;
@@ -151,6 +155,8 @@ onBeforeUnmount(()=>{
   box-sizing: border-box;
   margin-left: 15px;
   margin-right: 15px;
+  color:black;
+
 }
 .content-menu li::after{
   content: "";

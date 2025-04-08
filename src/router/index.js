@@ -45,7 +45,7 @@ const routes = [
         component:()=>import("../pages/about.vue")
     },
     {
-        path: '/article',
+        path: '/article/:articleId',
         name:'article',
         component:()=>import("../pages/article.vue")
     },

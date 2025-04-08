@@ -84,9 +84,9 @@ const data = reactive({
 
 function init(){
   proxy.$http({
-    url:'/article/require',
+    url:'/article',
     method:"POST",
-    data:{articleId:route.query.articleId}
+    data:{articleId:route.params.articleId}
   }).then(res=>{
     const uslugify = s => uslug(`/article?articleId=${route.query.articleId}/#`+s,{
       allowedChars: ['/','#','=','?'],
@@ -143,7 +143,7 @@ function init(){
       callback(){
       }
     })
-    data.article = res.data.article
+    data.article = res.data
     data.article.articleMessage = md.render("${toc}\n"+data.article.articleMessage)
     // let tokens = md.parse("${toc}"+data.article.articleMessage, {})
     // console.log(tokens)
