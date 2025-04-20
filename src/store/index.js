@@ -1,7 +1,7 @@
 import { defineStore} from 'pinia'
 import storage from "../util/storage";
-import route from "../router/route.js";
-import router from "../router/index.js";
+import { removeAdminRoutes,addAdminRoutes } from "../router/admin.js";
+
 
 
 const useStore = defineStore('boke',{
@@ -42,13 +42,14 @@ const useStore = defineStore('boke',{
         setIdentity(identity){
             this.identity = identity
             storage.set('identity',identity)
+            if(identity === "admin"){
+                addAdminRoutes()
+            }
         },
         delIdenttity(identity){
             this.identity = identity
             storage.remove("identity")
-            route.forEach((item)=>{
-                router.removeRoute(item)
-            })
+            removeAdminRoutes()
         },
         delToken(){
             this.token = "";

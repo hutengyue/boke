@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div style="font-family: rain;">
     <div class="body">
       <img class="bkg" v-lazy="bkg" alt="">
       <Header class="header"></Header>
@@ -77,9 +77,6 @@ onMounted(()=>{
 @font-face {
   font-family: rain;
   src: url("../assets/wenzi.ttf");
-}
-*{
-  font-family: rain;
 }
 @keyframes zhuye {
   from{

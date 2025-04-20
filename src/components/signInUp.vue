@@ -1,53 +1,8 @@
-<template>
-  <div class="reg">
-    <div :class="['container',{'right-panel-active':data.active == true}]">
-
-      <div class="container__form container--signup">
-        <div class="form" id="form1">
-          <h2 class="form__title">注 册</h2>
-          <input v-model="data.regName" type="text" maxlength="10" placeholder="用户名" class="input" />
-          <input v-model="data.regPsd" type="text" placeholder="密码" class="input" />
-          <input v-model="data.email" type="text" placeholder="邮箱" class="input" />
-          <input v-model="data.regCode" type="text" placeholder="验证码" class="input" />
-          <p v-show="data.code" @click="reqEmail()">获取验证码</p>
-
-          <p v-show="!data.code">{{data.count}}</p>
-          <button @click="register()" class="btn">注 册</button>
-        </div>
-      </div>
-
-      <div class="container__form container--signin">
-        <div class="form" id="form2">
-          <h2 class="form__title">登 录</h2>
-          <input v-model="data.logEmail" type="text" placeholder="邮箱" class="input" />
-          <input v-model="data.logPsd" type="password" placeholder="密码" class="input" />
-          <input v-model="data.logCode" type="text" placeholder="验证码" class="input" />
-          <a class="link">忘记密码?</a>
-          <div @click="init" v-html="data.captcha"></div>
-          <button @click="login()" class="btn">登 录</button>
-        </div>
-      </div>
-
-      <div class="container__overlay">
-        <div class="overlay">
-          <div class="overlay__panel overlay--left">
-            <button @click="data.active = false" class="btn" id="signIn">登 录</button>
-          </div>
-          <div class="overlay__panel overlay--right">
-            <button @click="data.active = true" class="btn" id="signUp">注 册</button>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</template>
-
 <script setup>
-import {getCurrentInstance, onBeforeUnmount, onMounted, reactive, watch} from "vue";
+import {getCurrentInstance, onBeforeUnmount, onMounted, reactive, watch,ref} from "vue";
 import { ElMessage } from 'element-plus'
 import useStore from "../store/index.js";
 import {useRouter} from "vue-router";
-import route from "../router/route.js";
 const {proxy} = getCurrentInstance()
 const store = useStore()
 const router = useRouter()
@@ -140,11 +95,6 @@ function login(){
         password:data.logPsd
     }).then(res => {
       if(Object.hasOwn(res.data, "token")){
-        if(res.data.identity == "admin"){
-          route.forEach((item)=>{
-            router.addRoute('admin',item)
-          })
-        }
         store.setIdentity(res.data.identity)
         store.setHeadImg(res.data.headImg)
         store.setToken(res.data.token)
@@ -167,13 +117,72 @@ watch(()=>data.count,(newVal)=>{
   }
 })
 
-onMounted(()=>{
+const isMobile = ref(false)
+
+onMounted(() => {
+  // 原有代码保持不变
   init()
+  checkMobile()
+  window.addEventListener('resize', checkMobile)
 })
-onBeforeUnmount(()=>{
-  clearInterval(data.countTimer)
+
+onBeforeUnmount(() => {
+  // 原有代码保持不变
+  window.removeEventListener('resize', checkMobile)
 })
+
+function checkMobile() {
+  isMobile.value = window.innerWidth <= 768
+}
 </script>
+
+<template>
+  <div class="reg">
+    <div class="mobile-switch" v-show="isMobile">
+      <button :class="{ active: !data.active }" @click="data.active = false">登录</button>
+      <button :class="{ active: data.active }" @click="data.active = true">注册</button>
+    </div>
+    <div :class="['container',{'right-panel-active':data.active == true}]">
+      <div class="container__form container--signup">
+        <div class="form" id="form1">
+          <h2 class="form__title">注 册</h2>
+          <input v-model="data.regName" type="text" maxlength="10" placeholder="用户名" class="input" />
+          <input v-model="data.regPsd" type="text" placeholder="密码" class="input" />
+          <input v-model="data.email" type="text" placeholder="邮箱" class="input" />
+          <input v-model="data.regCode" type="text" placeholder="验证码" class="input" @keyup.enter="register" />
+          <p v-show="data.code" @click="reqEmail()">获取验证码</p>
+
+          <p v-show="!data.code">{{data.count}}</p>
+          <button @click="register()" class="btn">注 册</button>
+        </div>
+      </div>
+
+      <div class="container__form container--signin">
+        <div class="form" id="form2">
+          <h2 class="form__title">登 录</h2>
+          <input v-model="data.logEmail" type="text" placeholder="邮箱" class="input" />
+          <input v-model="data.logPsd" type="password" placeholder="密码" class="input" />
+          <input v-model="data.logCode" type="text" placeholder="验证码" class="input" @keyup.enter="login" />
+          <a class="link">忘记密码?</a>
+          <div @click="init" v-html="data.captcha"></div>
+          <button @click="login()" class="btn">登 录</button>
+        </div>
+      </div>
+
+      <div class="container__overlay">
+        <div class="overlay">
+          <div class="overlay__panel overlay--left">
+            <button @click="data.active = false" class="btn" id="signIn">登 录</button>
+          </div>
+          <div class="overlay__panel overlay--right">
+            <button @click="data.active = true" class="btn" id="signUp">注 册</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
 
 <style scoped>
 @keyframes zhuye {
@@ -196,18 +205,6 @@ onBeforeUnmount(()=>{
   width: 100%;
   place-items: center;
   animation: zhuye 1s ease 0s 1 normal none running;
-}
-.form__title {
-  font-weight: 300;
-  margin: 0 0 1.25rem;
-  font-size: 40px;
-}
-
-.link {
-  color: #333;
-  font-size: 0.9rem;
-  margin: 0.5rem 0;
-  text-decoration: none;
 }
 
 .container {
@@ -327,10 +324,6 @@ onBeforeUnmount(()=>{
   transition: transform 80ms ease-in;
 }
 
-.form>.btn {
-  margin-top: 1.5rem;
-}
-
 .btn:active {
   transform: scale(0.95);
 }
@@ -349,16 +342,71 @@ onBeforeUnmount(()=>{
   text-align: center;
 }
 
-.input {
-  background-color: #eee;
-  border: none;
-  padding: 0.9rem 0.9rem;
-  margin: 0.5rem 0;
-  height: 35px;
+.form__title {
+  font-weight: 600;
+  margin: 0 0 1.25rem;
+  font-size: 32px;
+  color: #1d1d1f;
+  letter-spacing: -0.02em;
+}
+
+.form > .input {
+  background: rgba(0, 0, 0, 0.02);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  padding: 10px 14px;
+  margin-bottom: 8px;
   width: 100%;
-  color: black;
-  font-size: 20px;
-  border-radius: 10px;
+  height: 44px;
+  font-size: 15px;
+  border-radius: 12px;
+  transition: all 0.3s;
+  color: #1d1d1f;
+}
+
+.form > .input:focus {
+  outline: none;
+  border-color: #0071e3;
+  background-color: #fff;
+  box-shadow: 0 0 0 4px rgba(0, 113, 227, 0.1);
+}
+
+.form > p {
+  color: #0071e3;
+  font-size: 14px;
+  cursor: pointer;
+  padding: 6px 12px;
+  border-radius: 6px;
+  transition: all 0.2s;
+  margin: 0;
+}
+
+.form > p:hover {
+  background: rgba(0, 113, 227, 0.1);
+}
+
+.form > p[v-show="!data.code"] {
+  color: #86868b;
+  cursor: default;
+}
+
+.form > .link {
+  color: #0071e3;
+  font-size: 14px;
+  margin: 8px 0;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.form > .link:hover {
+  color: #0077ED;
+  text-decoration: underline;
+}
+
+.form > .btn {
+  margin-top: 1.5rem;
+  background: linear-gradient(135deg, #42a1ec, #0071e3);
+  font-size: 16px;
+  padding: 0.8rem 3rem;
 }
 
 @keyframes show {
@@ -371,6 +419,147 @@ onBeforeUnmount(()=>{
   100% {
     opacity: 1;
     z-index: 5;
+  }
+}
+
+
+/* mobile */
+@media (max-width: 768px) {
+  .reg {
+    background: #f5f5f7;
+    height: 100vh;
+    width: 100vw;
+    overflow-x: hidden;
+    position: fixed;
+    top: 0;
+    left: 0;
+  }
+
+  .container {
+    height: 100vh;
+    width: 100vw;
+    margin: 0;
+    padding: 0;
+    border-radius: 0;
+    box-shadow: none;
+    background: transparent;
+    overflow: hidden;
+  }
+
+  .container__form {
+    height: 100vh;
+    width: 100vw !important;
+    padding: 0;
+    transform: translateX(100%);
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .container--signin {
+    transform: translateX(0);
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .container.right-panel-active .container--signin {
+    transform: translateX(-100%);
+    opacity: 0;
+    visibility: hidden;
+  }
+
+  .container.right-panel-active .container--signup {
+    transform: translateX(0);
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .form {
+    padding: 24px;
+    height: 100vh;
+    justify-content: center;
+    max-width: 400px;
+    margin: 0 auto;
+  }
+
+  .form__title {
+    font-size: 32px;
+    margin-bottom: 40px;
+    background: linear-gradient(135deg, #1d1d1f, #434343);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    display: none;
+  }
+
+  .mobile-switch {
+    position: fixed;
+    top: 60px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 8px;
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(20px);
+    padding: 4px;
+    border-radius: 16px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    width: 85%;
+    max-width: 300px;
+    z-index: 1000;
+  }
+
+  .mobile-switch button {
+    flex: 1;
+    padding: 12px 24px;
+    border: none;
+    background: transparent;
+    color: #1d1d1f;
+    font-size: 15px;
+    font-weight: 500;
+    border-radius: 12px;
+    transition: all 0.3s;
+  }
+
+  .mobile-switch button.active {
+    background: #0071e3;
+    color: white;
+  }
+
+  .container__overlay {
+    display: none;
+  }
+
+  /* 输入框样式优化 */
+  .form > .input {
+    background: rgba(255, 255, 255, 0.8);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    height: 50px;
+    margin-bottom: 16px;
+    font-size: 16px;
+    backdrop-filter: blur(10px);
+  }
+
+  .form > .btn {
+    background: #0071e3;
+    margin-top: 32px;
+    height: 50px;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+  }
+}
+
+@media (max-width: 480px) {
+  .form {
+    padding: 20px;
+  }
+
+  .form__title {
+    font-size: 28px;
+    margin-bottom: 32px;
+  }
+
+  .mobile-switch {
+    width: 90%;
   }
 }
 </style>

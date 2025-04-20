@@ -1,138 +1,258 @@
 <script setup>
-import { ArrowLeft } from '@element-plus/icons-vue'
-import {useRouter,useRoute} from 'vue-router';
-import {ref} from 'vue'
+import { ref, computed,watch ,onMounted} from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import * as ElementPlusIconsVue from '@element-plus/icons-vue'
+import { Fold, Expand } from '@element-plus/icons-vue'
+
+const route = useRoute()
 const router = useRouter()
-const path = ref(null)
-function gotoPage(){
-  router.push('/admin/')
+const isCollapse = ref(false)
+const activeMenu = ref(route.path)
+const visitedViews = ref([])
+
+// 动态路由配置
+const routes = computed(() => {
+  // 获取所有路由
+  const allRoutes = router.getRoutes()
+  
+  // 获取 admin 主路由
+  const adminRoute = allRoutes.find(r => r.path === '/admin')
+  if (!adminRoute) return []
+
+  // 获取所有子路由并构建菜单
+  return adminRoute.children.map(route => ({
+    path: `/admin/${route.path}`,
+    name: route.meta?.title,  // 使用 meta.title 替代 name
+    icon: route.meta?.icon,
+    children: route.children?.map(child => ({
+      path: `/admin/${route.path}/${child.path}`,
+      name: child.meta?.title,  // 使用 meta.title 替代 name
+      icon: child.meta?.icon
+    })) || []
+  }))
+})
+console.log(routes)
+// 面包屑导航
+const breadcrumb = computed(() => {
+  const matched = route.matched.filter(item => item.meta && item.meta.title)
+  return matched
+})
+
+// 添加标签页
+const addVisitedView = (view) => {
+  if (visitedViews.value.some(v => v.path === view.path)) return
+  visitedViews.value.push({
+    name: view.meta?.title || view.name,  // 使用 meta.title
+    path: view.path,
+    meta: view.meta  // 添加 meta 信息
+  })
 }
-function gotoUsers(){
-  router.push('/admin/users')
+
+// 关闭标签页
+const closeSelectedTag = (view) => {
+  const index = visitedViews.value.findIndex(v => v.path === view.path)
+  visitedViews.value.splice(index, 1)
+  if (view.path === route.path) {
+    const lastView = visitedViews.value[visitedViews.value.length - 1]
+    if (lastView) {
+      router.push(lastView.path)
+    } else {
+      router.push('/')
+    }
+  }
 }
-function gotoPublic(){
-  router.push('/admin/public')
-}
-function gotoLogs(){
-  router.push('/admin/logs')
-}
-function gotoComments(){
-  router.push('/admin/comments')
-}
-function gotoMessages(){
-  router.push('/admin/messages')
-}
-function gotoArticles(){
-  router.push('/admin/articles')
-}
-function gotoTags(){
-  router.push('/admin/tags')
-}
-function gotoCategories(){
-  router.push('/admin/categories')
-}
+
+// 监听路由变化
+watch(route, (to) => {
+  if (to.name) {
+    addVisitedView(to)
+  }
+}, { immediate: true })
 </script>
 
 <template>
-  <div class="sidebar">
-    <div class="title">
-      <a style="color: white;font-size: 20px;font-weight: 700;">cavalry</a>
-    </div>
-    <el-menu
-        active-text-color="white"
-        background-color="#001529"
-        active-background-color="#263445"
-        class="el-menu-vertical-demo"
-        default-active="1"
-        text-color="#bfcbd9"
-    >
-      <el-sub-menu index="1">
-        <template #title>
-          <span>首页</span>
-        </template>
-        <el-menu-item class="menu-item" index="1-1" @click="gotoPage">分析页</el-menu-item>
-      </el-sub-menu>
-      <el-sub-menu index="2">
-        <template #title>
-          <span>系统管理</span>
-        </template>
-        <el-menu-item class="menu-item" index="2-1" @click="gotoUsers">用户管理</el-menu-item>
-        <el-menu-item class="menu-item" index="2-2" @click="gotoComments">评论管理</el-menu-item>
-        <el-menu-item class="menu-item" index="2-3" @click="gotoMessages">留言管理</el-menu-item>
-        <el-menu-item class="menu-item" index="2-4" @click="gotoLogs">日志管理</el-menu-item>
-        <el-menu-item class="menu-item" index="2-5" @click="gotoTags">标签管理</el-menu-item>
-        <el-menu-item class="menu-item" index="2-6" @click="gotoCategories">类别管理</el-menu-item>
-      </el-sub-menu>
-      <el-sub-menu index="3">
-        <template #title>
-          <span>文章管理</span>
-        </template>
-        <el-menu-item class="menu-item" index="3-1" @click="gotoArticles()">文章列表</el-menu-item>
-        <el-menu-item class="menu-item" index="3-2" @click="gotoPublic">文章发布</el-menu-item>
-      </el-sub-menu>
-      <el-menu-item index="4">
-        <template #title>
-          <span>常用组件</span>
-        </template>
-      </el-menu-item>
-    </el-menu>
-  </div>
-  <div class="container">
-    <div class="device">
-      <div class="navbar">
+  <div class="app-wrapper">
+    <!-- 侧边栏 -->
+    <div class="sidebar" :class="{ 'is-collapse': isCollapse }">
+      <div class="logo">
+        <span v-show="!isCollapse">Cavalry</span>
+        <div class="sidebar-toggle" @click="isCollapse = !isCollapse">
+          <el-icon><component :is="isCollapse ? Expand : Fold"/></el-icon>
+        </div>
       </div>
-      <div class="tags">
+      <el-menu
+          :collapse="isCollapse"
+          :default-active="activeMenu"
+          background-color="#001529"
+          text-color="#bfcbd9"
+          active-text-color="#409EFF"
+          unique-opened
+      >
+      <template v-for="route in routes" :key="route.path">
+        <el-sub-menu v-if="route.children && route.children.length" :index="route.path">
+          <template #title>
+            <el-icon><component :is="ElementPlusIconsVue[route.icon]"/></el-icon>
+            <span>{{ route.name }}</span>
+          </template>
+          <el-menu-item 
+            v-for="child in route.children" 
+            :key="child.path" 
+            :index="child.path"
+            @click="router.push(child.path)"
+          >
+            <el-icon><component :is="ElementPlusIconsVue[child.icon]"/></el-icon>
+            <span>{{ child.name }}</span>
+          </el-menu-item>
+        </el-sub-menu>
+        <el-menu-item 
+          v-else 
+          :index="route.path"
+          @click="router.push(route.path)" 
+        >
+          <el-icon><component :is="ElementPlusIconsVue[route.icon]"/></el-icon>
+          <span>{{ route.name }}</span>
+        </el-menu-item>
+      </template>
+      </el-menu>
+    </div>
 
+    <!-- 主要内容区 -->
+    <div class="main-container" :class="{ 'is-collapse': isCollapse }">
+      <!-- 导航栏 -->
+      <div class="navbar">
+        <el-breadcrumb separator="/">
+          <el-breadcrumb-item v-for="item in breadcrumb" :key="item.path">
+            {{ item.meta.title }}
+          </el-breadcrumb-item>
+        </el-breadcrumb>
+      </div>
+
+      <!-- 标签页 -->
+      <div class="tags-view">
+        <el-scrollbar horizontal>
+          <div class="tags-wrapper">
+            <el-tag
+                v-for="tag in visitedViews"
+                :key="tag.path"
+                :closable="true"
+                :effect="route.path === tag.path ? 'dark' : 'plain'"
+                @click="router.push(tag.path)"
+                @close="closeSelectedTag(tag)"
+            >
+                {{ tag.name }}  <!-- 直接使用 name，因为已经在 addVisitedView 中处理过 -->
+            </el-tag>
+          </div>
+        </el-scrollbar>
+      </div>
+
+      <!-- 内容区 -->
+      <div class="app-main">
+        <router-view></router-view>
       </div>
     </div>
-  </div>
-  <div class="main">
-    <router-view></router-view>
   </div>
 </template>
 
 <style scoped>
-.sidebar{
+.app-wrapper {
+  position: relative;
+  height: 100vh;
+  width: 100%;
+}
+
+.sidebar {
   position: fixed;
   top: 0;
   left: 0;
-  width: 210px!important;
   height: 100%;
-  overflow: hidden;
-  background-color: #001529;;
+  width: 210px;
+  background-color: #001529;
+  transition: width 0.3s;
+  z-index: 1001;
 }
-.title{
+
+.sidebar.is-collapse {
+  width: 64px;
+}
+
+.logo {
   height: 50px;
   display: flex;
   align-items: center;
-  justify-content: center;
-  background-color: #001529;;
+  justify-content: space-between;
+  padding: 0 16px;
+  overflow: hidden;
+  background: #002140;
 }
-.menu-item{
-  background-color: #0F2438;
+
+.logo span {
+  color: white;
+  font-size: 16px;
+  font-weight: 600;
 }
-.menu-item:active{
-  background-color: rgb(64,158,255);
+
+.sidebar-toggle {
+  cursor: pointer;
+  font-size: 16px;
+  color: white;
 }
-.el-menu-vertical-demo{
-  font-size: 20px;
-  border-right-width: 0;
-}
-.container{
+
+.main-container {
   margin-left: 210px;
+  min-height: 100%;
+  transition: margin-left 0.3s;
 }
-.device{
+
+.main-container.is-collapse {
+  margin-left: 64px;
 }
-.navbar{
+
+.navbar {
   height: 50px;
-  border-bottom: 1px solid rgb(228,231,237);
+  padding: 0 20px;
+  display: flex;
+  align-items: center;
+  background: white;
+  box-shadow: 0 1px 4px rgba(0,21,41,.08);
 }
-.tags{
-  height: 34px;border-bottom: 1px solid rgb(228,231,237);
+
+.tags-view {
+  height: 34px;
+  background: white;
+  border-bottom: 1px solid #d8dce5;
+  box-shadow: 0 1px 3px 0 rgba(0,0,0,.12);
 }
-.main{
-  margin-left: 210px;
+
+.tags-wrapper {
+  padding: 4px 8px;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.app-main {
+  padding: 10px;
   height: calc(100vh - 84px);
-  background-color: rgb(242,243,245);
+  overflow: auto;
+  background-color: #F0F2F5;
+}
+
+:deep(.el-menu) {
+  border-right: none;
+  transition: width 0.3s;
+}
+
+:deep(.el-menu--collapse) {
+  width: 64px;
+}
+
+:deep(.el-sub-menu .el-menu) {
+  transition: width 0.3s, transform 0.3s;
+}
+
+:deep(.el-menu--popup) {
+  min-width: 200px;
+  transition: transform 0.3s;
 }
 </style>

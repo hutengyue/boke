@@ -1,30 +1,3 @@
-<template>
-  <Header style="z-index: 1000"></Header>
-  <div>
-    <div class="body">
-      <div class="page">
-        <h1 class="page-title">网站更新日志</h1>
-        <div class="container">
-          <span >updating.....</span>
-          <div class="timeline">
-            <div class="timeline-item" v-for="(item,index) in data.logList" key="index">
-              <div class="timeline-item-title">
-                <div class="item-circle">
-                  <p>{{ item.createAt }}</p>
-                </div>
-              </div>
-              <div class="timeline-item-content">
-                <p>{{ item.content }}</p>
-              </div>
-            </div>
-          </div>
-        </div>
-        <hr>
-      </div>
-    </div>
-  </div>
-</template>
-
 <script setup>
 import {reactive,onMounted,getCurrentInstance} from "vue";
 import Header from "../components/header.vue";
@@ -37,135 +10,160 @@ onMounted(()=>{
     data.logList = [...res.data].reverse()
   })
 })
-
 </script>
 
+
+<template>
+  <Header style="z-index: 1000"></Header>
+  <div class="body">
+    <div class="page">
+      <div class="page-header">
+        <h1 class="page-title">更新日志</h1>
+        <p class="page-subtitle">记录每一次成长与进步</p>
+      </div>
+      <div class="container">
+        <div class="timeline">
+          <div class="timeline-item" v-for="(item,index) in data.logList" :key="index">
+            <div class="timeline-item-title">
+              <div class="item-circle">
+                <p>{{ item.createAt }}</p>
+              </div>
+            </div>
+            <div class="timeline-item-content">
+              <p>{{ item.content }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
 <style scoped>
-@font-face {
-  font-family: rain;
-  src: url("../assets/wenzi.ttf");
-}
-*{
-  font-family: rain;
-}
-@keyframes zhuye {
-  from{
-    opacity: 0;
-  }
-  to{
-    opacity: 1;
-  }
-}
-@keyframes bottom {
-  from{
-    opacity: 0;
-    transform: translate(0px,100px);
-  }
-  to{
-    opacity: 1;
-    transform: translate(0px,0px);
-  }
-}
-.body{
+.body {
   width: 100%;
+  min-height: 100vh;
   display: flex;
   justify-content: center;
-  align-items: center;
-  padding: 40px 15px;
-  background-image: linear-gradient(90deg,rgba(37,82,110,.1) 1px,#fff 0),
-  linear-gradient(180deg,rgba(37,82,110,.1) 1px,#fff 0);
-  background-size: 3rem 3rem;
+  padding: 80px 20px 40px;
+  background: linear-gradient(135deg, #e8f4ff 0%, #f0f9ff 100%);
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Icons", "Helvetica Neue", sans-serif;
 }
-.page{
-  margin-top: 70px;
-  width: 90%;
-  max-width: 1300px;
-  background-color: #fff;
-  box-shadow: 0 8px 16px -4px #2c2d300c;
-  border-radius: 20px;
-  border:1px solid #e3e8f7;
-  padding: 10px 35px;
-  font-weight: 700;
-  font-size: 18px;
-  min-height: 80%;
-  animation: bottom 1.5s ease 0s 1 normal none running;
+
+.page {
+  width: 100%;
+  max-width: 900px;
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(20px) saturate(180%);
+  border-radius: 24px;
+  padding: 40px;
+  box-shadow: 
+    0 4px 24px -1px rgba(71, 163, 255, 0.15),
+    0 0 1px 0 rgba(0, 0, 0, 0.05);
 }
-.page-title{
+
+.page-header {
   text-align: center;
-  color: rgb(50,50,50);
-  margin-top: 20px;
+  margin-bottom: 50px;
 }
-.container{
-  letter-spacing: 1px;
+
+.page-title {
+  font-size: 40px;
+  font-weight: 700;
+  color: #47a3ff;
+  margin-bottom: 12px;
+  letter-spacing: -0.022em;
 }
-.container span{
-  color: rgb(102,102,102);
-  font-size: 20px;
-}
-.timeline{
-  padding: 14px 20px 5px;
-  border-left: 2px solid rgba(60,60,67,0.8);
-  margin: 0 0 20px 10px;
-}
-.timeline-item{
-  margin: 0 0 15px;
-}
-.timeline-item-title{
-  position: relative;
-  color: rgba(60,60,67,0.8);
-}
-.item-circle::before{
-  position: absolute;
-  top:50%;
-  left: -27px;
-  width: 6px;
-  height: 6px;
-  border: 3px solid rgba(60,60,67,0.8);
-  border-radius: 50%;
-  background: white;
-  content:'';
-  transition: all .3s;
-  transform: translate(0,-50%);
-}
-.container p{
-  line-height: 1.5;
-  text-align: left;
-  font-weight: 500;
-  letter-spacing:1px;
-  margin: 0 0 15px;
-}
-.timeline-item-content{
-  position: relative;
-  padding: 12px 15px;
-  border-radius: 8px;
-  background: rgb(247,247,249);
-  color: black;
+
+.page-subtitle {
+  color: #8e8e93;
   font-size: 17px;
+  font-weight: 500;
 }
-.timeline-item-content>:last-child{
-  margin-bottom: 0;
-}
-hr{
+
+.timeline {
   position: relative;
-  margin: 40px auto;
-  border: 2px dashed rgba(255,255,255,0.4);
-  width: calc(100% - 4px);
-  box-sizing: content-box;
-  height: 0;
-  overflow: visible;
+  padding-left: 32px;
+  border-left: 2px solid #47a3ff;
 }
-hr:before{
+
+.timeline-item {
+  margin-bottom: 40px;
+  position: relative;
+}
+
+.item-circle::before {
+  content: '';
   position: absolute;
-  top: -10px;
-  left: 5%;
-  z-index: 1;
-  color: rgba(255,255,255,0.7);
-  content: '\f0c4';
-  font-size: 20px;
-  line-height: 1;
-  transition: all 1s ease-in-out;
-  display: inline-block;
+  left: -41px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #47a3ff;
+  box-shadow: 
+    0 0 0 6px rgba(71, 163, 255, 0.15),
+    0 0 20px rgba(71, 163, 255, 0.2);
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.timeline-item:hover .item-circle::before {
+  transform: translateY(-50%) scale(1.2);
+  box-shadow: 
+    0 0 0 8px rgba(71, 163, 255, 0.2),
+    0 0 30px rgba(71, 163, 255, 0.3);
+}
+
+.timeline-item-title {
+  margin-bottom: 16px;
+}
+
+.item-circle p {
+  color: #47a3ff;
+  font-size: 13px;
   font-weight: 600;
-  text-rendering: auto;
+  font-family: "SF Mono", SFMono-Regular, ui-monospace, Menlo, Monaco, Consolas, monospace;
+  letter-spacing: 0.5px;
+  opacity: 0.9;
+}
+
+.timeline-item-content {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 20px 24px;
+  box-shadow: 
+    0 2px 12px rgba(71, 163, 255, 0.1),
+    0 0 1px rgba(0, 0, 0, 0.05);
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  border: 1px solid rgba(71, 163, 255, 0.15);
+}
+
+.timeline-item-content:hover {
+  transform: translateY(-2px) translateX(4px);
+  box-shadow: 
+    0 8px 24px rgba(71, 163, 255, 0.15),
+    0 2px 8px rgba(71, 163, 255, 0.1);
+  border-color: #47a3ff;
+}
+
+.timeline-item-content p {
+  color: #1d1d1f;
+  font-size: 15px;
+  line-height: 1.6;
+  margin: 0;
+  font-weight: 450;
+  letter-spacing: -0.022em;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 </style>

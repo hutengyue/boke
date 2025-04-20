@@ -1,17 +1,5 @@
-<template>
-  <div class="pieBox">
-    <div class="device">
-      <p>设备</p>
-      <div id="pie1"></div>
-    </div>
-    <div class="browser">
-      <p>浏览器</p>
-      <div id="pie2"></div>
-    </div>
-  </div>
-</template>
 <script setup>
-import {getCurrentInstance, toRef,onMounted,reactive} from "vue";
+import {getCurrentInstance, toRef,onMounted,reactive,onUnmounted} from "vue";
 const {proxy} = getCurrentInstance()
 const props = defineProps({
   visitList:Array
@@ -27,42 +15,48 @@ const visitList = toRef(props,'visitList')
 function getOption(data){
   const option = {
     tooltip: {
-      trigger: 'item'
+      trigger: 'item',
+      formatter: '{b}: {c} ({d}%)'
     },
     legend: {
-      top: '5%',
-      left: 'center'
+      orient: 'horizontal',
+      top: 'bottom',
+      left: 'center',
+      padding: [0, 0, 10, 0],
+      itemWidth: 10,
+      itemHeight: 10,
+      textStyle: {
+        fontSize: 12,
+        color: '#6e6e73'
+      }
     },
     series: [
       {
-        name: 'Access From',
         type: 'pie',
-        radius: ['40%', '70%'],
-        avoidLabelOverlap: false,
+        radius: '65%',
+        center: ['50%', '45%'],
         itemStyle: {
-          borderRadius: 10,
+          borderRadius: 4,
           borderColor: '#fff',
-          borderWidth: 2
+          borderWidth: 1
         },
         label: {
-          show: false,
-          position: 'center'
-        },
-        emphasis: {
-          label: {
-            show: true,
-            fontSize: 40,
-            fontWeight: 'bold'
-          }
+          show: true,
+          formatter: '{d}%',
+          fontSize: 14,
+          fontWeight: 500,
+          color: '#1d1d1f'
         },
         labelLine: {
-          show: false
+          length: 15,
+          length2: 0,
+          maxSurfaceAngle: 80
         },
         data: data
       }
     ]
   };
-  return option
+  return option;
 }
 onMounted(()=>{
   let array = []
@@ -77,29 +71,95 @@ onMounted(()=>{
 
   const pie1 = proxy.$echarts.init(document.getElementById('pie1'))
   const pie2 = proxy.$echarts.init(document.getElementById('pie2'))
-  pie1.setOption(getOption(data.device))
-  pie2.setOption(getOption(data.browser))
+  
+  // 设置图表主题色
+  const colors = ['#47a3ff', '#36cfc9', '#ff7875', '#ffc069', '#95de64'];
+  pie1.setOption({
+    ...getOption(data.device),
+    color: colors
+  })
+  pie2.setOption({
+    ...getOption(data.browser),
+    color: colors
+  })
+    // 优化 resize 处理
+  const resizeHandler = () => {
+    pie1.resize()
+    pie2.resize()
+  }
+  window.addEventListener("resize", resizeHandler)
+  
+  // 组件卸载时移除事件监听
+  onUnmounted(() => {
+    window.removeEventListener("resize", resizeHandler)
+  })
 })
 </script>
 
+<template>
+  <div class="pieBox">
+    <div class="chart-container device">
+      <h3 class="chart-title">设备分布</h3>
+      <div id="pie1"></div>
+    </div>
+    <div class="chart-container browser">
+      <h3 class="chart-title">浏览器分布</h3>
+      <div id="pie2"></div>
+    </div>
+  </div>
+</template>
+
 <style scoped>
-.pieBox{
-  width: 30%;
-  height: 400px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-.device,.browser{
+.pieBox {
   width: 100%;
-  height: 100%;
+  height: 600px;
+  display: grid;
+  grid-template-rows: 1fr 1fr;
+  gap: 20px;
 }
-#pie1{
+
+.chart-container {
+  position: relative;
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(10px);
+  border-radius: 24px;
+  padding: 16px;
   height: 100%;
-  width: 100%;
+  box-shadow: 
+    0 4px 20px rgba(71, 163, 255, 0.08),
+    0 1px 3px rgba(71, 163, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.4);
 }
-#pie2{
-  height: 100%;
-  width: 100%;
+
+.chart-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1d1d1f;
+  margin-bottom: 8px;
+  padding-left: 12px;
+  border-left: 3px solid #47a3ff;
+}
+
+#pie1, #pie2 {
+  position: absolute;
+  top: 50px;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+
+@media (max-width: 768px) {
+  .pieBox {
+    height: auto;
+    min-height: 700px;
+  }
+  
+  .chart-container {
+    height: 340px;
+  }
+  
+  #pie1, #pie2 {
+    top: 40px;
+  }
 }
 </style>

@@ -3,7 +3,7 @@
 </template>
 
 <script setup>
-import {onMounted, getCurrentInstance, reactive, toRefs, watch, toRef} from "vue";
+import {onMounted, getCurrentInstance, reactive, toRefs, watch, toRef,onUnmounted} from "vue";
 import moment from "moment";
 const {proxy} = getCurrentInstance()
 const props = defineProps({
@@ -34,7 +34,6 @@ onMounted(()=>{
     }
   }
   console.log(ipList,numberList)
-  const visit = proxy.$echarts.init(document.getElementById('main'))
   const option = {
     tooltip: {
       trigger: 'axis',
@@ -128,18 +127,42 @@ onMounted(()=>{
       }
     ]
   };
+  const visit = proxy.$echarts.init(document.getElementById('main'))
   visit.setOption(option)
-  window.addEventListener("resize", function () {
-    visit.resize();
-  });
+  
+  // 优化 resize 处理
+  const resizeHandler = () => {
+    visit.resize()
+  }
+  window.addEventListener("resize", resizeHandler)
+  
+  // 组件卸载时移除事件监听
+  onUnmounted(() => {
+    window.removeEventListener("resize", resizeHandler)
+  })
 })
 </script>
 
 <style scoped>
-#main{
-  margin-top: 50px;
-  height: 300px;
+#main {
+  margin: 20px 0 40px;
+  height: 360px;
   width: 100%;
-  margin-bottom: 30px;
+  padding: 20px;
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(10px);
+  border-radius: 24px;
+  box-shadow: 
+    0 4px 20px rgba(71, 163, 255, 0.08),
+    0 1px 3px rgba(71, 163, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+#main:hover {
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 
+    0 8px 30px rgba(71, 163, 255, 0.12),
+    0 2px 8px rgba(71, 163, 255, 0.08);
 }
 </style>

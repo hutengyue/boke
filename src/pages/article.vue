@@ -1,14 +1,33 @@
 <template>
-  <div>
+  <div class="all">
     <Header style="z-index: 1000"></Header>
     <div class="articleHeader">
+      <div class="header-overlay"></div>
       <img class="articleImg" :src="data.article.articleImg"/>
-      <a class="articleTitle">{{ data.article.articleTitle }}</a>
-      <p>{{data.article.articleLabel}}</p>
-      <div class="articleDetail">
-        <a>创建时间:{{data.article.dateTime}}</a>
-        <a>{{data.article.articleLabel}}</a>
-        <a>创建时间:2023-05-21</a>
+      <div class="header-content">
+        <h1 class="articleTitle">{{ data.article.articleTitle }}</h1>
+        <div class="article-meta">
+          <div class="meta-tags">
+            <span class="label category">{{ data.article.categoryName }}</span>
+            <span class="label tag" v-for="tag in data.article.tagNames" :key="tag">
+              {{ tag }}
+            </span>
+          </div>
+          <div class="articleDetail">
+            <span class="detail-item">
+              <i class="far fa-clock"></i>
+              {{ data.article.createAt }}
+            </span>
+            <span class="detail-item">
+              <i class="far fa-eye"></i>
+              {{ data.article.heat }} 阅读
+            </span>
+            <span class="detail-item">
+              <i class="far fa-folder"></i>
+              {{ data.article.articleLabel }}
+            </span>
+          </div>
+        </div>
       </div>
     </div>
     <div v-html="data.toc"></div>
@@ -32,7 +51,7 @@
           <div class="commentsTop">
             <div>
               <a>{{ item.username }}</a>
-              <a>{{ item.dateTime }}</a>
+              <a>{{ item.creatAt }}</a>
             </div>
             <p>回复</p>
           </div>
@@ -79,10 +98,12 @@ const data = reactive({
   toc:'',
   message:'',
   comments:[],
-  active:0
+  active:0,
+  commentMeta:{}
 })
 
-function init(){
+async function init(){
+  await proxy.$http.post(`/article/${route.params.articleId}/heat`)
   proxy.$http({
     url:'/article',
     method:"POST",
@@ -210,28 +231,21 @@ function isElementInViewport(element,toc) {
 }
 function initComment(){
   proxy.$http({
-    url:'/comment',
-    method:"GET",
-    data:{
-      articleId:data.article.articleId
-    }
-  }).then(res=>{
-    data.comments = res.data
-  })
+    url: `/comment/list?page=${1}&limit=${10}&articleId=${data.article.articleId}`,
+    method: "GET",
+  }).then(res => {
+    data.comments = res.data.items; 
+    data.commentMeta = res.data.meta; 
+  });
 }
 function submit(){
   proxy.$http.post('/comment/submit',{
       message:data.message,
       articleId:data.article.articleId,
-      dateTime:new Date().toLocaleString()
     }
   ).then(res=>{
     data.message = ''
-    data.comments.unshift(res.data.comment)
-    return ElMessage({
-      message: res.data.msg,
-      type: res.data.type
-    })
+    data.comments.unshift(res.data)
   })
 }
 
@@ -241,13 +255,6 @@ onMounted(()=>{
 </script>
 
 <style scoped>
-@font-face {
-  font-family: rain;
-  src: url("../assets/wenzi.ttf");
-}
-*{
-  font-family: rain;
-}
 @keyframes zhuye {
   from{
     opacity: 0;
@@ -268,44 +275,156 @@ onMounted(()=>{
     transform: translate(0px,0px);
   }
 }
-.articleHeader{
+.all{
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+}
+.articleHeader {
+  position: relative;
+  height: 400px;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background: #000;
+}
+
+.header-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(to bottom, rgba(0,0,0,0.3), rgba(0,0,0,0.7));
+  z-index: 1;
+}
+
+.articleImg {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform: scale(1.1);
+  filter: blur(5px);
+  transition: all 0.3s ease;
+}
+
+.header-content {
+  position: relative;
+  z-index: 2;
+  max-width: 800px;
+  width: 90%;
+  text-align: center;
+  padding: 0 20px;
+}
+
+.articleTitle {
+  font-size: 48px;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 20px;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.article-meta {
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  align-content: center;
-  position: relative;
-  height: 350px;
-  width: 100%;
-  animation: zhuye 1.5s ease 0s 1 normal none running;
+  align-items: center;
+  gap: 12px;
 }
-.articleImg{
-  z-index: -10;
-  position: absolute;
-  height: 100%;
-  width: 100%;
-  left: 0;
-  top: 0;
-  object-fit: cover;
-}
-.articleTitle{
-  font-size: 60px;
-  color: white;
-  text-align: center;
-  font-family: normal;
-  text-shadow: 2px 2px 10px #000;
-}
-.articleHeader p{
-  color: rgb(171,164,136);
-}
-.articleDetail a{
 
+.meta-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+  margin-bottom: 12px;
 }
+
+.label {
+  background: rgba(255,255,255,0.1);
+  backdrop-filter: blur(10px);
+  padding: 6px 12px;
+  border-radius: 20px;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  transition: all 0.3s ease;
+}
+
+.label.category {
+  background: rgba(0, 122, 255, 0.2);
+  border: 1px solid rgba(0, 122, 255, 0.3);
+}
+
+.label.tag {
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.label:hover {
+  transform: translateY(-1px);
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.articleDetail {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  color: rgba(255,255,255,0.8);
+  font-size: 14px;
+}
+
+.detail-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.detail-item i {
+  font-size: 16px;
+}
+
+@media (max-width: 768px) {
+  .articleHeader {
+    height: 300px;
+  }
+
+  .articleTitle {
+    font-size: 32px;
+    margin-bottom: 16px;
+  }
+
+  .articleDetail {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .meta-tags {
+    gap: 6px;
+    margin-bottom: 8px;
+  }
+  
+  .label {
+    padding: 4px 10px;
+    font-size: 12px;
+  }
+}
+
+
+
 .articleBody{
   width: 100%;
   padding: 20px;
   display: flex;
   flex-direction: column;
   align-items: center;
+  animation: bottom 1.5s ease 0s 1 normal none running;
+
 }
 .entryContent{
   width: 100%;

@@ -110,86 +110,147 @@ onMounted(async () => {
 </script>
 
 <style scoped>
-@font-face {
-  font-family: rain;
-  src: url("../assets/wenzi.ttf");
-}
-@keyframes bottom {
-  from{
-    opacity: 0;
-    transform: translate(0px,100px);
-  }
-  to{
-    opacity: 1;
-    transform: translate(0px,0px);
-  }
-}
-*{
-  font-family: rain;
-}
-.body{
+.body {
+  background: linear-gradient(135deg, #f2f2f7 0%, #fff 100%);
   width: 100%;
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
-  justify-content: center;
   align-items: center;
-  padding: 40px 5px;
-  background-image: linear-gradient(90deg,rgba(37,82,110,.1) 1px,#fff 0),
-  linear-gradient(180deg,rgba(37,82,110,.1) 1px,#fff 0);
-  background-size: 3rem 3rem;
+  padding: 90px 24px 40px;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
 }
-.page{
-  margin-top: 70px;
-  width: 99%;
-  max-width: 1300px;
-  background-color: #fff;
-  box-shadow: 0 8px 16px -4px #2c2d300c;
-  border-radius: 20px;
-  border:1px solid #e3e8f7;
-  padding: 10px 10px;
+
+.page {
+  width: 100%;
+  max-width: 1200px;
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(25px) saturate(180%);
+  border-radius: 28px;
+  padding: 40px;
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.06),
+    0 1px 2px rgba(0, 0, 0, 0.04);
+  animation: fade-slide-up 1s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.page-title {
+  font-size: 40px;
   font-weight: 700;
-  font-size: 18px;
+  background: linear-gradient(135deg, #2374e1 0%, #47a3ff 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 48px;
+  text-align: center;
+  letter-spacing: -0.03em;
+}
+
+.statistic {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 20px;
+  margin-bottom: 60px;
+  padding: 0;
+}
+
+.statistic-detail {
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(10px);
+  border-radius: 24px;
+  padding: 24px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  animation: bottom 1.5s ease 0s 1 normal none running;
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  box-shadow: 
+    0 4px 20px rgba(71, 163, 255, 0.08),
+    0 1px 3px rgba(71, 163, 255, 0.05);
 }
-.page-title{
-  margin-top: 30px;
+
+.statistic-detail:hover {
+  transform: translateY(-4px) scale(1.02);
+  background: rgba(255, 255, 255, 0.95);
+  box-shadow: 
+    0 20px 40px rgba(71, 163, 255, 0.12),
+    0 4px 12px rgba(71, 163, 255, 0.08);
 }
-.statistic{
-  margin-top: 50px;
-  width: 90%;
-  max-width: 700px;
-  height: 140px;
-  border-radius: 20px;
-  border: 2px solid #e67474;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: space-evenly;
-  padding: 20px 20px;
+
+.statistic-detail p:first-child {
+  font-size: 15px;
+  color: #6e6e73;
+  margin-bottom: 12px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
 }
-.statistic-detail{
-  height: 50%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: space-between;
+
+.statistic-detail p:last-child {
+  font-size: 36px;
+  background: linear-gradient(135deg, #2374e1 0%, #47a3ff 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-weight: 700;
+  letter-spacing: -0.02em;
 }
-.allocation{
-  margin-top: 70px;
-  width: 99%;
-  max-width: 1300px;
-  background-color: #fff;
-  box-shadow: 0 8px 16px -4px #2c2d300c;
-  border-radius: 20px;
-  border:1px solid #e3e8f7;
-  display: flex;
-  flex-direction: row;
-  justify-content: space-around;
-  align-items: center;
-  padding: 35px 0px;
-  animation: bottom 1.5s ease 0s 1 normal none running;
+
+.allocation {
+  width: 100%;
+  max-width: 1200px;
+  margin-top: 40px;
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(25px) saturate(180%);
+  border-radius: 28px;
+  padding: 40px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+  gap: 40px;
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.06),
+    0 1px 2px rgba(0, 0, 0, 0.04);
+  animation: fade-slide-up 1s cubic-bezier(0.16, 1, 0.3, 1) 0.2s backwards;
+}
+
+@keyframes fade-slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 768px) {
+  .body {
+    padding: 80px 16px 30px;
+  }
+  
+  .page, .allocation {
+    padding: 24px;
+    border-radius: 24px;
+  }
+  
+  .page-title {
+    font-size: 32px;
+    margin-bottom: 32px;
+  }
+  
+  .statistic {
+    gap: 16px;
+  }
+  
+  .statistic-detail {
+    padding: 20px;
+  }
+  
+  .statistic-detail p:last-child {
+    font-size: 28px;
+  }
+  
+  .allocation {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
 }
 </style>

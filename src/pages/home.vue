@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div style="font-family: rain;">
     <Header style="z-index: 1000"></Header>
     <div class="zhu" ref="zhu">
       <h1>欢迎光临</h1>
@@ -151,9 +151,6 @@ onMounted(()=>{
   font-family: rain;
   src: url("../assets/wenzi.ttf");
 }
-*{
-  font-family: rain;
-}
 @keyframes hideToShow {
   0%{
     opacity: 0;
@@ -195,7 +192,7 @@ onMounted(()=>{
   align-items: center;
 }
 .zhu h1{
-  font-size: 50px;
+  font-size: 60px;
   margin-bottom: 20px;
   color: white;
   text-shadow: 2px 2px 10px #000;

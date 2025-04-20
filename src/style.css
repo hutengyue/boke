@@ -157,6 +157,7 @@ p code{
 .entryContent h2,
 .entryContent h3,
 .entryContent h4 {
+    position: relative;
     margin-top: 30px;
     margin-bottom: 20px;
 }
@@ -176,6 +177,7 @@ p code{
 }
 
 .entryContent h5 {
+    position: relative;
     font-size: 18px;
     padding-left: 28px;
 }

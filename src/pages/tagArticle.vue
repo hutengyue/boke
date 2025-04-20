@@ -1,5 +1,5 @@
 <template>
-  <div class="body">
+  <div class="body" style="font-family: rain;">
     <div v-if="tag" class="container-article">
       <div class="article">
         <div @click="gotoArticle(item.articleId)" v-for="(item,index) in article" :key="index" v-slide-in class="article-container">

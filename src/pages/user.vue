@@ -35,11 +35,5 @@ onMounted(()=>{
 </script>
 
 <style>
-@font-face {
-  font-family: rain;
-  src: url("../assets/wenzi.ttf");
-}
-*{
-  font-family: rain;
-}
+
 </style>

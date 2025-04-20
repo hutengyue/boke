@@ -1,14 +1,51 @@
 <template>
-  <div style="width:50%;height:400px;">
-    <p>分布</p>
+  <div class="map-container">
+    <h3 class="chart-title">访问分布</h3>
     <div id="china"></div>
   </div>
 </template>
 
+<style scoped>
+.map-container {
+  width: 100%;
+  height: 500px;
+  padding: 24px;
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(10px);
+  border-radius: 24px;
+  box-shadow: 
+    0 4px 20px rgba(71, 163, 255, 0.08),
+    0 1px 3px rgba(71, 163, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.map-container:hover {
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 
+    0 8px 30px rgba(71, 163, 255, 0.12),
+    0 2px 8px rgba(71, 163, 255, 0.08);
+}
+
+.chart-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #1d1d1f;
+  margin-bottom: 20px;
+  letter-spacing: -0.01em;
+}
+
+#china {
+  width: 100%;
+  height: calc(100% - 40px);
+  min-height: 400px;
+}
+</style>
+
 <script setup>
 import china from '../../assets/map/china.json'
 import citys from '../../assets/js/citys.js'
-import {onMounted, getCurrentInstance, reactive, toRefs, watch, toRef} from "vue";
+import {onMounted,onUnmounted, getCurrentInstance, reactive, toRefs, watch, toRef} from "vue";
 const {proxy} = getCurrentInstance()
 const props = defineProps({
   visitList:Array
@@ -82,20 +119,17 @@ function init(){
   option.series[0].data = mapList
   proxy.$echarts.registerMap('china', china);
   map.setOption(option, true);
-  window.addEventListener("resize", function () {
-    map.resize();
-  });
+  const resizeHandler = () => {
+    map.resize()
+  }
+  window.addEventListener("resize", resizeHandler)
+  
+  // 组件卸载时移除事件监听
+  onUnmounted(() => {
+    window.removeEventListener("resize", resizeHandler)
+  })
 }
 onMounted(()=>{
   init()
 })
 </script>
-
-<style scoped>
-#china{
-  display: flex;
-  align-items: center;
-  width:100%;
-  height:100%;
-}
-</style>

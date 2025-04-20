@@ -1,92 +1,138 @@
 <template>
-  <div class="body">
-    <div class="search-container">
-      <div style="display: flex;align-items: center;">
-        <a>关键字</a>
-        <el-input size="small" v-model="data.search" style="width: 200px;margin-left: 20px;" placeholder="用户名" clearable />
-      </div>
-      <div style="margin-left: 40px">
-        <el-button :icon="Search" type="primary" @click="search()">搜索</el-button>
-        <el-button :icon="Refresh" @click="refresh()">重置</el-button>
-      </div>
+  <div class="container">
+    <!-- 搜索栏 -->
+    <div class="search-bar">
+      <el-input
+        v-model="searchQuery"
+        placeholder="搜索用户名"
+        class="search-input"
+        :prefix-icon="Search"
+        clearable
+        @clear="handleSearch"
+        @keyup.enter="handleSearch"
+      />
+      <el-button type="primary" :icon="Search" @click="handleSearch">搜索</el-button>
+      <el-button :icon="Refresh" @click="resetSearch">重置</el-button>
     </div>
-    <el-card class="box-card" shadow="never">
+
+    <!-- 用户列表卡片 -->
+    <el-card class="user-card" shadow="hover">
       <template #header>
         <div class="card-header">
-          <el-button type="success" @click="data.dialog = true;data.type = 1;">新增</el-button>
-          <el-button type="danger" :disabled="data.selectUsers==0" @click="del()">删除</el-button>
+          <span class="title">用户列表</span>
+          <div class="actions">
+            <el-button type="primary" :icon="Plus" @click="handleAdd">新增用户</el-button>
+            <el-button 
+              type="danger" 
+              :icon="Delete" 
+              :disabled="!selectedUsers.length"
+              @click="handleBatchDelete"
+            >
+              批量删除
+            </el-button>
+          </div>
         </div>
       </template>
-      <el-table :border="true" :data="data.list" style="width: 100%"
-                @selection-change="select">
-        <el-table-column width="80" type="selection"/>
-        <el-table-column fixed prop="userId" label="编号" width="100" />
-        <el-table-column label="头像" width="130" >
-          <template v-slot="scope">
-            <img style="width: 60px;height: 60px" :src="scope.row.headImg" alt="">
+
+      <!-- 用户表格 -->
+      <el-table
+        :data="userList"
+        style="width: 100%"
+        @selection-change="handleSelectionChange"
+        :border="false"
+        :stripe="true"
+      >
+        <el-table-column type="selection" width="50" />
+        <el-table-column label="用户信息" width="250">
+          <template #default="{ row }">
+            <div class="user-info">
+              <el-avatar :size="40" :src="row.headImg" />
+              <div class="user-detail">
+                <span class="username">{{ row.username }}</span>
+                <span class="identity" :class="row.identity">
+                  {{ row.identity === 'admin' ? '管理员' : '用户' }}
+                </span>
+              </div>
+            </div>
           </template>
         </el-table-column>
-        <el-table-column prop="username" label="名称" width="130" />
-        <el-table-column label="性别" width="120" >
-          <template v-slot="scope">
-            <a>{{scope.row.sex == 1?'男':'女'}}</a>
+        <el-table-column prop="email" label="邮箱" />
+        <el-table-column label="性别" width="80">
+          <template #default="{ row }">
+            <el-tag :type="row.sex === 1 ? 'info' : 'danger'" effect="plain">
+              {{ row.sex === 1 ? '男' : '女' }}
+            </el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="identity" label="身份" width="150"></el-table-column>
-        <el-table-column prop="email" label="邮箱" width="200" />
-        <el-table-column prop="introduction" label="介绍" width="250" />
-        <el-table-column prop="createTime" label="创建时间" width="250" />
-        <el-table-column fixed="right" label="操作" width="200">
-          <template v-slot="scope">
-            <el-button type="primary" size="small" @click="edit(scope.row)">修改</el-button>
-            <el-button type="danger" size="small" @click="del(scope.row)">删除</el-button>
+        <el-table-column prop="introduction" label="介绍" show-overflow-tooltip />
+        <el-table-column prop="createAt" label="创建时间" width="180" />
+        <el-table-column label="操作" width="150" fixed="right">
+          <template #default="{ row }">
+            <el-button-group>
+              <el-button type="primary" link @click="handleEdit(row)">编辑</el-button>
+              <el-button type="danger" link @click="handleDelete(row)">删除</el-button>
+            </el-button-group>
           </template>
         </el-table-column>
       </el-table>
-      <template #footer>
+
+      <!-- 分页器 -->
+      <div class="pagination">
         <el-pagination
-            :background="true"
-            v-model:current-page="data.currentPage"
-            :page-size="pageSize"
-            :small="false"
-            layout="total,prev, pager, next, jumper"
-            :total="data.users.length"
-            @current-change="handleCurrentChange"
+          v-model:current-page="currentPage"
+          v-model:page-size="pageSize"
+          :page-sizes="[10, 20, 30, 50]"
+          :total="total"
+          layout="total, sizes, prev, pager, next, jumper"
+          @size-change="handleSizeChange"
+          @current-change="handleCurrentChange"
         />
-      </template>
+      </div>
     </el-card>
 
-
-    <el-dialog v-model="data.dialog" title="用户" width="500" align-center>
-      <el-form :model="data.target">
-        <el-form-item label="用户名" :label-width="'120px'">
-          <el-input v-model="data.target.username" />
+    <!-- 用户表单对话框 -->
+    <el-dialog
+      v-model="dialogVisible"
+      :title="dialogType === 'add' ? '新增用户' : '编辑用户'"
+      width="500px"
+      destroy-on-close
+    >
+      <el-form
+        ref="formRef"
+        :model="userForm"
+        :rules="formRules"
+        label-width="80px"
+      >
+        <el-form-item label="用户名" prop="username">
+          <el-input v-model="userForm.username" />
         </el-form-item>
-        <el-form-item label="性别" :label-width="'140px'">
-          <el-select v-model="data.target.sex" placeholder="性别">
-            <el-option label="男" value="1" />
-            <el-option label="女" value="2" />
+        <el-form-item label="性别" prop="sex">
+          <el-radio-group v-model="userForm.sex">
+            <el-radio :label="1">男</el-radio>
+            <el-radio :label="2">女</el-radio>
+          </el-radio-group>
+        </el-form-item>
+        <el-form-item label="身份" prop="identity">
+          <el-select v-model="userForm.identity" placeholder="请选择身份">
+            <el-option label="管理员" value="admin" />
+            <el-option label="用户" value="user" />
           </el-select>
         </el-form-item>
-        <el-form-item label="身份" :label-width="'140px'">
-          <el-select v-model="data.target.identity" placeholder="身份">
-            <el-option label="admin" value="admin" />
-            <el-option label="user" value="user" />
-          </el-select>
+        <el-form-item label="邮箱" prop="email">
+          <el-input v-model="userForm.email" />
         </el-form-item>
-        <el-form-item label="邮箱" :label-width="'120px'">
-          <el-input v-model="data.target.email" />
-        </el-form-item>
-        <el-form-item label="介绍" :label-width="'120px'">
-          <el-input v-model="data.target.introduction" />
+        <el-form-item label="介绍" prop="introduction">
+          <el-input
+            v-model="userForm.introduction"
+            type="textarea"
+            :rows="3"
+          />
         </el-form-item>
       </el-form>
       <template #footer>
         <div class="dialog-footer">
-          <el-button @click="data.dialog = false">取消</el-button>
-          <el-button type="primary" @click="add()">
-            确认
-          </el-button>
+          <el-button @click="dialogVisible = false">取消</el-button>
+          <el-button type="primary" @click="handleSubmit">确认</el-button>
         </div>
       </template>
     </el-dialog>
@@ -94,141 +140,261 @@
 </template>
 
 <script setup>
-import { ElMessageBox,ElMessage } from 'element-plus'
-import {Search,Refresh} from '@element-plus/icons-vue'
-import {getCurrentInstance, onMounted, reactive} from "vue";
-const {proxy} = getCurrentInstance()
-const pageSize = 12
-var data = reactive({
-  search:'',
-  users:[],
-  selectUsers:[],
-  list:[],
-  currentPage:1,
-  dialog:false,
-  target:{},
-  type:1 //1新增2修改
+import { ref, reactive } from 'vue'
+import { ElMessage, ElMessageBox } from 'element-plus'
+import { Search, Refresh, Plus, Delete } from '@element-plus/icons-vue'
+import { getCurrentInstance } from 'vue'
+
+const { proxy } = getCurrentInstance()
+
+// 状态定义
+const searchQuery = ref('')
+const currentPage = ref(1)
+const pageSize = ref(7)
+const total = ref(0)
+const userList = ref([])
+const selectedUsers = ref([])
+const dialogVisible = ref(false)
+const dialogType = ref('add')
+const formRef = ref(null)
+
+// 表单数据与规则
+const userForm = reactive({
+  username: '',
+  sex: 1,
+  email: '',
+  identity: '',
+  introduction: ''
 })
-function search(){
-  proxy.$http({
-    url:'/user/search',
-    method:'post',
-    data:{username:data.search}
-  }).then(res => {
-    data.list.length = 0
-    data.list.push(res.data.user)
-    return ElMessage({
-      message: res.data.msg,
-      type: res.data.type
-    })
-  })
-}
-function refresh(){
-  data.search = ''
-  init()
+
+const formRules = {
+  username: [{ required: true, message: '请输入用户名', trigger: 'blur' }],
+  sex: [{ required: true, message: '请选择性别', trigger: 'change' }],
+  identity: [{ required: true, message: '请选择身份', trigger: 'change' }],
+  email: [
+    { required: true, message: '请输入邮箱', trigger: 'blur' },
+    { type: 'email', message: '请输入正确的邮箱格式', trigger: 'blur' }
+  ]
 }
 
-function add(){
-  if(data.type == 1){
-    data.target.createTime = new Date().toLocaleString()
-    proxy.$http({
-      url:'/user/add',
-      method:'post',
-      data:{user:data.target}
-    }).then(res => {
-      data.dialog = false
-      init()
-      return ElMessage({
-        message: res.data.msg,
-        type: res.data.type
-      })
-    })
-  }else{
-    proxy.$http({
-      url:'/user/update',
-      method:'post',
-      data:{user:data.target}
-    }).then(res => {
-      data.dialog = false
-      init()
-      return ElMessage({
-        message: res.data.msg,
-        type: res.data.type
-      })
-    })
+// 获取用户列表
+const fetchUsers = async () => {
+  try {
+    const res = await proxy.$http.get(`/user/list?page=${currentPage.value}&limit=${pageSize.value}${searchQuery.value ? `&username=${searchQuery.value}` : ''}`)
+    userList.value = res.data.items
+    total.value = res.data.meta.total
+  } catch (error) {
+    ElMessage.error('获取用户列表失败')
   }
 }
-function edit(val){
-  data.target = {...val}
-  data.dialog = true
-  data.type = 2
+
+// 搜索相关
+const handleSearch = () => {
+  currentPage.value = 1
+  fetchUsers()
 }
-function del(val){
-  ElMessageBox.confirm('是否确认此操作?', '提示', {
-    confirmButtonText: '确定',
-    cancelButtonText: '取消',
-    type: 'warning'
-  }).then(()=>{
-    var list
-    if(val == undefined){
-      list = data.selectUsers.map((item)=>{
-        return item.userId
-      })
-    }else{
-      list = val.userId
+
+const resetSearch = () => {
+  searchQuery.value = ''
+  currentPage.value = 1
+  fetchUsers()
+}
+
+// 分页相关
+const handleSizeChange = (val) => {
+  pageSize.value = val
+  fetchUsers()
+}
+
+const handleCurrentChange = (val) => {
+  currentPage.value = val
+  fetchUsers()
+}
+
+// 选择相关
+const handleSelectionChange = (val) => {
+  selectedUsers.value = val
+}
+
+// 表单相关
+const handleAdd = () => {
+  dialogType.value = 'add'
+  dialogVisible.value = true
+  Object.assign(userForm, {
+    username: '',
+    sex: 1,
+    email: '',
+    identity: '',
+    introduction: ''
+  })
+}
+
+const handleEdit = (row) => {
+  dialogType.value = 'edit'
+  dialogVisible.value = true
+  Object.assign(userForm, row)
+}
+
+const handleSubmit = async () => {
+  if (!formRef.value) return
+  
+  await formRef.value.validate(async (valid) => {
+    if (valid) {
+      try {
+        const url = dialogType.value === 'add' ? '/user/add' : '/user/update'
+        await proxy.$http.post(url, { user: userForm })
+        ElMessage.success(dialogType.value === 'add' ? '添加成功' : '更新成功')
+        dialogVisible.value = false
+        fetchUsers()
+      } catch (error) {
+        ElMessage.error(dialogType.value === 'add' ? '添加失败' : '更新失败')
+      }
     }
-    proxy.$http({
-      url:'/user/delete',
-      method:'post',
-      data:{userId:list}
-    }).then(res => {
-      init()
-      return ElMessage({
-        message: res.data.msg,
-        type: res.data.type
-      })
+  })
+}
+
+// 删除相关
+const handleDelete = async (row) => {
+  try {
+    await ElMessageBox.confirm('确认删除该用户?', '警告', {
+      type: 'warning'
     })
-  })
+    await proxy.$http.post('/user/delete', { userId: row.userId })
+    ElMessage.success('删除成功')
+    fetchUsers()
+  } catch (error) {
+    if (error !== 'cancel') ElMessage.error('删除失败')
+  }
 }
-function select(val){
-  data.selectUsers = val
+
+const handleBatchDelete = async () => {
+  try {
+    await ElMessageBox.confirm(`确认删除选中的 ${selectedUsers.value.length} 个用户?`, '警告', {
+      type: 'warning'
+    })
+    const userIds = selectedUsers.value.map(user => user.userId)
+    await proxy.$http.post('/user/delete', { userId: userIds })
+    ElMessage.success('批量删除成功')
+    fetchUsers()
+  } catch (error) {
+    if (error !== 'cancel') ElMessage.error('批量删除失败')
+  }
 }
-function handleCurrentChange(val){
-  data.list = data.users.slice((val-1)*pageSize,val * pageSize)
-}
-function init(){
-  proxy.$http({
-    url:'/users',
-    method:'get'
-  }).then(res => {
-    data.users = res.data
-    data.list = data.users.slice((data.currentPage-1)*pageSize,data.currentPage * pageSize)
-  })
-}
-onMounted(()=>{
-  init()
-})
+
+// 初始化
+fetchUsers()
 </script>
 
 <style scoped>
-.body{
-  width: 100%;
-  height: 100%;
+.container {
+  padding: 24px;
+  background-color: #f5f5f7;
+  min-height: 100%;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen;
+}
+
+.search-bar {
   display: flex;
-  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.search-input {
+  width: 300px;
+}
+
+.user-card {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-radius: 16px;
+  border: none;
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
   align-items: center;
 }
-.search-container{
-  padding: 18px;
-  background-color: white;
-  width: 93%;
-  margin-top: 20px;
-  box-shadow: 0px 0px 12px rgba(0, 0, 0, .12);
-  border-radius: 4px;
-  display: flex;
+
+.title {
+  font-size: 18px;
+  font-weight: 500;
+  color: #1d1d1f;
 }
-.box-card{
-  margin-top: 20px;
-  width: 93%;
+
+.actions {
+  display: flex;
+  gap: 12px;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.user-detail {
+  display: flex;
+  flex-direction: column;
+}
+
+.username {
+  font-weight: 500;
+  color: #1d1d1f;
+}
+
+.identity {
+  font-size: 12px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: #f5f5f7;
+}
+
+.identity.admin {
+  color: #0066cc;
+  background: #e8f2ff;
+}
+
+.identity.user {
+  color: #666;
+  background: #f5f5f7;
+}
+
+.pagination {
+  margin-top: 24px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+:deep(.el-card__body) {
+  padding: 20px;
+}
+
+:deep(.el-table) {
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+:deep(.el-table th) {
+  background-color: #f8f8fa !important;
+  font-weight: 500;
+  color: #1d1d1f;
+}
+
+:deep(.el-table--striped .el-table__body tr.el-table__row--striped td) {
+  background: #fafafa;
+}
+
+:deep(.el-pagination.is-background .el-pager li:not(.disabled).active) {
+  background-color: #0066cc;
+}
+
+:deep(.el-button--primary) {
+  background-color: #0066cc;
+}
+
+:deep(.el-dialog) {
+  border-radius: 16px;
+  overflow: hidden;
 }
 </style>

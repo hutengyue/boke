@@ -135,9 +135,6 @@ function change(index){
   font-family: rain;
   src: url("../assets/wenzi.ttf");
 }
-*{
-  font-family: rain;
-}
 @keyframes floating {
   0%{
     transform: translate(0,-4px);
@@ -172,6 +169,7 @@ function change(index){
   align-items: center;
   flex-direction: column;
   width: 100%;
+  font-family: rain;
   background-image: linear-gradient(90deg,rgba(37,82,110,.1) 1px,#fff 0),
   linear-gradient(180deg,rgba(37,82,110,.1) 1px,#fff 0);
   background-size: 3rem 3rem;

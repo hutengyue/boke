@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div style="font-family: rain;">
     <Header style="z-index: 1000"></Header>
     <div class="all" ref="all">
       <div class="chatBox">
@@ -593,9 +593,6 @@ onBeforeUnmount(()=>{
 @font-face {
   font-family: rain;
   src: url("../assets/wenzi.ttf");
-}
-*{
-  font-family: rain;
 }
 @keyframes zhuye {
   from{

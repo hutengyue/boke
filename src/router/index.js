@@ -58,19 +58,8 @@ const routes = [
         path: '/*',
         name:'404',
         component:()=>import("../pages/404.vue")
-    },
-    {
-        path: '/admin',
-        name:'admin',
-        component:()=>import("../pages/admin.vue"),
-        children:[
-            {
-                path: '',
-                component:()=>import('../pages/backstage/page.vue')
-            },
-        ]
-
     }
+    
 ]
 
 const router = createRouter({

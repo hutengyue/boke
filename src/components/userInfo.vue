@@ -59,8 +59,7 @@
 
 <script setup>
 import {getCurrentInstance, reactive, toRef,onMounted} from "vue";
-import OSS from 'ali-oss';
-
+import { uploadToOSS } from "../util/api.js";
 import useStore from "../store/index.js";
 import {useRouter} from "vue-router";
 const props = defineProps({
@@ -92,30 +91,8 @@ async function beforeAvatarUpload(file) {
   }
 
   try {
-    // 获取OSS配置
-    if (!data.ossConfig) {
-      const res = await proxy.$http.get('/upload/getOssConfig');
-      data.ossConfig = res.data;
-    }
-
-    // 初始化OSS客户端
-    const client = new OSS({
-      region: data.ossConfig.region,
-      accessKeyId: data.ossConfig.accessKeyId,
-      accessKeySecret: data.ossConfig.accessKeySecret,
-      bucket: data.ossConfig.bucket,
-      stsToken: data.ossConfig.security_token
-    });
-
-    const now = new Date();
-    const year = now.getFullYear();
-    const month = String(now.getMonth() + 1).padStart(2, '0');
-    const day = String(now.getDate()).padStart(2, '0');
-    const fileName = `boke/${year}/${month}/${day}/${Date.now()}_${file.name}`;
-    
-    const result = await client.put(fileName, file);
-
-    data.fileInfo = result.url;
+    const url = await uploadToOSS(file);
+    data.fileInfo = url;
     console.log(data.fileInfo)
     data.imageUrl = URL.createObjectURL(file);
     ElMessage.success('上传成功');
@@ -128,31 +105,32 @@ async function beforeAvatarUpload(file) {
 }
 function reviseImg(){
   data.centerDialogVisible = false;
-  console.log(data.fileInfo) 
-  proxy.$http({
-    url:'/user/reviseImg',
-    method:"POST",
-    data:{image:data.fileInfo}
-  }).then(res=>{
-    data.fileInfo = ''
-    router.go(0)
-  })
+  if(data.fileInfo) {
+    user.value.headImg = data.fileInfo;
+  }
 }
+
 function submit(){
-  if(user.value.username === ""){
+  if(user.value.username === "") {
     ElMessage.warning('用户名不能为空');
     return;
   }
+  if(data.fileInfo) {
+    user.value.headImg = data.fileInfo;
+  }
+  console.log(user.value);
   proxy.$http({
-    url:'/user/revise',
-    method:"POST",
-    data:{user:user.value}
-  }).then(res=>{
+    url: '/user/update',
+    method: "POST",
+    data: { user: user.value }
+  }).then(res => {
+    // 提交成功后清空临时文件信息
+    data.fileInfo = '';
     return ElMessage({
       message: res.data.msg,
       type: res.data.type
-    })
-  })
+    });
+  });
 }
 function exit(){
   store.delIdenttity()
@@ -161,7 +139,7 @@ function exit(){
   router.go(0)
 }
 function gotoAdmin(){
-  router.push('/admin')
+  router.push('/admin/analysis')
 }
 </script>
 
