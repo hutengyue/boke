@@ -1,3 +1,65 @@
+<script setup>
+import {getCurrentInstance, onMounted, reactive,watch} from "vue";
+import {useRouter} from "vue-router";
+import useStore from "../store/index.js";
+import {ElMessage} from "element-plus";
+
+
+const store = useStore()
+const router = useRouter()
+const {proxy} = getCurrentInstance()
+var data = reactive({
+  article:[],
+  all:[],
+  category:[],
+  cateIndex:0,
+  number:[],//文章、分类、访问
+  search:'',
+
+})
+let city = store.getCity
+async function gotoArticle(id){
+  router.push({name:'article',params:{articleId:id}})
+}
+
+function init(){
+  proxy.$http.get('/article/count').then(res=>{
+    data.number[0] = res.data
+  })
+  proxy.$http.get('/category').then(res=>{
+    res.data.forEach((item)=>{
+      proxy.$http.post('/article/searchByCategory',{
+        categoryId:item.categoryId,pageNo:1,pageSize:4
+      }).then(response=>{
+        data.category.push({categoryName:item.categoryName,articles:response.data})
+      })
+    })
+    data.number[1] = res.data.length
+  })
+  proxy.$http.get('/visit/count').then(res=>{
+    data.number[2] = res.data
+  })
+}
+watch(()=>data.search,(nval,oval)=>{
+  if(nval == ''){
+    data.article = data.all
+    return
+  }
+  proxy.$http({
+    url:'/article/search',
+    method:'post',
+    data:{title:nval}
+  }).then(res => {
+    if(res.data.article){
+      data.article = res.data.article
+    }
+  })
+})
+onMounted(()=>{
+  init()
+})
+</script>
+
 <template>
   <div class="container">
     <div class="aside">
@@ -96,72 +158,15 @@
   </div>
 </template>
 
-<script setup>
-import {getCurrentInstance, onMounted, reactive,watch} from "vue";
-import {useRouter} from "vue-router";
-import useStore from "../store/index.js";
-import {ElMessage} from "element-plus";
-
-
-const store = useStore()
-const router = useRouter()
-const {proxy} = getCurrentInstance()
-var data = reactive({
-  article:[],
-  all:[],
-  category:[],
-  cateIndex:0,
-  number:[],//文章、分类、访问
-  search:'',
-
-})
-let city = store.getCity
-async function gotoArticle(id){
-  router.push({name:'article',params:{articleId:id}})
-}
-
-function init(){
-  proxy.$http.get('/article/count').then(res=>{
-    data.number[0] = res.data
-  })
-  proxy.$http.get('/category').then(res=>{
-    res.data.forEach((item)=>{
-      proxy.$http.post('/article/searchByCategory',{
-        categoryId:item.categoryId,pageNo:1,pageSize:4
-      }).then(response=>{
-        data.category.push({categoryName:item.categoryName,articles:response.data})
-      })
-    })
-    data.number[1] = res.data.length
-  })
-  proxy.$http.get('/visit/count').then(res=>{
-    data.number[2] = res.data
-  })
-}
-watch(()=>data.search,(nval,oval)=>{
-  if(nval == ''){
-    data.article = data.all
-    return
-  }
-  proxy.$http({
-    url:'/article/search',
-    method:'post',
-    data:{title:nval}
-  }).then(res => {
-    if(res.data.article){
-      data.article = res.data.article
-    }
-  })
-})
-onMounted(()=>{
-  init()
-})
-</script>
-
 <style scoped>
 @font-face {
   font-family: rain;
   src: url("../assets/wenzi.ttf");
+}
+@keyframes gradient {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
 }
 .icon{
   width: 23px;
@@ -171,8 +176,9 @@ onMounted(()=>{
 .container{
   width: 100%;
   background-image: linear-gradient(90deg,rgba(37,82,110,.1) 1px,#fff 0),
-  linear-gradient(180deg,rgba(37,82,110,.1) 1px,#fff 0);
+    linear-gradient(180deg,rgba(37,82,110,.1) 1px,#fff 0);
   background-size: 3rem 3rem;
+  backdrop-filter: blur(20px);
   display: flex;
   flex-direction: row;
   justify-content: center;
@@ -198,10 +204,12 @@ onMounted(()=>{
   padding: 20px;
   box-sizing: border-box;
   border-radius: 20px;
-  background:linear-gradient(-45deg,#e8d8b9,#eccec5,#a3e9eb,#bdbdf0,#eec1ea);
-  background-size: 100% 200%;
-  color: black;
-  box-shadow: 0 1px 20px -6px rgba(0,0,0,0.5)
+  background: linear-gradient(-45deg, #e8d8b9, #eccec5, #a3e9eb, #bdbdf0, #eec1ea);
+  background-size: 400% 400%;
+  animation: gradient 15s ease infinite;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
 }
 .user-img{
   width: 90px;
@@ -224,6 +232,10 @@ onMounted(()=>{
   flex-direction: row;
   align-items: center;
   justify-content: center;
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(5px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 15px;
 }
 .user-card-item{
   display: flex;
@@ -238,7 +250,9 @@ onMounted(()=>{
   text-align: center;
 }
 .user-pyq{
-  background-color: #39c5bb;
+  background: linear-gradient(135deg, #39c5bb, #4FA8FF);
+  box-shadow: 0 4px 15px rgba(57, 197, 187, 0.3);
+  transition: all 0.3s ease;
   width: 70%;
   padding: 10px;
   color:white;
@@ -247,11 +261,10 @@ onMounted(()=>{
   border-radius: 30px;
   border: none;
   font-size: 17px;
-  transition: all .5s;
 }
-.user-pyq:hover{
-  background-color: darkorchid;
-  color: white;
+.user-pyq:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(57, 197, 187, 0.4);
 }
 .user-link{
   width: 50%;
@@ -301,7 +314,9 @@ onMounted(()=>{
   flex-direction: column;
   width: 100%;
   padding: 15px;
-  background-color: white;
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   box-shadow: 0 1px 20px -6px rgba(0,0,0,0.5);
   border-radius: 10px;
   margin-top: 25px;
@@ -323,8 +338,14 @@ onMounted(()=>{
   padding: 0 14px;
   height: 30px;
   outline: 0;
-  background-color: white;
   color: #595a5a;
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.search input:focus {
+  box-shadow: 0 0 0 3px rgba(57, 197, 187, 0.2);
 }
 
 .container-article{
@@ -361,12 +382,14 @@ onMounted(()=>{
   position: relative;
   border-radius: 10px;
   overflow: hidden;
-  margin-bottom: 20px;
-  box-shadow: 0 1px 20px -6px;
-  transition: all .5s;
+  margin-bottom: 20px;  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 .article-container:hover{
-  box-shadow: 0 1px 20px 0px;
+  transform: translateY(-5px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
 }
 .article-bkg{
   position: absolute;
@@ -469,4 +492,107 @@ onMounted(()=>{
   transform: scale(1.2);
 }
 
+
+@media screen and (max-width: 768px) {
+  .container {
+    flex-direction: column;
+    padding: 15px;
+  }
+
+  .aside {
+    width: 100%;
+    max-width: none;
+    margin-right: 0;
+    margin-bottom: 20px;
+  }
+
+  .container-article {
+    width: 100%;
+  }
+
+  .article-container {
+    height: auto;
+    min-height: 200px;
+  }
+
+  .article-message-left {
+    width: 100%;
+    padding: 15px;
+  }
+
+  .article-img-right,
+  .article-img-left {
+    display: none;
+  }
+
+  .article-message-header {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .article-message-time,
+  .article-message-heat,
+  .article-message-comment {
+    font-size: 14px;
+  }
+
+  .article-message-title {
+    font-size: 20px;
+  }
+
+  .article-category {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .article-category div:nth-child(2) {
+    margin-left: 0;
+  }
+
+  .user-card {
+    width: 100%;
+  }
+
+  .user-pyq {
+    width: 80%;
+  }
+
+  .search-box {
+    margin-top: 15px;
+  }
+
+  .category {
+    font-size: 18px;
+  }
+}
+
+/* 小屏幕手机适配 */
+@media screen and (max-width: 480px) {
+  .container {
+    padding: 10px;
+  }
+
+  .article-message-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .article-message-time,
+  .article-message-heat,
+  .article-message-comment {
+    font-size: 12px;
+  }
+
+  .user-name {
+    font-size: 20px;
+  }
+
+  .user-description {
+    font-size: 14px;
+  }
+
+  .aside-notice p {
+    font-size: 20px;
+  }
+}
 </style>

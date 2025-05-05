@@ -1,14 +1,19 @@
 <script setup>
-import { ref, computed,watch ,onMounted} from 'vue'
+import { ref, computed,watch ,onMounted,getCurrentInstance} from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import * as ElementPlusIconsVue from '@element-plus/icons-vue'
-import { Fold, Expand } from '@element-plus/icons-vue'
+import { Fold, Expand, FullScreen, CaretBottom, SwitchButton } from '@element-plus/icons-vue'
+import { ElMessage } from 'element-plus'
+import useStore from "../store/index.js";
 
+const store = useStore()
 const route = useRoute()
 const router = useRouter()
 const isCollapse = ref(false)
 const activeMenu = ref(route.path)
 const visitedViews = ref([])
+const {proxy} = getCurrentInstance()
+
 
 // 动态路由配置
 const routes = computed(() => {
@@ -61,7 +66,27 @@ const closeSelectedTag = (view) => {
     }
   }
 }
-
+const toggleFullScreen = () => {
+  if (!document.fullscreenElement) {
+    document.documentElement.requestFullscreen()
+  } else {
+    document.exitFullscreen()
+  }
+}
+const handleLogout = () => {
+  router.push('/user')
+}
+const handleCommand = (command) => {
+  switch (command) {
+    case 'exit':
+      store.delIdenttity()
+      store.delToken()
+      store.delHeadImg()
+      store.delUsername()
+      router.push('/user')
+      break
+  }
+}
 // 监听路由变化
 watch(route, (to) => {
   if (to.name) {
@@ -125,6 +150,31 @@ watch(route, (to) => {
             {{ item.meta.title }}
           </el-breadcrumb-item>
         </el-breadcrumb>
+        <div class="navbar-right">
+          <el-tooltip content="退出后台" placement="bottom">
+            <div class="right-item" @click="handleLogout">
+              <el-icon><SwitchButton /></el-icon>
+            </div>
+          </el-tooltip>
+          <el-tooltip content="全屏" placement="bottom">
+            <div class="right-item" @click="toggleFullScreen">
+              <el-icon><FullScreen /></el-icon>
+            </div>
+          </el-tooltip>
+          
+          <el-dropdown trigger="click" @command="handleCommand">
+            <div class="avatar-container">
+              <el-avatar :size="32" :src="store.getHeadImg" />
+              <span class="username">{{store.getUsername}}</span>
+              <el-icon><CaretBottom /></el-icon>
+            </div>
+            <template #dropdown>
+              <el-dropdown-menu>
+                <el-dropdown-item command="exit">退出登录</el-dropdown-item>
+              </el-dropdown-menu>
+            </template>
+          </el-dropdown>
+        </div>
       </div>
 
       <!-- 标签页 -->
@@ -254,5 +304,51 @@ watch(route, (to) => {
 :deep(.el-menu--popup) {
   min-width: 200px;
   transition: transform 0.3s;
+}
+
+.navbar {
+  height: 50px;
+  padding: 0 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: white;
+  box-shadow: 0 1px 4px rgba(0,21,41,.08);
+}
+
+.navbar-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.right-item {
+  padding: 8px;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: all 0.3s;
+}
+
+.right-item:hover {
+  background: rgba(0,0,0,0.04);
+}
+
+.avatar-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 8px;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: all 0.3s;
+}
+
+.avatar-container:hover {
+  background: rgba(0,0,0,0.04);
+}
+
+.username {
+  font-size: 14px;
+  color: #333;
 }
 </style>

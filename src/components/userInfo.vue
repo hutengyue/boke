@@ -136,6 +136,7 @@ function exit(){
   store.delIdenttity()
   store.delToken()
   store.delHeadImg()
+  store.delUsername()
   router.go(0)
 }
 function gotoAdmin(){

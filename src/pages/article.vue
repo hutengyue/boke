@@ -30,7 +30,6 @@
         </div>
       </div>
     </div>
-    <div v-html="data.toc"></div>
     <div class="articleBody">
       <div class="entryContent" v-html="data.article.articleMessage">
       </div>
@@ -51,28 +50,61 @@
           <div class="commentsTop">
             <div>
               <a>{{ item.username }}</a>
-              <a>{{ item.creatAt }}</a>
+              <a>{{ item.createAt }}</a>
             </div>
-            <p>回复</p>
+            <p @click="showReplyInput(item)">回复</p>
           </div>
           <div class="commentsMessage">
             <p>{{ item.message }}</p>
           </div>
-<!--          <div class="answer" v-for="(item,index) in data.comments" :key="index">-->
-<!--            <img :src="item.headImg" class="commentsImg">-->
-<!--            <div class="commentsBody">-->
-<!--              <div class="commentsTop">-->
-<!--                <div>-->
-<!--                  <a>{{ item.username }}</a>-->
-<!--                  <a>{{ item.dateTime }}</a>-->
-<!--                </div>-->
-<!--                <p>回复</p>-->
-<!--              </div>-->
-<!--              <div class="commentsMessage">-->
-<!--                <p>{{ item.message }}</p>-->
-<!--              </div>-->
-<!--            </div>-->
-<!--          </div>-->
+          <!-- 回复输入框 -->
+          <div v-if="item.showReply" class="reply-input">
+            <textarea 
+              v-model="item.replyMessage" 
+              class="commentTextarea"
+              placeholder="写下你的回复..."
+              maxlength="100"
+            ></textarea>
+            <div class="reply-actions">
+              <button class="cancel-btn" @click="cancelReply(item)">取消</button>
+              <button class="reply-btn" @click="submitReply(item)">回复</button>
+            </div>
+          </div>
+          <!-- 回复列表 -->
+          <div class="replies" v-if="item.replies && item.replies.length > 0">
+            <div class="reply-item" v-for="(reply, replyIndex) in item.replies" :key="reply.commentId">
+              <img :src="reply.headImg" class="commentsImg">
+              <div class="commentsBody">
+                <div class="commentsTop">
+                  <div>
+                    <a>{{ reply.username }}</a>
+                    <span class="reply-to" v-if="reply.toId">
+                      <span class="at-symbol">@</span>
+                      {{ reply.user.username }}
+                    </span>
+                    <a>{{ reply.createAt }}</a>
+                  </div>
+                  <p @click="showReplyInput(reply, item)">回复</p>
+                </div>
+                <div class="commentsMessage">
+                  <p>{{ reply.message }}</p>
+                </div>
+                <!-- 回复的回复输入框 -->
+                <div v-if="reply.showReply" class="reply-input">
+                  <textarea 
+                    v-model="reply.replyMessage" 
+                    class="commentTextarea"
+                    placeholder="写下你的回复..."
+                    maxlength="100"
+                  ></textarea>
+                  <div class="reply-actions">
+                    <button class="cancel-btn" @click="cancelReply(reply)">取消</button>
+                    <button class="reply-btn" @click="submitReply(reply, item)">回复</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -90,6 +122,7 @@ import Header from "../components/header.vue";
 import {getCurrentInstance,reactive,onMounted } from "vue";
 import useStore from "../store/index.js";
 import {useRoute} from "vue-router";
+import { ElMessage } from 'element-plus'
 const {proxy} = getCurrentInstance()
 const store = useStore()
 const route = useRoute()
@@ -244,10 +277,63 @@ function submit(){
       articleId:data.article.articleId,
     }
   ).then(res=>{
-    data.message = ''
-    data.comments.unshift(res.data)
+    initComment()
   })
 }
+function showReplyInput(comment, parentComment = null) {
+  // 关闭所有其他回复框
+  data.comments.forEach(c => {
+    c.showReply = false;
+    c.replyMessage = '';
+    if (c.replies) {
+      c.replies.forEach(r => {
+        r.showReply = false;
+        r.replyMessage = '';
+      });
+    }
+  });
+  
+  // 显示当前回复框
+  comment.showReply = true;
+  comment.replyMessage = '';
+  // 保存父评论信息（如果是回复的回复）
+  if (parentComment) {
+    comment.parentComment = parentComment;
+  }
+}
+
+function cancelReply(comment) {
+  comment.showReply = false;
+  comment.replyMessage = '';
+  comment.parentComment = null;
+}
+
+async function submitReply(comment, parentComment = null) {
+  if (!comment.replyMessage.trim()) {
+    ElMessage.warning('请输入回复内容');
+    return;
+  }
+  
+  try {
+    const res = await proxy.$http.post('/comment/reply', {
+      message: comment.replyMessage,
+      articleId: data.article.articleId,
+      parentId: parentComment ? parentComment.commentId : comment.commentId,
+      toId: comment.userId // 回复目标用户ID
+    });
+    
+    // 刷新评论列表
+    initComment();
+    // 清空并隐藏回复框
+    comment.replyMessage = '';
+    comment.showReply = false;
+    comment.parentComment = null;
+    
+  } catch (error) {
+    ElMessage.error('回复失败，请重试');
+  }
+}
+
 
 onMounted(()=>{
   init()
@@ -424,6 +510,7 @@ onMounted(()=>{
   flex-direction: column;
   align-items: center;
   animation: bottom 1.5s ease 0s 1 normal none running;
+  position: relative;
 
 }
 .entryContent{
@@ -537,4 +624,90 @@ onMounted(()=>{
   font-size: 18px;
   margin-bottom: 20px;
 }
+.reply-input {
+  margin: 10px 0 20px 0;
+  width: 100%;
+}
+
+.reply-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  margin-top: 10px;
+}
+
+.cancel-btn {
+  padding: 8px 16px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  background: white;
+  color: #666;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.cancel-btn:hover {
+  background: #f5f5f5;
+}
+
+.reply-btn {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  background: rgb(131, 123, 199);
+  color: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.reply-btn:hover {
+  background: rgb(121, 113, 189);
+}
+
+.commentsTop p {
+  padding: 5px 10px;
+  background-color: rgb(239,122,80);
+  color: white;
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.commentsTop p:hover {
+  background-color: rgb(229, 112, 70);
+  transform: translateY(-1px);
+}
+
+.replies {
+  margin-left: 20px;
+  margin-top: 15px;
+}
+
+.reply-item {
+  display: flex;
+  margin-bottom: 15px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid rgba(0,0,0,0.05);
+}
+
+.reply-item:last-child {
+  border-bottom: none;
+}
+
+.reply-to {
+  color: #39c5bb;
+  margin: 0 8px;
+  font-size: 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.at-symbol {
+  color: #39c5bb;
+  font-weight: bold;
+  margin-right: 2px;
+}
+
 </style>

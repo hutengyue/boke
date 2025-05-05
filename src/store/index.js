@@ -10,7 +10,7 @@ const useStore = defineStore('boke',{
     },
     state:()=>({
         token:"",
-        userName:"",
+        username:"",
         headImg:"",
         city:"",
         identity:""
@@ -24,6 +24,9 @@ const useStore = defineStore('boke',{
         },
         getCity(){
             return this.city || storage.get("city") || ""
+        },
+        getUsername(){
+            return this.username || storage.get("username") || ""
         }
     },
     actions:{
@@ -34,6 +37,10 @@ const useStore = defineStore('boke',{
         setHeadImg(headImg){
             this.headImg = headImg;
             storage.set('headImg',headImg)
+        },
+        setUsername(username){
+            this.username = username;
+            storage.set('username',username)
         },
         setCity(city){
             this.city = city;
@@ -58,7 +65,11 @@ const useStore = defineStore('boke',{
         delHeadImg(headImg){
             this.headImg = ""
             storage.remove("headImg")
-        }
+        },
+        delUsername(username){
+            this.username = ""
+            storage.remove("username")
+        },
     }
 })
 

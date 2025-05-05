@@ -1,7 +1,7 @@
 <template>
   <div class="tool">
     <music-player></music-player>
-    <scroll-top></scroll-top>
+    <!-- <scroll-top></scroll-top> -->
   </div>
 </template>
 
@@ -13,8 +13,8 @@
   display: flex;
   position: fixed;
   align-items: center;
-  right: 3%;
-  bottom: 3%;
+  right: 0%;
+  top: 10%;
   height: 160px;
   justify-content: space-around;
   flex-direction: column;

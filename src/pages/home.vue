@@ -8,8 +8,7 @@
         <span>I</span>
       </div>
       <svg @click="gotoBody()" t="1680946162277" class="icon zhu-bottom" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="1201" width="200" height="200"><path d="M511.853714 734.793143a55.296 55.296 0 0 1-38.326857-15.945143L28.16 273.188571a54.125714 54.125714 0 0 1 76.580571-76.580571l407.113143 407.04 407.405715-407.04a54.125714 54.125714 0 0 1 76.580571 76.580571L550.034286 718.848a53.833143 53.833143 0 0 1-38.253715 15.945143z" p-id="1202" fill="#ffffff"></path></svg>
-      <div class="zhu-image">
-        <div id="screen"></div>
+      <div id="screen">
       </div>
     </div>
     <HomeBody/>
@@ -212,7 +211,7 @@ onMounted(()=>{
   font-size: 30px;
   animation: hideToShow .7s infinite;
 }
-.zhu-image{
+#screen{
   position: fixed;
   height: 100vh;
   width: 100%;

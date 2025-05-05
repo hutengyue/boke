@@ -98,6 +98,7 @@ function login(){
         store.setIdentity(res.data.identity)
         store.setHeadImg(res.data.headImg)
         store.setToken(res.data.token)
+        store.setUsername(res.data.username)
         router.push('/')
       }else {
         return ElMessage({

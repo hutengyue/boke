@@ -257,17 +257,20 @@ p code{
 }
 
 /*目录*/
-.toc{
+.toc {
     position: fixed;
-    top: 13vh;
+    top: 20px;
     right: 2%;
     width: 250px;
+    margin-left: auto;  /* 确保右对齐 */
     background-color: #F7F9Fe;
     border-radius: 8px;
-    padding:10px 10px 10px 5px;
+    padding: 10px 10px 10px 5px;
     color: #595a5a;
     box-sizing: border-box;
     z-index: 100;
+    margin-top: 2%;
+    transition: all .2s;
 }
 .toc:before{
     content:'🏖️目录';

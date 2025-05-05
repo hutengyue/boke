@@ -58,6 +58,10 @@ function getOption(data){
   };
   return option;
 }
+
+let pie1Instance = null
+let pie2Instance = null
+
 onMounted(()=>{
   let array = []
   for(let i = 0;i < visitList.value.length;i++){
@@ -69,29 +73,38 @@ onMounted(()=>{
     data.browser.push({name:item,value:array[item].length})
   }
 
-  const pie1 = proxy.$echarts.init(document.getElementById('pie1'))
-  const pie2 = proxy.$echarts.init(document.getElementById('pie2'))
+  pie1Instance = proxy.$echarts.init(document.getElementById('pie1'))
+  pie2Instance = proxy.$echarts.init(document.getElementById('pie2'))
   
   // 设置图表主题色
   const colors = ['#47a3ff', '#36cfc9', '#ff7875', '#ffc069', '#95de64'];
-  pie1.setOption({
+  pie1Instance.setOption({
     ...getOption(data.device),
     color: colors
   })
-  pie2.setOption({
+  pie2Instance.setOption({
     ...getOption(data.browser),
     color: colors
   })
-    // 优化 resize 处理
+  
+  // 优化 resize 处理
   const resizeHandler = () => {
-    pie1.resize()
-    pie2.resize()
+    pie1Instance && pie1Instance.resize()
+    pie2Instance && pie2Instance.resize()
   }
   window.addEventListener("resize", resizeHandler)
   
-  // 组件卸载时移除事件监听
+  // 组件卸载时移除事件监听和销毁实例
   onUnmounted(() => {
     window.removeEventListener("resize", resizeHandler)
+    if (pie1Instance) {
+      pie1Instance.dispose()
+      pie1Instance = null
+    }
+    if (pie2Instance) {
+      pie2Instance.dispose()
+      pie2Instance = null
+    }
   })
 })
 </script>

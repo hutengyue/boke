@@ -55,6 +55,11 @@ const routes = [
         component:()=>import("../pages/tag.vue")
     },
     {
+        path: '/openIM',
+        name: 'openIM',
+        component:()=>import("../pages/openim.vue")
+    },
+    {
         path: '/*',
         name:'404',
         component:()=>import("../pages/404.vue")

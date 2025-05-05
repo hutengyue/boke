@@ -51,6 +51,34 @@ const props = defineProps({
   visitList:Array
 })
 const visitList = toRef(props,'visitList')
+let mapInstance = null // 添加实例引用
+
+function init(){
+  let mapList = []
+  mapInstance = proxy.$echarts.init(document.getElementById('china'))
+  visitList.value.forEach((item)=>{
+    let location = item.location.replace('市','');
+    if(citys[location]){
+      mapList.push({name:location,value:citys[location]})
+    }
+  })
+  option.series[0].data = mapList
+  proxy.$echarts.registerMap('china', china);
+  mapInstance.setOption(option, true);
+  const resizeHandler = () => {
+    mapInstance && mapInstance.resize()
+  }
+  window.addEventListener("resize", resizeHandler)
+  
+  // 组件卸载时移除事件监听和销毁实例
+  onUnmounted(() => {
+    window.removeEventListener("resize", resizeHandler)
+    if (mapInstance) {
+      mapInstance.dispose()
+      mapInstance = null
+    }
+  })
+}
 const option = reactive({
   legend: {
     data: []
@@ -107,28 +135,6 @@ const option = reactive({
   }]
 })
 
-function init(){
-  let mapList = []
-  const map = proxy.$echarts.init(document.getElementById('china'))
-  visitList.value.forEach((item)=>{
-    let location = item.location.replace('市','');
-    if(citys[location]){
-      mapList.push({name:location,value:citys[location]})
-    }
-  })
-  option.series[0].data = mapList
-  proxy.$echarts.registerMap('china', china);
-  map.setOption(option, true);
-  const resizeHandler = () => {
-    map.resize()
-  }
-  window.addEventListener("resize", resizeHandler)
-  
-  // 组件卸载时移除事件监听
-  onUnmounted(() => {
-    window.removeEventListener("resize", resizeHandler)
-  })
-}
 onMounted(()=>{
   init()
 })

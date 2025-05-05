@@ -21,10 +21,22 @@ axios.interceptors.request.use(
 
 axios.interceptors.response.use(
     response => {
+        if(response.data.type){
+            ElMessage({
+                message: response.data.msg,
+                type: response.data.type
+            })
+        }
         return Promise.resolve(response);
     },
     error => {
         const store = useStore()
+        if (error.response.data.msg) {
+            ElMessage({
+                message: error.response.data.msg,
+                type: error.response.data.type || 'error'
+            })
+        }
         switch (error.response.data.statusCode) {
             // 401: 未登录
             // 未登录则跳转登录页面，并携带当前页面的路径
@@ -47,6 +59,7 @@ axios.interceptors.response.use(
                     });
                 }
             default:
+                break;
         }
         return Promise.reject(error.response);
     }
