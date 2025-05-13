@@ -104,6 +104,7 @@ const sendMessage = () => {
       toId: currentChat.id,
       message: messageInput.value
     }
+    console.log(data)
     ws.emit('privateMessage', data)
   }
   messageInput.value = ''
@@ -136,11 +137,13 @@ const selectTarget = async(target) => {
     currentChat.messages = result.data
   }else{
     currentChat.type = 'private'
-    currentChat.id = target.userId
-    currentChat.name = target.username
+    currentChat.id = target.userId || target.id
+    currentChat.name = target.username || target.name
     currentChat.introduction = target.introduction
     currentChat.headImg = target.headImg
-    currentChat.messages = []
+    let result = await proxy.$http.get(`/pmessage/history?userId1=${userId.value}&userId2=${currentChat.id}&pageNo=${1}&pageSize=${20}`)
+    console.log(result.data)
+    currentChat.messages = result.data
   }
   nextTick(() => {
     scrollToBottom()
@@ -189,6 +192,7 @@ function initWebSocket(){
     ws.emit('connection',{userId:userId.value})
 
     ws.on('connection',async(data)=>{
+      console.log(data.pmessage)
       data.message.forEach((item)=>{
         if(item.type == 'group'){
           chatList.value.push({
@@ -199,6 +203,16 @@ function initWebSocket(){
             message:item.message,
             createAt:item.createAt,
             introduction:item.group.introduction
+          })
+        }else{
+          chatList.value.push({
+            type:'private',
+            id:item.userId,
+            name:item.username,
+            headImg:item.headImg,
+            message:item.message,
+            createAt:item.createAt,
+            introduction:item.introduction
           })
         }
       })
@@ -235,12 +249,8 @@ function initWebSocket(){
     })
 
     ws.on('privateMessage',(data)=>{
-      if(currentChat.type === 'private' && 
-         ((data.fromId === userId.value && data.toId === currentChat.id) ||
-          (data.toId === userId.value && data.fromId === currentChat.id))) {
-        currentChat.messages.push(data)
-        scrollToBottom()
-      }
+      currentChat.messages.push(data)
+      scrollToBottom()
     })
   }
 }
@@ -275,13 +285,13 @@ onBeforeUnmount(() => {
           <span class="username">{{store.getUsername}}</span>
         </div>
         <div class="menu-items">
-          <div class="menu-item" :class="{ active: activeMenu === 'chat' }" @click="activeMenu = 'chat'">
+          <div class="menu-item" :class="{ active: activeMenu === 'chat' }" @click="activeMenu = 'chat';selectTarget(chatList[0])">
             <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>
             </svg>
             <span>聊天</span>
           </div>
-          <div class="menu-item" :class="{ active: activeMenu === 'friends' }" @click="activeMenu = 'friends';">
+          <div class="menu-item" :class="{ active: activeMenu === 'friends' }" @click="activeMenu = 'friends';selectTarget(friendsList[0])">
             <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
               <circle cx="9" cy="7" r="4"/>
@@ -483,7 +493,7 @@ onBeforeUnmount(() => {
           </div>
         </div>
         <div class="input-area">
-          <div class="toolbar">
+          <!-- <div class="toolbar">
             <button class="tool-btn" title="发送图片">
               <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.5">
                 <rect x="3" y="3" width="18" height="18" rx="4" ry="4"/>
@@ -497,7 +507,7 @@ onBeforeUnmount(() => {
                 <polyline points="14 2 14 8 20 8"/>
               </svg>
             </button>
-          </div>
+          </div> -->
           <div class="message-input">
             <input 
               type="text" 

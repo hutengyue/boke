@@ -43,7 +43,7 @@
         :stripe="true"
       >
         <el-table-column type="selection" width="50" />
-        <el-table-column label="用户信息" width="250">
+        <el-table-column label="用户信息" width="150">
           <template #default="{ row }">
             <div class="user-info">
               <el-avatar :size="40" :src="row.headImg" />
@@ -66,12 +66,28 @@
         </el-table-column>
         <el-table-column prop="introduction" label="介绍" show-overflow-tooltip />
         <el-table-column prop="createAt" label="创建时间" width="180" />
-        <el-table-column label="操作" width="150" fixed="right">
+        <el-table-column label="操作" width="200">
           <template #default="{ row }">
-            <el-button-group>
-              <el-button type="primary" link @click="handleEdit(row)">编辑</el-button>
-              <el-button type="danger" link @click="handleDelete(row)">删除</el-button>
-            </el-button-group>
+            <div class="action-buttons">
+              <el-button 
+                class="edit-button" 
+                type="primary" 
+                link 
+                @click="handleEdit(row)"
+              >
+                <el-icon class="icon"><Edit /></el-icon>
+                编辑
+              </el-button>
+              <el-button 
+                class="delete-button" 
+                type="danger" 
+                link 
+                @click="handleDelete(row)"
+              >
+                <el-icon class="icon"><Delete /></el-icon>
+                删除
+              </el-button>
+            </div>
           </template>
         </el-table-column>
       </el-table>
@@ -83,7 +99,7 @@
           v-model:page-size="pageSize"
           :page-sizes="[10, 20, 30, 50]"
           :total="total"
-          layout="total, sizes, prev, pager, next, jumper"
+          layout="total, prev, pager, next, jumper"
           @size-change="handleSizeChange"
           @current-change="handleCurrentChange"
         />
@@ -142,7 +158,7 @@
 <script setup>
 import { ref, reactive } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { Search, Refresh, Plus, Delete } from '@element-plus/icons-vue'
+import { Search, Refresh, Plus, Delete, Edit } from '@element-plus/icons-vue'
 import { getCurrentInstance } from 'vue'
 
 const { proxy } = getCurrentInstance()
@@ -287,7 +303,7 @@ fetchUsers()
 
 <style scoped>
 .container {
-  padding: 24px;
+  padding: 12px;
   background-color: #f5f5f7;
   min-height: 100%;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen;
@@ -295,12 +311,43 @@ fetchUsers()
 
 .search-bar {
   display: flex;
-  gap: 12px;
+  gap: 16px;
   margin-bottom: 24px;
+  padding: 20px;
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(10px);
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+}
+
+.search-bar:hover {
+  background: rgba(255, 255, 255, 0.8);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
 }
 
 .search-input {
   width: 300px;
+}
+
+:deep(.el-input__wrapper) {
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+  transition: all 0.3s ease;
+}
+
+:deep(.el-input__wrapper:hover) {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+:deep(.el-button) {
+  border-radius: 12px;
+  transition: all 0.3s ease;
+}
+
+:deep(.el-button:not(.is-disabled):hover) {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .user-card {
@@ -367,12 +414,12 @@ fetchUsers()
 }
 
 :deep(.el-card__body) {
-  padding: 20px;
+  padding: 0;
 }
 
 :deep(.el-table) {
-  border-radius: 8px;
-  overflow: hidden;
+  border-radius: 0;
+  margin: 0;
 }
 
 :deep(.el-table th) {
@@ -383,6 +430,12 @@ fetchUsers()
 
 :deep(.el-table--striped .el-table__body tr.el-table__row--striped td) {
   background: #fafafa;
+}
+
+.pagination {
+  margin: 24px 20px;
+  display: flex;
+  justify-content: flex-end;
 }
 
 :deep(.el-pagination.is-background .el-pager li:not(.disabled).active) {
@@ -396,5 +449,41 @@ fetchUsers()
 :deep(.el-dialog) {
   border-radius: 16px;
   overflow: hidden;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 12px;
+}
+
+.action-buttons .el-button {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.action-buttons .edit-button {
+  color: #0066cc;
+  background: rgba(0, 102, 204, 0.05);
+}
+
+.action-buttons .edit-button:hover {
+  background: rgba(0, 102, 204, 0.1);
+}
+
+.action-buttons .delete-button {
+  color: #ff3b30;
+  background: rgba(255, 59, 48, 0.05);
+}
+
+.action-buttons .delete-button:hover {
+  background: rgba(255, 59, 48, 0.1);
+}
+
+.action-buttons .icon {
+  font-size: 14px;
 }
 </style>

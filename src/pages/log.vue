@@ -6,7 +6,7 @@ const data = reactive({
   logList:[]
 })
 onMounted(()=>{
-  proxy.$http.get('/log').then((res)=>{
+  proxy.$http.get('/log/all').then((res)=>{
     data.logList = [...res.data].reverse()
   })
 })
@@ -46,7 +46,7 @@ onMounted(()=>{
   display: flex;
   justify-content: center;
   padding: 80px 20px 40px;
-  background: linear-gradient(135deg, #e8f4ff 0%, #f0f9ff 100%);
+  background: linear-gradient(135deg, #f2f2f7 0%, #fff 100%);
   font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Icons", "Helvetica Neue", sans-serif;
 }
 

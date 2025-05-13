@@ -60,6 +60,8 @@ function init() {
   proxy.$http.get('/visit/detail').then((res) => {
     data.total = res.data[0];
     data.all = res.data[1];
+    data.list = res.data[2];
+
     const listMap = new Map();
     data.all.forEach((item) => {
       const date = item.createAt.substring(0, 10);
@@ -77,7 +79,6 @@ function init() {
       const visitCount = list.length;
 
       if (date === today) {
-        data.list = list;
         data.today.ip = ipCount;
         data.today.number = visitCount;
       } else if (date === yesterday) {
@@ -86,6 +87,7 @@ function init() {
       }
 
       data.line.unshift({ name: date, number: visitCount, ip: ipCount });
+
     });
   });
 }

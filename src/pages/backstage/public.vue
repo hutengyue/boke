@@ -1,37 +1,47 @@
 <template>
   <div class="box">
     <div class="header">
-      <el-upload
-          class="avatar-uploader"
-          :action="data.httpUrl" :show-file-list="false" drag name="img"
-          :on-success="handleAvatarSuccess"
-          :before-upload="beforeAvatarUpload">
-        <img v-if="data.imageUrl" :src="data.imageUrl" class="avatar">
-        <div v-else>
-          <i class="el-icon-upload"></i>
-          <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
+      <div class="header-content">
+        <div class="header-left">
+          <el-upload
+              class="avatar-uploader"
+              :show-file-list="false" drag name="img"
+              :before-upload="beforeAvatarUpload">
+            <img v-if="data.imageUrl" :src="data.imageUrl" class="avatar">
+            <div v-else class="upload-placeholder">
+              <i class="el-icon-upload"></i>
+              <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
+            </div>
+          </el-upload>
         </div>
-      </el-upload>
-      <input class="title" v-model="data.title" type="text" placeholder="请输入标题">
-      <input class="label" v-model="data.label" type="text" placeholder="请输入简介">
-
-      <el-select v-model="data.category" placeholder="请选择类别">
-        <el-option
-            v-for="item in data.options"
-            :key="item.value"
-            :label="item.label"
-            :value="item.value">
-        </el-option>
-      </el-select>
-      <el-select v-model="data.tags" multiple placeholder="请选择标签" >
-        <el-option
-            v-for="item in data.tagOptions"
-            :key="item.value"
-            :label="item.label"
-            :value="item.value"
-        />
-      </el-select>
-      <el-button @click="submit()" type="success" round>提交</el-button>
+        <div class="header-right">
+          <div class="input-group">
+            <input class="title" v-model="data.title" type="text" placeholder="请输入标题">
+            <div class="meta-group">
+              <input class="label" v-model="data.label" type="text" placeholder="请输入简介">
+              <div class="select-group">
+                <el-select v-model="data.category" placeholder="请选择类别" class="category-select">
+                  <el-option
+                      v-for="item in data.options"
+                      :key="item.value"
+                      :label="item.label"
+                      :value="item.value">
+                  </el-option>
+                </el-select>
+                <el-select v-model="data.tags" multiple placeholder="请选择标签" class="tags-select">
+                  <el-option
+                      v-for="item in data.tagOptions"
+                      :key="item.value"
+                      :label="item.label"
+                      :value="item.value"
+                  />
+                </el-select>
+              </div>
+            </div>
+          </div>
+          <el-button @click="submit()" type="success" class="submit-btn">发布文章</el-button>
+        </div>
+      </div>
     </div>
     <div class="message">
       <div class="write">
@@ -52,7 +62,7 @@ import {ElMessage} from "element-plus";
 import MarkdownIt from "markdown-it";
 import hljs from "highlight.js";
 import 'highlight.js/styles/atom-one-dark.css'
-import global from "../../util/global.js";
+import {uploadToOSS} from '../../util/api.js'
 
 const {proxy} = getCurrentInstance()
 const data = reactive({
@@ -62,29 +72,38 @@ const data = reactive({
   title: '',
   label: '',
   text:'',
-  httpUrl:`http://${global.httpUrl}/imgUpload`,
   fileInfo:'',
   imageUrl:'',
   tags:[],
   tagOptions:[]
 })
-function handleAvatarSuccess(res, file) {
-  data.imageUrl = URL.createObjectURL(file.raw);
-  data.fileInfo = res.fileInfo
-  console.log(data.fileInfo,data.imageUrl)
-}
-function beforeAvatarUpload(file) {
+
+async function beforeAvatarUpload(file) {
   const isJPG = file.type === 'image/jpeg' || 'image/png';
   const isLt2M = file.size / 1024 / 1024 < 2;
 
   if (!isJPG) {
     ElMessage.error('上传头像图片只能是 JPG或PNG 格式!')
+    return false;
   }
   if (!isLt2M) {
     ElMessage.error('上传头像图片大小不能超过 2MB!');
+    return false;
   }
-  return isJPG && isLt2M;
+
+  try {
+    const url = await uploadToOSS(file);
+    data.fileInfo = url;
+    data.imageUrl = URL.createObjectURL(file);
+    ElMessage.success('上传成功');
+    return false; // 返回false阻止Element默认上传
+  } catch (error) {
+    ElMessage.error('上传失败');
+    console.error(error);
+    return false;
+  }
 }
+
 function write(message){
   console.log(message)
   var md = new MarkdownIt({
@@ -130,22 +149,21 @@ function write(message){
 }
 
 function submit(){
-  let article = {articleTitle:data.title,articleLabel:data.label,articleImg:data.fileInfo.path,
-    html:data.message,dateTime:new Date().toLocaleString(),categoryId:data.category,
-  tags:data.tags}
-  console.log(article)
-  proxy.$http({
-    url:'/article/submit',
-    method:"POST",
-    data:{article:article}
-  }).then(res=>{
-    data.message = ''
-    return ElMessage({
-      showClose: true,
-      message: res.data.msg,
-      type: res.data.type
-    })
-  })
+  // let article = {articleTitle:data.title,articleLabel:data.label,articleImg:data.fileInfo,
+  //   html:data.message,categoryId:data.category,tags:data.tags}
+  // console.log(article)
+  // proxy.$http({
+  //   url:'/article/submit',
+  //   method:"POST",
+  //   data:{article:article}
+  // }).then(res=>{
+  //   data.message = ''
+  //   return ElMessage({
+  //     showClose: true,
+  //     message: res.data.msg,
+  //     type: res.data.type
+  //   })
+  // })
 }
 
 watch(()=>data.message,(newVal)=>{
@@ -173,78 +191,214 @@ onMounted(()=>{
 </script>
 
 <style scoped>
-.box{
+.box {
   box-sizing: border-box;
-  padding: 10px;
+  min-height: 100vh;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.header {
+  width: 100%;
+  margin-bottom: 12px;
+  box-sizing: border-box;
+  padding: 20px;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+}
+
+.header-content {
+  display: flex;
+  gap: 24px;
+  align-items: flex-start;
+}
+
+.header-left {
+  flex: 0 0 180px;
+}
+
+.header-right {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+}
+
+.meta-group {
+  display: flex;
+  gap: 16px;
+}
+
+.label {
+  flex: 1;
+}
+
+.select-group {
+  display: flex;
+  gap: 12px;
+  flex: 2;
+}
+
+.category-select,
+.tags-select {
+  flex: 1;
+}
+
+.header input {
+  width: 100%;
+  padding: 10px 14px;
+  font-size: 14px;
+  color: #1d1d1f;
+  background: rgba(255, 255, 255, 0.98);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.header input.title {
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: -0.3px;
+  padding: 12px 16px;
+}
+
+.header input:focus {
+  border-color: #0071e3;
+  box-shadow: 0 0 0 3px rgba(0, 113, 227, 0.08);
+  background: #fff;
+}
+
+.message {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px;
+  width: 100%;
+  max-width: 1600px;
+  flex: 1;
+  margin-top: 0;
+  min-height: calc(100vh - 200px);
+}
+
+.write, .read {
+  background: rgba(255, 255, 255, 0.8);
+  padding: 6px;
+  border-radius: 16px;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.08);
+  display: flex;
+  flex-direction: column;
   height: 100%;
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  background-color: rgb(242,242,242);
-}
-.header{
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  width: 90%;
-  border: none;
-  outline: none;
-  justify-content: space-around;
-}
-.header input{
-  padding: 10px;
-  border: none;
-  outline: none;
-}
-.message{
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  height: 90%;
-  width: 100%;
-  margin-top: 5px;
-  justify-content: space-around;
-  padding: 10px;
-}
-.write,.read{
-  width: 49%;
-  height: 90%;
-  background-color: white;
-  padding: 10px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-.writeText,.readText{
-  width: 90%;
-  margin-top: 10px;
-  height: 93%;
-  overflow: auto;
-  outline: none;
-  border: none;
 }
 
+.write p, .read p {
+  font-size: 20px;
+  font-weight: 600;
+  color: #1d1d1f;
+  margin-bottom: 8px;
+}
 
-:deep(.avatar-uploader){
-  width: 200px;
-  height: 100px;
+.writeText, .readText {
+  flex: 1;
+  padding: 6px;
+  font-size: 16px;
+  line-height: 1.8;
+  color: #1d1d1f;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 12px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+  min-height: calc(100vh - 300px);
+  overflow-y: auto;
 }
-:deep(.el-upload-dragger){
-  width: 200px;
-  height: 100px;
+
+.writeText:focus {
+  border-color: #0071e3;
+  box-shadow: 0 0 0 4px rgba(0, 113, 227, 0.1);
 }
-:deep(.dialog-footer){
-  margin-top: 10px;
+
+:deep(.avatar-uploader) {
+  width: 160px;
+  height: 100%;
+  border-radius: 8px;
+  overflow: hidden;
+  transition: all 0.2s ease;
+}
+
+:deep(.el-upload-dragger) {
   width: 100%;
+  height: 100%;
+  border: 2px dashed rgba(0, 0, 0, 0.06);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.98);
+  transition: all 0.2s ease;
+}
+
+:deep(.el-upload-dragger:hover) {
+  border-color: #0071e3;
+  background: rgba(0, 113, 227, 0.04);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 113, 227, 0.08);
+}
+
+.upload-placeholder {
+  height: 100%;
   display: flex;
-  flex-direction: row;
-  align-items: center;
+  flex-direction: column;
   justify-content: center;
+  align-items: center;
+  color: #666;
+  font-size: 12px;
 }
-.avatar{
-  object-fit: cover;
+
+.avatar {
   width: 100%;
   height: 100%;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.submit-btn {
+  align-self: flex-end;
+  padding: 16px 36px;
+  font-size: 16px;
+  font-weight: 600;
+  border-radius: 14px;
+  background: #0071e3;
+  border-color: #0071e3;
+  transition: all 0.3s ease;
+  letter-spacing: 0.3px;
+}
+
+.submit-btn:hover {
+  background: #0077ed;
+  border-color: #0077ed;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 113, 227, 0.2);
+}
+
+:deep(.el-select) {
+  width: 100%;
+}
+
+:deep(.el-select .el-input__wrapper) {
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 10px;
+  box-shadow: none;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  padding: 2px 10px;
+}
+
+:deep(.el-select .el-input__wrapper.is-focus) {
+  border-color: #0071e3;
+  box-shadow: 0 0 0 4px rgba(0, 113, 227, 0.1);
 }
 </style>

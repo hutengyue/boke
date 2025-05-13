@@ -130,7 +130,7 @@
   display: flex;
   gap: 8px;
   z-index: 100;
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(0, 0,0, 0.6);
   backdrop-filter: blur(20px);
   padding: 4px;
   border-radius: 12px;
@@ -192,7 +192,7 @@
 .message-item {
   break-inside: avoid;
   margin-bottom: 16px;
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(0, 0,0, 0.6);
   backdrop-filter: blur(10px);
   border-radius: 14px;
   padding: 16px;
@@ -202,7 +202,6 @@
 }
 
 .message-item:hover {
-  background: rgba(255, 255, 255, 0.08);
   border-color: rgba(255, 255, 255, 0.12);
   transform: translateY(-2px) translateZ(0);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
@@ -344,7 +343,7 @@
 
 .danmuBox {
   height: calc(100% - 70px);
-  padding: 20px;
+  padding: 10px;
   margin-top: 60px;
   transition: opacity 0.3 ease;
 }
@@ -352,8 +351,8 @@
 .danmu {
   display: inline-flex;
   align-items: center;
-  padding: 6px 12px;
-  background: rgba(255, 255, 255, 0.08);
+  padding: 6px 12px 6px 6px;
+  background: rgba(0, 0,0, 0.6);
   backdrop-filter: blur(8px);
   border-radius: 20px;
   border: 1px solid rgba(255, 255, 255, 0.1);
@@ -366,8 +365,8 @@
 }
 
 .danmuImg {
-  width: 40px;
-  height: 40px;
+  width: 30px;
+  height: 30px;
   border-radius: 50%;
   object-fit: cover;
   border: 1px solid rgba(255, 255, 255, 0.1);
@@ -375,7 +374,7 @@
 
 .danmuText {
   color: rgba(255, 255, 255, 0.9);
-  font-size: 17px;
+  font-size: 14px;
   margin-left: 8px;
   font-weight: 400;
 }
