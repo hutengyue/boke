@@ -21,7 +21,7 @@ axios.interceptors.request.use(
 
 axios.interceptors.response.use(
     response => {
-        if(response.data.type){
+        if(response.data.msg){
             ElMessage({
                 message: response.data.msg,
                 type: response.data.type

@@ -27,6 +27,10 @@ onMounted(()=>{
     }
   });
 
+  document.addEventListener("contextmenu", function (e) {
+    e.preventDefault();
+  });
+
   let flag = !cookie.get('visit')?true:false
   proxy.$http({
     url:'/visit',

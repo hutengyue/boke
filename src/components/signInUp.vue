@@ -76,10 +76,6 @@ function register(){
         data.email = '';data.regName='';data.regPsd='';data.regCode='';
         data.active = false
       }
-      return ElMessage({
-        message: res.data.msg,
-        type: res.data.type
-      });
     })
   }
 }
@@ -148,8 +144,8 @@ function checkMobile() {
         <div class="form" id="form1">
           <h2 class="form__title">注 册</h2>
           <input v-model="data.regName" type="text" maxlength="10" placeholder="用户名" class="input" />
-          <input v-model="data.regPsd" type="text" placeholder="密码" class="input" />
           <input v-model="data.email" type="text" placeholder="邮箱" class="input" />
+          <input v-model="data.regPsd" type="text" placeholder="密码" class="input" />
           <input v-model="data.regCode" type="text" placeholder="验证码" class="input" @keyup.enter="register" />
           <p v-show="data.code" @click="reqEmail()">获取验证码</p>
 

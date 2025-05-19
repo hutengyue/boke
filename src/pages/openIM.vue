@@ -127,6 +127,7 @@ const searchFriends = () => {
 }
 
 const selectTarget = async(target) => {
+
   if(target.type == 'group' && target.type){
     currentChat.type = target.type
     currentChat.id = target.id
@@ -192,7 +193,7 @@ function initWebSocket(){
     ws.emit('connection',{userId:userId.value})
 
     ws.on('connection',async(data)=>{
-      console.log(data.pmessage)
+      console.log(data)
       data.message.forEach((item)=>{
         if(item.type == 'group'){
           chatList.value.push({
