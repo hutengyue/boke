@@ -12,6 +12,7 @@ const store = useStore()
 var headImg = ref('')
 let lastScrollPosition = ref(window.pageYOffset)
 let display = ref('1')
+let category = ref([])
 
 function gotoHome(){
   router.push('/')
@@ -36,6 +37,9 @@ function gotoAbout(){
 }
 function gotoTag(){
   router.push('/tag')
+}
+function gotoCategory(categoryId){
+  router.push(`/category?id=${categoryId}`)
 }
 
 const isMenuOpen = ref(false)
@@ -68,8 +72,9 @@ onMounted(()=>{
     headImg.value = store.getHeadImg
   })
 
-
-
+  proxy.$http.get('/category').then(res=>{
+    category.value = res.data
+  })
 })
 onBeforeUnmount(()=>{
   proxy.$bus.off('headImg')
@@ -94,6 +99,23 @@ onBeforeUnmount(()=>{
           </svg>
           <span>首页</span>
         </li>
+        <li class="category-dropdown">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"/>
+          </svg>
+          <span>分类</span>
+          <ul class="dropdown-menu">
+            <li v-for="item in category" :key="item.categoryId" @click="gotoCategory(item.categoryId)">
+              {{ item.categoryName }}
+            </li>
+          </ul>
+        </li>
+        <li @click="gotoTag()">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
+          </svg>
+          <span>标签</span>
+        </li>
         <li @click="gotoChat()">
           <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
@@ -105,12 +127,6 @@ onBeforeUnmount(()=>{
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
           </svg>
           <span>留言</span>
-        </li>
-        <li @click="gotoTag()">
-          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
-          </svg>
-          <span>标签</span>
         </li>
         <li @click="gotoCount()">
           <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
@@ -153,8 +169,8 @@ onBeforeUnmount(()=>{
 }
 
 .content:hover {
-  backdrop-filter: blur(10px);
-  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(20px);
+  background: rgba(255, 255, 255, 0.4);
 }
 
 .content h1 {
@@ -207,6 +223,68 @@ onBeforeUnmount(()=>{
   color: #0071e3;
   transform: scale(1.1);
   text-shadow: none;
+}
+
+.category-dropdown {
+  position: relative;
+  display: flex;
+  align-items: center;
+  padding: 8px 16px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(8px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s;
+}
+
+.category-dropdown:hover {
+  background: rgba(255, 255, 255, 0.9);
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.category-dropdown:hover .dropdown-menu {
+  display: block;
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.dropdown-menu {
+  display: none;
+  position: absolute;
+  top: calc(100% + 2px);
+  left: -50%;
+  min-width: 180px;
+  backdrop-filter: blur(20px);
+  background: rgba(255, 255, 255, 0.4);
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  padding: 8px;
+  opacity: 0;
+  transition: all 0.2s ease-out;
+  z-index: 1000;
+  pointer-events: none;
+}
+
+.dropdown-menu li {
+  padding: 10px 16px;
+  margin: 2px 0;
+  font-size: 14px;
+  font-weight: 500;
+  color: #1d1d1f;
+  cursor: pointer;
+  transition: all 0.2s ease-out;
+  background: white;
+  border-radius: 8px;
+  display: block;
+  text-align: center;
+}
+
+.dropdown-menu li:hover {
+  background: rgba(0, 113, 227, 0.08);
+  color: #0071e3;
+  transform: none;
 }
 
 .icon {

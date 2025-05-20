@@ -193,7 +193,6 @@ function initWebSocket(){
     ws.emit('connection',{userId:userId.value})
 
     ws.on('connection',async(data)=>{
-      console.log(data)
       data.message.forEach((item)=>{
         if(item.type == 'group'){
           chatList.value.push({
@@ -341,7 +340,7 @@ onBeforeUnmount(() => {
               </div>
               <div class="chat-meta">
                 <span class="time">{{ item.createAt }}</span>
-                <div class="unread">1</div>
+                <!-- <div class="unread">1</div> -->
               </div>
             </div>
           </div>

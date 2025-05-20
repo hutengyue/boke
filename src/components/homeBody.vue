@@ -417,7 +417,7 @@ onMounted(()=>{
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  padding: 20px;
+  padding: 15px;
   float: left;
 }
 .article-message-time,.article-message-heat,.article-message-comment{
@@ -445,13 +445,13 @@ onMounted(()=>{
 .article-category{
   display: flex;
   align-items: center;
-  font-size: 18px;
+  font-size: 15px;
   text-align: center;
   color: white;
 }
 .article-category .icon{
-  width: 17px;
-  height: 17px;
+  width: 14px;
+  height: 14px;
 }
 .article-category div{
   display: flex;
@@ -517,7 +517,7 @@ onMounted(()=>{
 
   .article-message-left {
     width: 100%;
-    padding: 15px;
+    padding: 10px;
   }
 
   .article-img-right,
@@ -533,7 +533,7 @@ onMounted(()=>{
   .article-message-time,
   .article-message-heat,
   .article-message-comment {
-    font-size: 14px;
+    font-size: 12px;
   }
 
   .article-message-title {
@@ -580,7 +580,7 @@ onMounted(()=>{
   .article-message-time,
   .article-message-heat,
   .article-message-comment {
-    font-size: 12px;
+    font-size: 10px;
   }
 
   .user-name {

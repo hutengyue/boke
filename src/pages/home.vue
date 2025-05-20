@@ -1,5 +1,5 @@
 <template>
-  <div style="font-family: rain;">
+  <div>
     <Header style="z-index: 1000"></Header>
     <div class="zhu" ref="zhu">
       <h1>欢迎光临</h1>
@@ -146,10 +146,6 @@ onMounted(()=>{
 </script>
 
 <style scoped>
-@font-face {
-  font-family: rain;
-  src: url("../assets/wenzi.ttf");
-}
 @keyframes hideToShow {
   0%{
     opacity: 0;
@@ -189,6 +185,7 @@ onMounted(()=>{
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Icons", "Helvetica Neue", sans-serif;
 }
 .zhu h1{
   font-size: 60px;

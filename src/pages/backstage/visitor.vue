@@ -60,7 +60,7 @@ function handleCurrentChange(val) {
 }
 
 function fetchVisitData(page) {
-  proxy.$http.get(`/visit?page=${page}&limit=${pageSize}`).then(res => {
+  proxy.$http.get(`/visit?page=${page}&pageSize=${pageSize}`).then(res => {
     data.visits = res.data.items
     data.total = res.data.meta.total
   })
