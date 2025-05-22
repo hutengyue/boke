@@ -264,7 +264,7 @@ function isElementInViewport(element,toc) {
 }
 function initComment(){
   proxy.$http({
-    url: `/comment/list?page=${1}&limit=${10}&articleId=${data.article.articleId}`,
+    url: `/comment/list?page=${1}&pageSize=${10}&articleId=${data.article.articleId}`,
     method: "GET",
   }).then(res => {
     data.comments = res.data.items; 
@@ -366,7 +366,7 @@ onMounted(()=>{
 }
 .articleHeader {
   position: relative;
-  height: 400px;
+  height: 350px;
   width: 100%;
   display: flex;
   align-items: center;
@@ -477,7 +477,7 @@ onMounted(()=>{
 
 @media (max-width: 768px) {
   .articleHeader {
-    height: 300px;
+    height: 270px;
   }
 
   .articleTitle {

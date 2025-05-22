@@ -155,8 +155,8 @@ onMounted(()=>{
   100% { background-position: 0% 50%; }
 }
 .icon{
-  width: 23px;
-  height: 23px;
+  width: 20px;
+  height: 20px;
   margin-right: 3px;
 }
 .container{
