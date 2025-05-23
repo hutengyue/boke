@@ -70,13 +70,17 @@
       <div class="authorContent">
         <div class="itemMask">
           <div class="self">
-            <div>
-              <p>专业</p>
-              <p>软件工程</p>
+            <div class="info-card">
+              <p class="info-label">专业</p>
+              <p class="info-value">软件工程</p>
             </div>
-            <div>
-              <p>身份</p>
-              <p>2024届毕业生</p>
+            <div class="info-card">
+              <p class="info-label">身份</p>
+              <p class="info-value">2024届毕业生</p>
+            </div>
+            <div class="info-card">
+              <p class="info-label">星座</p>
+              <p class="info-value">狮子座</p>
             </div>
           </div>
         </div>
@@ -166,9 +170,7 @@ function change(index){
   flex-direction: column;
   width: 100%;
   font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
-  background-image: linear-gradient(90deg,rgba(37,82,110,.1) 1px,#fff 0),
-  linear-gradient(180deg,rgba(37,82,110,.1) 1px,#fff 0);
-  background-size: 3rem 3rem;
+  background-color: #f8f8fa;
 }
 .aboutBox{
   width: 100%;
@@ -359,9 +361,40 @@ function change(index){
   flex-direction: column;
   justify-content: center;
   align-items: flex-start;
-  background-color: #fff;
-  box-shadow: 0 8px 16px -4px #2c2d300c;
-  border:1px solid #e3e8f7;
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.self {
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 1rem;
+}
+
+.info-card {
+  background: rgba(255, 255, 255, 0.5);
+  border-radius: 12px;
+  padding: 1rem;
+  transition: transform 0.3s ease;
+}
+
+.info-card:hover {
+  transform: translateY(-5px);
+}
+
+.info-label {
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 0.5rem;
+}
+
+.info-value {
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
 }
 .itemGroup{
   width: 59%;
