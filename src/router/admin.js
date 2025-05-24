@@ -108,7 +108,6 @@ const adminRoutes = {
                 title: '分析页'
             }
         },
-        ...permissionRoutes.admin
     ]
 }
 
@@ -123,17 +122,18 @@ function getRoutesByRole(role) {
 
 export function addAdminRoutes() {
     const identity = localStorage.getItem('identity')?.replace(/"/g, '')
-    
+    console.log(identity)
     // 添加基础路由
     if (identity === 'user' || identity === 'admin') {
         router.addRoute(adminRoutes)
         
         // 添加权限路由作为子路由
         const routes = getRoutesByRole(identity)
-        console.log(routes)
+        console.log('routes',routes)
         routes.forEach(route => {
             router.addRoute('admin', route)  // 添加为 admin 的子路由
         })
+        console.log(router.getRoutes())
     }
 }
 
