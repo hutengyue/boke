@@ -19,7 +19,6 @@ const {proxy} = getCurrentInstance()
 const routes = computed(() => {
   // 获取所有路由
   const allRoutes = router.getRoutes()
-  
   // 获取 admin 主路由
   const adminRoute = allRoutes.find(r => r.path === '/admin')
   if (!adminRoute) return []
@@ -36,7 +35,6 @@ const routes = computed(() => {
     })) || []
   }))
 })
-console.log(routes)
 // 面包屑导航
 const breadcrumb = computed(() => {
   const matched = route.matched.filter(item => item.meta && item.meta.title)

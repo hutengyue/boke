@@ -33,7 +33,6 @@ function init(){
     data.number[2] = res.data
   })
   proxy.$http.get('/article/page').then(res=>{
-    console.log(res.data)
     data.articles = res.data.items
   })
 }

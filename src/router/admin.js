@@ -122,18 +122,19 @@ function getRoutesByRole(role) {
 
 export function addAdminRoutes() {
     const identity = localStorage.getItem('identity')?.replace(/"/g, '')
-    console.log(identity)
     // 添加基础路由
     if (identity === 'user' || identity === 'admin') {
-        router.addRoute(adminRoutes)
-        
-        // 添加权限路由作为子路由
+        // 先移除已存在的admin路由
+        removeAdminRoutes()
+        // 获取权限路由
         const routes = getRoutesByRole(identity)
-        console.log('routes',routes)
-        routes.forEach(route => {
-            router.addRoute('admin', route)  // 添加为 admin 的子路由
-        })
-        console.log(router.getRoutes())
+        // 创建新的路由配置，避免修改原对象
+        const newAdminRoute = {
+            ...adminRoutes,
+            children: [...adminRoutes.children, ...routes]
+        }
+        // 添加完整的路由配置
+        router.addRoute(newAdminRoute)
     }
 }
 

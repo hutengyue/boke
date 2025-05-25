@@ -3,6 +3,8 @@ import {getCurrentInstance, onBeforeUnmount, onMounted, reactive, watch,ref} fro
 import { ElMessage } from 'element-plus'
 import useStore from "../store/index.js";
 import {useRouter} from "vue-router";
+import { addAdminRoutes } from "../router/admin.js";
+
 const {proxy} = getCurrentInstance()
 const store = useStore()
 const router = useRouter()
@@ -95,6 +97,7 @@ function login(){
         store.setHeadImg(res.data.headImg)
         store.setToken(res.data.token)
         store.setUsername(res.data.username)
+        addAdminRoutes()
         router.push('/')
       }else {
         return ElMessage({
