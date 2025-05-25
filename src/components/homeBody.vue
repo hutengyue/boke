@@ -349,7 +349,7 @@ onMounted(()=>{
 }
 .article-container{
   width: 100%;
-  height: 190px;
+  height: 180px;
   position: relative;
   border-radius: 10px;
   overflow: hidden;

@@ -196,7 +196,7 @@ const formRules = {
 // 获取用户列表
 const fetchUsers = async () => {
   try {
-    const res = await proxy.$http.get(`/user/list?page=${currentPage.value}&limit=${pageSize.value}${searchQuery.value ? `&username=${searchQuery.value}` : ''}`)
+    const res = await proxy.$http.get(`/user/list?page=${currentPage.value}&pageSize=${pageSize.value}${searchQuery.value ? `&username=${searchQuery.value}` : ''}`)
     userList.value = res.data.items
     total.value = res.data.meta.total
   } catch (error) {

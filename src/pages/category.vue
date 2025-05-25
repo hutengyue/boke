@@ -42,10 +42,10 @@
                 <p class="article-message-title">{{item.articleTitle}}</p>
                 <p class="article-label">{{item.articleLabel}}</p>
                 <div class="article-category">
-                <div>
-                    <svg t="1718202362866" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="18205" width="200" height="200"><path d="M531.071917 56.831751l402.814237-20.671909c37.055838 0 67.199706 30.079868 67.199706 67.071706l-18.047921 404.478231c0 31.807861-15.807931 47.039794-37.759835 68.351701l-10.047956 9.855957-398.718255 397.822259A136.959401 136.959401 0 0 1 439.040319 1023.99552a137.0874 137.0874 0 0 1-97.279574-40.127824L56.193994 698.876942a135.935405 135.935405 0 0 1-40.319823-97.151575c0-36.735839 14.207938-71.295688 40.319823-97.151575l398.718256-397.886259c5.439976-5.759975 10.239955-11.007952 14.399937-15.743931 20.799909-22.719901 31.167864-34.17585 61.69573-34.17585z m162.687288 425.598138c35.327845 0 70.527691-13.439941 97.343574-40.191824a136.319404 136.319404 0 0 0 40.447823-97.279574c0-36.67184-14.335937-71.231688-40.447823-97.087575A137.791397 137.791397 0 0 0 556.159807 344.958491c0 36.735839 14.271938 71.295688 40.319823 97.151575 26.879882 26.879882 62.079728 40.191824 97.343575 40.191824z m-41.599818-178.879217a58.751743 58.751743 0 0 1 41.599818-17.087925 58.751743 58.751743 0 0 1 58.751743 58.623743 58.879742 58.879742 0 0 1-117.503486 0c0-15.615932 6.143973-30.399867 17.215925-41.535818zM258.561109 504.765792a47.167794 47.167794 0 0 0-66.879708-0.064 47.487792 47.487792 0 0 0-0.127999 67.071706l273.470804 275.198796 0.063999 0.192a47.167794 47.167794 0 0 0 66.751708 0c18.559919-18.559919 18.559919-48.511788 0.128-67.135707l-273.406804-275.198796z" fill="#51A9FF" p-id="18206"></path></svg>
-                    <p v-for="(tag,index) in item.tags" :key="index">{{ tag.tagName }}</p>
-                </div>
+                  <div>
+                      <svg t="1718202362866" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="18205" width="200" height="200"><path d="M531.071917 56.831751l402.814237-20.671909c37.055838 0 67.199706 30.079868 67.199706 67.071706l-18.047921 404.478231c0 31.807861-15.807931 47.039794-37.759835 68.351701l-10.047956 9.855957-398.718255 397.822259A136.959401 136.959401 0 0 1 439.040319 1023.99552a137.0874 137.0874 0 0 1-97.279574-40.127824L56.193994 698.876942a135.935405 135.935405 0 0 1-40.319823-97.151575c0-36.735839 14.207938-71.295688 40.319823-97.151575l398.718256-397.886259c5.439976-5.759975 10.239955-11.007952 14.399937-15.743931 20.799909-22.719901 31.167864-34.17585 61.69573-34.17585z m162.687288 425.598138c35.327845 0 70.527691-13.439941 97.343574-40.191824a136.319404 136.319404 0 0 0 40.447823-97.279574c0-36.67184-14.335937-71.231688-40.447823-97.087575A137.791397 137.791397 0 0 0 556.159807 344.958491c0 36.735839 14.271938 71.295688 40.319823 97.151575 26.879882 26.879882 62.079728 40.191824 97.343575 40.191824z m-41.599818-178.879217a58.751743 58.751743 0 0 1 41.599818-17.087925 58.751743 58.751743 0 0 1 58.751743 58.623743 58.879742 58.879742 0 0 1-117.503486 0c0-15.615932 6.143973-30.399867 17.215925-41.535818zM258.561109 504.765792a47.167794 47.167794 0 0 0-66.879708-0.064 47.487792 47.487792 0 0 0-0.127999 67.071706l273.470804 275.198796 0.063999 0.192a47.167794 47.167794 0 0 0 66.751708 0c18.559919-18.559919 18.559919-48.511788 0.128-67.135707l-273.406804-275.198796z" fill="#51A9FF" p-id="18206"></path></svg>
+                      <p v-for="(tag,index) in item.tags" :key="index">{{ tag.tagName }}</p>
+                  </div>
                 </div>
             </div>
         </div>
@@ -56,7 +56,7 @@
 
 <script setup>
 import Header from '../components/header.vue'
-import { onMounted, reactive,getCurrentInstance } from 'vue'
+import { onMounted, reactive, getCurrentInstance, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 
@@ -71,18 +71,30 @@ const data = reactive({
   articles: []
 })
 
-function goToArticle(articleId) {
-  router.push(`/article/${articleId}`)
+async function gotoArticle(id){
+  router.push({name:'article',params:{articleId:id}})
 }
 
-onMounted(async () => {
-  const categoryId = route.query.id
+function fetchCategoryData(categoryId) {
   proxy.$http.get(`/category/${categoryId}`).then((res) => {
     data.categoryId = res.data.categoryId
     data.categoryName = res.data.categoryName
     data.createAt = res.data.createAt
     data.articles = res.data.articles
   })
+}
+
+watch(() => route.query.id, (newId) => {
+  if (newId) {
+    fetchCategoryData(newId)
+  }
+})
+
+onMounted(async () => {
+  const categoryId = route.query.id
+  if (categoryId) {
+    fetchCategoryData(categoryId)
+  }
 })
 </script>
 
@@ -162,26 +174,11 @@ onMounted(async () => {
   stroke: #666;
 }
 
-@media screen and (max-width: 768px) {
-  .category-header {
-    padding: 2rem 1rem;
-    margin: 1rem;
-    width: calc(100% - 2rem);
-  }
-
-  .category-title {
-    font-size: 2rem;
-  }
-
-  .category-meta {
-    font-size: 0.9rem;
-  }
-}
 .articles-grid {
   display: flex;
   flex-direction: column;
-  width:60%;
-  max-witdh:900px;
+  width:90%;
+  max-width:850px;
 }
 
 .article{
@@ -310,6 +307,14 @@ onMounted(async () => {
 
 
 @media screen and (max-width: 768px) {
+  .category-title {
+    font-size: 2rem;
+  }
+
+  .category-meta {
+    font-size: 0.9rem;
+  }
+
   .container {
     flex-direction: column;
     padding: 15px;

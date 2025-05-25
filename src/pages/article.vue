@@ -80,7 +80,7 @@
                     <a>{{ reply.username }}</a>
                     <span class="reply-to" v-if="reply.toId">
                       <span class="at-symbol">@</span>
-                      {{ reply.user.username }}
+                      {{ reply.replyToUsername }}
                     </span>
                     <a>{{ reply.createAt }}</a>
                   </div>
@@ -267,6 +267,7 @@ function initComment(){
     url: `/comment/list?page=${1}&pageSize=${10}&articleId=${data.article.articleId}`,
     method: "GET",
   }).then(res => {
+    console.log(res.data.items)
     data.comments = res.data.items; 
     data.commentMeta = res.data.meta; 
   });
@@ -476,9 +477,6 @@ onMounted(()=>{
 }
 
 @media (max-width: 768px) {
-  .articleHeader {
-    height: 270px;
-  }
 
   .articleTitle {
     font-size: 32px;
@@ -498,6 +496,56 @@ onMounted(()=>{
   .label {
     padding: 4px 10px;
     font-size: 12px;
+  }
+
+  .articleBody {
+    padding: 12px;
+  }
+
+  .entryContent {
+    font-size: 15px;
+    line-height: 1.6;
+  }
+
+  .comment {
+    padding: 12px;
+  }
+
+  .commentHeader a {
+    font-size: 20px;
+  }
+
+  .commentTextarea {
+    height: 120px;
+    font-size: 14px;
+  }
+
+  .commentButton {
+    font-size: 16px;
+    padding: 8px 16px;
+  }
+
+  .commentsHeader p {
+    font-size: 16px;
+  }
+
+  .commentsTop {
+    font-size: 15px;
+  }
+
+  .commentsMessage {
+    padding: 15px;
+    font-size: 15px;
+    margin-bottom: 15px;
+  }
+
+  .replies {
+    margin-left: 10px;
+  }
+
+  .reply-actions button {
+    padding: 6px 12px;
+    font-size: 14px;
   }
 }
 

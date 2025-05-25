@@ -149,7 +149,7 @@ function select(val) {
 async function handleCurrentChange(val) {
   data.currentPage = val
   try {
-    const res = await proxy.$http.get(`/comment/all?page=${val}&limit=${data.pageSize}`)
+    const res = await proxy.$http.get(`/comment/all?page=${val}&pageSize=${data.pageSize}`)
     data.comments = res.data.items
     data.list = data.comments
     data.total = res.data.meta.total
@@ -180,7 +180,7 @@ async function fetchComments() {
     data.comments = res.data.items
     data.list = data.comments
     data.total = res.data.meta.total
-    data.pageSize = res.data.meta.limit
+    data.pageSize = res.data.meta.pageSize
   } catch (error) {
     ElMessage.error('获取评论列表失败')
   }

@@ -42,7 +42,7 @@
       <div class="pagination">
         <el-pagination
             v-model:current-page="data.currentPage"
-            :page-size="data.meta.limit"
+            :page-size="data.meta.pageSize"
             :small="false"
             layout="total,prev, pager, next, jumper"
             :total="data.meta.total"
@@ -104,7 +104,7 @@ var data = reactive({
   meta: {
     total: 0,
     page: 1,
-    limit: pageSize,
+    pageSize: pageSize,
     totalPages: 0
   }
 })
@@ -154,7 +154,7 @@ async function fetchLogs() {
     const res = await proxy.$http.get('/log', {
       params: {
         page: data.currentPage,
-        limit: pageSize
+        pageSize: pageSize
       }
     })
     data.list = res.data.items

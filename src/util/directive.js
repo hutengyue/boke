@@ -42,9 +42,6 @@ export default {
         })
         app.directive('slide-in',{
             mounted(el) {
-                if (!isBelowViewport(el)) {
-                    return;
-                }
                 const animation = el.animate([
                     {
                         transform: `scale(0.7,0.7)`,
@@ -59,9 +56,12 @@ export default {
                     duration: DURATION,
                     easing: 'ease'
                 })
-                animation.pause();  // 暂停动画
-                animationMap.set(el, animation);
-                ob.observe(el);
+                
+                if (isBelowViewport(el)) {
+                    animation.pause();  // 只有在视口下方的元素才暂停动画
+                    animationMap.set(el, animation);
+                    ob.observe(el);
+                }
             },
             beforeUnmount(el) {
                 ob.unobserve(el);
