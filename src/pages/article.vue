@@ -235,7 +235,7 @@ async function scroll() {
   for (let i = 0; i < link.length; i++) {
     let id = link[i].getAttribute('href').substring(1)
     let h = document.getElementById(id)
-    if (isElementInViewport(h)) {
+    if (isElementInViewport(h) && link[data.active]) {
       link[data.active].classList.remove('active')
       data.active = i
       link[i].classList.add('active')
@@ -267,7 +267,6 @@ function initComment(){
     url: `/comment/list?page=${1}&pageSize=${10}&articleId=${data.article.articleId}`,
     method: "GET",
   }).then(res => {
-    console.log(res.data.items)
     data.comments = res.data.items; 
     data.commentMeta = res.data.meta; 
   });
@@ -476,81 +475,6 @@ onMounted(()=>{
   font-size: 16px;
 }
 
-@media (max-width: 768px) {
-
-  .articleTitle {
-    font-size: 32px;
-    margin-bottom: 16px;
-  }
-
-  .articleDetail {
-    flex-direction: column;
-    gap: 8px;
-  }
-
-  .meta-tags {
-    gap: 6px;
-    margin-bottom: 8px;
-  }
-  
-  .label {
-    padding: 4px 10px;
-    font-size: 12px;
-  }
-
-  .articleBody {
-    padding: 12px;
-  }
-
-  .entryContent {
-    font-size: 15px;
-    line-height: 1.6;
-  }
-
-  .comment {
-    padding: 12px;
-  }
-
-  .commentHeader a {
-    font-size: 20px;
-  }
-
-  .commentTextarea {
-    height: 120px;
-    font-size: 14px;
-  }
-
-  .commentButton {
-    font-size: 16px;
-    padding: 8px 16px;
-  }
-
-  .commentsHeader p {
-    font-size: 16px;
-  }
-
-  .commentsTop {
-    font-size: 15px;
-  }
-
-  .commentsMessage {
-    padding: 15px;
-    font-size: 15px;
-    margin-bottom: 15px;
-  }
-
-  .replies {
-    margin-left: 10px;
-  }
-
-  .reply-actions button {
-    padding: 6px 12px;
-    font-size: 14px;
-  }
-}
-
-
-
 .articleBody{
   width: 100%;
   padding: 20px;
@@ -758,4 +682,76 @@ onMounted(()=>{
   margin-right: 2px;
 }
 
+@media (max-width: 768px) {
+
+  .articleTitle {
+    font-size: 32px;
+    margin-bottom: 16px;
+  }
+
+  .articleDetail {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .meta-tags {
+    gap: 6px;
+    margin-bottom: 8px;
+  }
+
+  .label {
+    padding: 4px 10px;
+    font-size: 12px;
+  }
+
+  .articleBody {
+    padding: 12px;
+  }
+
+  .entryContent {
+    font-size: 15px;
+    line-height: 1.6;
+  }
+
+  .comment {
+    padding: 12px;
+  }
+
+  .commentHeader a {
+    font-size: 20px;
+  }
+
+  .commentTextarea {
+    height: 120px;
+    font-size: 14px;
+  }
+
+  .commentButton {
+    font-size: 16px;
+    padding: 8px 16px;
+  }
+
+  .commentsHeader p {
+    font-size: 16px;
+  }
+
+  .commentsTop {
+    font-size: 15px;
+  }
+
+  .commentsMessage {
+    padding: 15px;
+    font-size: 15px;
+    margin-bottom: 15px;
+  }
+
+  .replies {
+    margin-left: 10px;
+  }
+
+  .reply-actions button {
+    padding: 6px 12px;
+    font-size: 14px;
+  }
+}
 </style>

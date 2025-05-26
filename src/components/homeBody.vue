@@ -171,7 +171,7 @@ onMounted(()=>{
   padding: 30px;
 }
 .aside{
-  width: 23%;
+  width: 30%;
   max-width: 290px;
   display: flex;
   flex-direction: column;
@@ -334,7 +334,7 @@ onMounted(()=>{
 }
 
 .container-article{
-  width: 60%;
+  width: 70%;
   max-width: 900px;
   display: flex;
   flex-direction: column;
