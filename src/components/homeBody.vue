@@ -14,7 +14,6 @@ var data = reactive({
   articles:[],
   cateIndex:0,
   number:[],//文章、分类、访问
-  search:'',
 
 })
 let city = store.getCity
@@ -36,21 +35,7 @@ function init(){
     data.articles = res.data.items
   })
 }
-watch(()=>data.search,(nval,oval)=>{
-  if(nval == ''){
-    data.article = data.all
-    return
-  }
-  proxy.$http({
-    url:'/article/search',
-    method:'post',
-    data:{title:nval}
-  }).then(res => {
-    if(res.data.article){
-      data.article = res.data.article
-    }
-  })
-})
+
 onMounted(()=>{
   init()
 })
@@ -90,12 +75,6 @@ onMounted(()=>{
         </p>
         <div class="notice-message">
           <a>欢迎来自{{city}}的人来到cavalry的小站</a>
-        </div>
-      </div>
-      <div class="search-box">
-        <p>搜索</p>
-        <div class="search">
-          <input v-model="data.search" type="text">
         </div>
       </div>
     </div>
@@ -178,6 +157,8 @@ onMounted(()=>{
   align-items: center;
   padding: 0 0px 10px 5px;
   margin-right: 50px;
+  position: sticky;
+  top: 10px;
 }
 .aside-user{
   width: 100%;
@@ -294,45 +275,6 @@ onMounted(()=>{
   width: 100%;
   height: 85px;
 }
-.search-box{
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  padding: 15px;
-  background: rgba(255, 255, 255, 0.8);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  box-shadow: 0 1px 20px -6px rgba(0,0,0,0.5);
-  border-radius: 10px;
-  margin-top: 25px;
-}
-.search-box p{
-  color:#39c5bb;
-  font-size: 20px;
-  margin-bottom: 10px;
-}
-.search{
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-.search input{
-  width: 100%;
-  border: 2px solid #39c5bb;
-  border-radius: 40px;
-  padding: 0 14px;
-  height: 30px;
-  outline: 0;
-  color: #595a5a;
-  background: rgba(255, 255, 255, 0.9);
-  box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.1);
-  transition: all 0.3s ease;
-}
-
-.search input:focus {
-  box-shadow: 0 0 0 3px rgba(57, 197, 187, 0.2);
-}
-
 .container-article{
   width: 70%;
   max-width: 900px;
@@ -535,10 +477,6 @@ onMounted(()=>{
 
   .user-pyq {
     width: 80%;
-  }
-
-  .search-box {
-    margin-top: 15px;
   }
 
   .category {

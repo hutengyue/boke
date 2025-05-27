@@ -27,6 +27,8 @@ const applyCount = ref(0)
 
 //当前聊天
 const currentChat = reactive({
+  id:'',
+  type:'',
   name: '',
   introduction: '',
   headImg:'',
@@ -228,8 +230,11 @@ function initWebSocket(){
     })
 
     ws.on('groupMessage',(data)=>{
-      currentChat.messages.push(data)
-      scrollToBottom()
+      if(currentChat.type == 'group'){
+        currentChat.messages.push(data)
+        chatList.value[0].message = data.message
+        scrollToBottom()
+      }
     })
 
 
@@ -249,8 +254,10 @@ function initWebSocket(){
     })
 
     ws.on('privateMessage',(data)=>{
-      currentChat.messages.push(data)
-      scrollToBottom()
+      if(currentChat.type == 'private' && currentChat.id == data.fromId){
+        currentChat.messages.push(data)
+        scrollToBottom()
+      }
     })
   }
 }
