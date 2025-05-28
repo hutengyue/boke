@@ -32,7 +32,14 @@ const currentChat = reactive({
   name: '',
   introduction: '',
   headImg:'',
-  messages: []
+  messages: [],
+  meta: {
+    pageNo: 1,
+    total: 0,
+    pageSize: 20,
+    totalPages: 0
+  },
+  loading: false
 })
 //消息列表
 let chatList = ref([])
@@ -113,11 +120,14 @@ const sendMessage = () => {
 }
 
 // 滚动到底部
-const scrollToBottom = () => {
+const scrollToBottom = (smooth = false) => {
   nextTick(() => {
     const container = document.querySelector('.message-container')
     if (container) {
-      container.scrollTop = container.scrollHeight
+      container.scrollTo({
+        top: container.scrollHeight,
+        behavior: smooth ? 'smooth' : 'auto'
+      })
     }
   })
 }
@@ -129,24 +139,24 @@ const searchFriends = () => {
 }
 
 const selectTarget = async(target) => {
-
   if(target.type == 'group' && target.type){
     currentChat.type = target.type
     currentChat.id = target.id
     currentChat.name = target.name
     currentChat.introduction = target.introduction
     currentChat.headImg = target.headImg
-    let result = await proxy.$http.get(`/gmessage/group/${target.id}?pageNo=${1}&pageSize=${20}`)
-    currentChat.messages = result.data
+    let result = await proxy.$http.get(`/gmessage/group/${target.id}?pageNo=${1}&pageSize=${currentChat.meta.pageSize}`)
+    currentChat.messages = result.data.items.reverse()
+    currentChat.meta = result.data.meta
   }else{
     currentChat.type = 'private'
     currentChat.id = target.userId || target.id
     currentChat.name = target.username || target.name
     currentChat.introduction = target.introduction
     currentChat.headImg = target.headImg
-    let result = await proxy.$http.get(`/pmessage/history?userId1=${userId.value}&userId2=${currentChat.id}&pageNo=${1}&pageSize=${20}`)
-    console.log(result.data)
-    currentChat.messages = result.data
+    let result = await proxy.$http.get(`/pmessage/history?userId1=${userId.value}&userId2=${currentChat.id}&pageNo=${1}&pageSize=${currentChat.meta.pageSize}`)
+    currentChat.messages = result.data.items.reverse()
+    currentChat.meta = result.data.meta
   }
   nextTick(() => {
     scrollToBottom()
@@ -233,7 +243,7 @@ function initWebSocket(){
       if(currentChat.type == 'group'){
         currentChat.messages.push(data)
         chatList.value[0].message = data.message
-        scrollToBottom()
+        scrollToBottom(true)
       }
     })
 
@@ -256,13 +266,46 @@ function initWebSocket(){
     ws.on('privateMessage',(data)=>{
       if(currentChat.type == 'private' && currentChat.id == data.fromId){
         currentChat.messages.push(data)
-        scrollToBottom()
+        scrollToBottom(true)
       }
     })
   }
 }
 
+// 加载更多消息
+const loadMoreMessages = async () => {
+  if (currentChat.loading || currentChat.meta.pageNo >= currentChat.meta.totalPages) return
+  currentChat.loading = true
+  try {
+    const nextPage = currentChat.meta.pageNo + 1
+    let result
+    if (currentChat.type === 'group') {
+      result = await proxy.$http.get(`/gmessage/group/${currentChat.id}?pageNo=${nextPage}&pageSize=${currentChat.meta.pageSize}`)
+    } else {
+      result = await proxy.$http.get(`/pmessage/history?userId1=${userId.value}&userId2=${currentChat.id}&pageNo=${nextPage}&pageSize=${currentChat.meta.pageSize}`)
+    }
+    const oldHeight = document.querySelector('.message-container').scrollHeight
+    currentChat.messages = [...result.data.items.reverse(), ...currentChat.messages]
+    currentChat.meta.pageNo = nextPage
+    currentChat.meta = result.data.meta
+    nextTick(() => {
+      const newHeight = document.querySelector('.message-container').scrollHeight
+      document.querySelector('.message-container').scrollTop = newHeight - oldHeight
+    })
+  } catch (error) {
+    ElMessage.error('加载消息失败')
+  } finally {
+    currentChat.loading = false
+  }
+}
 
+// 监听滚动事件加载更多消息
+const handleScroll = (e) => {
+  const { scrollTop } = e.target
+  if (scrollTop === 0) {
+    loadMoreMessages()
+  }
+}
 
 onBeforeUnmount(() => {
   // 清理WebSocket连接
@@ -484,7 +527,8 @@ onBeforeUnmount(() => {
             <span class="subtitle">{{currentChat.introduction}}</span>
           </div>
         </div>
-        <div class="message-container">
+        <div class="message-container" @scroll="handleScroll">
+          <div v-if="currentChat.loading" class="loading-more">加载更多消息...</div>
           <div v-for="(item, index) in currentChat.messages" :key="index" 
                :class="[item.user.userId == userId ? 'message-right' : 'message-left']">
             <div class="message-item">
@@ -1550,5 +1594,12 @@ onBeforeUnmount(() => {
   .list-container {
     width: 240px;
   }
+}
+
+.loading-more {
+  text-align: center;
+  padding: 10px 0;
+  color: #999;
+  font-size: 14px;
 }
 </style>
