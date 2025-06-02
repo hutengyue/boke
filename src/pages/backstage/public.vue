@@ -105,7 +105,6 @@ async function beforeAvatarUpload(file) {
 }
 
 function write(message){
-  console.log(message)
   var md = new MarkdownIt({
     html: true,
     linkify: true,
@@ -148,22 +147,32 @@ function write(message){
   data.text = md.render(`${message}`)
 }
 
-function submit(){
-  // let article = {articleTitle:data.title,articleLabel:data.label,articleImg:data.fileInfo,
-  //   html:data.message,categoryId:data.category,tags:data.tags}
-  // console.log(article)
-  // proxy.$http({
-  //   url:'/article/submit',
-  //   method:"POST",
-  //   data:{article:article}
-  // }).then(res=>{
-  //   data.message = ''
-  //   return ElMessage({
-  //     showClose: true,
-  //     message: res.data.msg,
-  //     type: res.data.type
-  //   })
-  // })
+async function uploadMarkdownToOSS() {
+  if (!data.message.trim()) {
+    ElMessage.warning('文章内容不能为空');
+    return null;
+  }
+  const blob = new Blob([data.message], { type: 'text/markdown' });
+  const file = new File([blob], `${Date.now()}.md`, { type: 'text/markdown' });
+  
+  const url = await uploadToOSS(file);
+  return url;
+}
+
+async function submit() {
+  const markdownUrl = await uploadMarkdownToOSS();
+  if (!markdownUrl) return;
+  let article = {
+    articleTitle: data.title,
+    articleLabel: data.label,
+    articleImg: data.fileInfo,
+    articleMessage: markdownUrl,
+    categoryId: data.category,
+    tags: data.tags
+  };
+  
+  proxy.$http.post('/article/create', article).then(res => {
+  });
 }
 
 watch(()=>data.message,(newVal)=>{

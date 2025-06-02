@@ -11,6 +11,7 @@ export async function uploadToOSS(file, directory = 'boke') {
   try {
     // 获取OSS配置
     const res = await http.get('/upload/getOssConfig');
+    console.log(res.data)
     const ossConfig = res.data;
 
     // 初始化OSS客户端
@@ -20,7 +21,9 @@ export async function uploadToOSS(file, directory = 'boke') {
       accessKeySecret: ossConfig.accessKeySecret,
       bucket: ossConfig.bucket,
       stsToken: ossConfig.security_token,
-      secure: true
+      secure: true,
+      endpoint: 'file.cavalry.xin', // 配置自定义域名
+      cname: true, // 开启CNAME
     });
 
     // 生成文件路径
