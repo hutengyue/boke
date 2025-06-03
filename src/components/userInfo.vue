@@ -93,7 +93,7 @@ async function beforeAvatarUpload(file) {
   try {
     const url = await uploadToOSS(file);
     data.fileInfo = url;
-    console.log(data.fileInfo)
+    // console.log(data.fileInfo)
     data.imageUrl = URL.createObjectURL(file);
     ElMessage.success('上传成功');
     return false; // 返回false阻止Element默认上传
@@ -118,7 +118,7 @@ function submit(){
   if(data.fileInfo) {
     user.value.headImg = data.fileInfo;
   }
-  console.log(user.value);
+  // console.log(user.value);
   proxy.$http({
     url: '/user/update',
     method: "POST",

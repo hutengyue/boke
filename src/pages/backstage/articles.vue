@@ -3,9 +3,9 @@
     <el-card class="user-card" shadow="hover">
       <template #header>
         <div class="card-header">
-          <span class="title">留言列表</span>
+          <span class="title">文章列表</span>
           <div class="actions">
-            <el-button type="primary" :icon="Plus" @click="data.dialog = true;data.type = 1;">新增留言</el-button>
+            <!-- <el-button type="primary" :icon="Plus" @click="data.dialog = true;data.type = 1;">新增文章</el-button> -->
             <el-button type="danger" :icon="Delete" :disabled="data.select.length==0" @click="del()">批量删除</el-button>
           </div>
         </div>
@@ -13,22 +13,24 @@
       <el-table :data="data.list" style="width: 100%" :border="false" :stripe="true"
                 @selection-change="select">
         <el-table-column width="50" type="selection" />
-        <el-table-column fixed prop="messageId" label="编号" min-width="5%" />
-        <el-table-column label="发送者" min-width="13%">
+        <el-table-column fixed="left" prop="articleId" label="编号" min-width="5%" />
+        <el-table-column prop="articleTitle" label="标题" min-width="15%" />
+        <el-table-column prop="articleLabel" label="封面" min-width="10%" >
           <template #default="{ row }">
-            <div class="commenter-info">
-              <el-avatar :size="32" :src="row.headImg" />
-              <span class="commenter-name">{{ row.username }}</span>
-            </div>
+            <el-avatar :size="40" :src="row.articleImg" />
           </template>
         </el-table-column>
-        <el-table-column label="留言内容" min-width="30%">
+        <el-table-column prop="categoryName" label="分类" min-width="10%" />
+        <el-table-column label="标签" min-width="15%">
           <template #default="{ row }">
-            <div class="message-content">
-              {{ row.content }}
-            </div>
+            <el-tag v-for="tag in row.tagNames" :key="tag" size="small" style="margin-right: 5px">
+              {{ tag }}
+            </el-tag>
           </template>
         </el-table-column>
+        <el-table-column prop="heat" label="热度" min-width="8%" />
+        <el-table-column prop="commentsCount" label="评论数" min-width="8%" />
+        <el-table-column prop="createAt" label="创建时间" min-width="15%" />
         <el-table-column fixed="right" align="center" label="操作" width="200">
           <template #default="{ row }">
             <div class="action-buttons">
@@ -54,10 +56,9 @@
       </div>
     </el-card>
 
-
     <el-dialog
       v-model="data.dialog"
-      :title="data.type === 1 ? '新增留言' : '编辑留言'"
+      :title="data.type === 1 ? '新增文章' : '编辑文章'"
       width="500px"
       align-center
       destroy-on-close
@@ -66,15 +67,31 @@
         :model="data.target"
         label-width="80px"
       >
-        <el-form-item label="留言内容" prop="message">
-          <el-input
-            v-model="data.target.message"
-            type="textarea"
-            :rows="4"
-            placeholder="请输入留言内容"
-            maxlength="200"
-            show-word-limit
-          />
+        <el-form-item label="标题" prop="title">
+          <el-input v-model="data.target.title" placeholder="请输入文章标题" />
+        </el-form-item>
+        <el-form-item label="简介" prop="label">
+          <el-input v-model="data.target.label" placeholder="请输入文章简介" />
+        </el-form-item>
+        <el-form-item label="分类" prop="categoryId">
+          <el-select v-model="data.target.categoryId" placeholder="请选择分类">
+            <el-option
+              v-for="category in data.categories"
+              :key="category.categoryId"
+              :label="category.categoryName"
+              :value="category.categoryId"
+            />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="标签" prop="tags">
+          <el-select v-model="data.target.tags" multiple placeholder="请选择标签">
+            <el-option
+              v-for="tag in data.tags"
+              :key="tag.tagId"
+              :label="tag.tagName"
+              :value="tag.tagId"
+            />
+          </el-select>
         </el-form-item>
       </el-form>
       <template #footer>
@@ -95,16 +112,16 @@ import { getCurrentInstance, onMounted, reactive } from "vue";
 import { Plus, Delete, Edit } from '@element-plus/icons-vue'
 
 const { proxy } = getCurrentInstance()
-const pageSize = 12
+const pageSize = 8
 var data = reactive({
-  messages: [],
   target: {},
   select: [],
   list: [],
   type: 1,
   dialog: false,
   currentPage: 1,
-  total: 0,
+  categories: [],
+  tags: [],
   meta: {
     total: 0,
     page: 1,
@@ -121,12 +138,12 @@ function edit(row) {
 
 async function del(row) {
   try {
-    await ElMessageBox.confirm('确认删除该留言?', '警告', {
+    await ElMessageBox.confirm('确认删除该文章?', '警告', {
       type: 'warning'
     })
-    await proxy.$http.post('/message/delete', { messageId: row ? row.messageId : data.select.map(item => item.messageId) })
+    await proxy.$http.post('/article/delete', { articleId: row ? row.articleId : data.select.map(item => item.articleId) })
     ElMessage.success('删除成功')
-    fetchMessages()
+    fetchArticles()
   } catch (error) {
     if (error !== 'cancel') ElMessage.error('删除失败')
   }
@@ -138,24 +155,24 @@ function select(val) {
 
 async function handleCurrentChange(val) {
   data.currentPage = val
-  fetchMessages()
+  fetchArticles()
 }
 
 async function add() {
   try {
-    const url = data.type === 1 ? '/message/add' : '/message/update'
-    await proxy.$http.post(url, { message: data.target })
+    const url = data.type === 1 ? '/article/add' : '/article/update'
+    await proxy.$http.post(url, data.target)
     ElMessage.success(data.type === 1 ? '添加成功' : '更新成功')
     data.dialog = false
-    fetchMessages()
+    fetchArticles()
   } catch (error) {
     ElMessage.error(data.type === 1 ? '添加失败' : '更新失败')
   }
 }
 
-async function fetchMessages() {
+async function fetchArticles() {
   try {
-    const res = await proxy.$http.get('/message/page', {
+    const res = await proxy.$http.get('/article/page', {
       params: {
         page: data.currentPage,
         pageSize: pageSize
@@ -163,14 +180,33 @@ async function fetchMessages() {
     })
     data.list = res.data.items
     data.meta = res.data.meta
-    data.total = res.data.meta.total
   } catch (error) {
-    ElMessage.error('获取留言列表失败')
+    ElMessage.error('获取文章列表失败')
+  }
+}
+
+async function fetchCategories() {
+  try {
+    const res = await proxy.$http.get('/category')
+    data.categories = res.data
+  } catch (error) {
+    ElMessage.error('获取分类列表失败')
+  }
+}
+
+async function fetchTags() {
+  try {
+    const res = await proxy.$http.get('/tag')
+    data.tags = res.data
+  } catch (error) {
+    ElMessage.error('获取标签列表失败')
   }
 }
 
 onMounted(() => {
-  fetchMessages()
+  fetchArticles()
+  fetchCategories()
+  fetchTags()
 })
 </script>
 
@@ -297,24 +333,6 @@ onMounted(() => {
 }
 
 .action-buttons .icon {
-  font-size: 14px;
-}
-
-.message-content {
-  padding: 8px 0;
-  font-size: 14px;
-  line-height: 1.5;
-  color: #333;
-}
-
-.commenter-info {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.commenter-name {
-  color: #333;
   font-size: 14px;
 }
 </style>

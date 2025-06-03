@@ -48,16 +48,21 @@ axios.interceptors.response.use(
                     ElMessage.warning('请重新登录')
                 }else{
                     ElMessage.warning('请登录')
-                }
-                if(router.currentRoute.value.fullPath == '/user'){
-                    return router.go(0)
-                }else {
                     return router.replace({ //跳转到登录页面
                         path: '/user',
                         // 将跳转的路由path作为参数，登录成功后跳转到该路由
                         query: {redirect: router.currentRoute.value.fullPath}
                     });
                 }
+                // if(router.currentRoute.value.fullPath == '/user'){
+                //     return router.go(0)
+                // }else {
+                    // return router.replace({ //跳转到登录页面
+                    //     path: '/user',
+                    //     // 将跳转的路由path作为参数，登录成功后跳转到该路由
+                    //     query: {redirect: router.currentRoute.value.fullPath}
+                    // });
+                // }
             default:
                 break;
         }

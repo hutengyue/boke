@@ -92,13 +92,14 @@ function login(){
         email:data.logEmail,
         password:data.logPsd
     }).then(res => {
-      if(Object.hasOwn(res.data, "token")){
+      if(Object.hasOwn(res.data, "token")){        
         store.setIdentity(res.data.identity)
         store.setHeadImg(res.data.headImg)
         store.setToken(res.data.token)
         store.setUsername(res.data.username)
         addAdminRoutes()
-        router.push('/')
+        const redirect = router.currentRoute.value.query.redirect || '/'
+        router.push(redirect)
       }else {
         return ElMessage({
           message: res.data.msg,

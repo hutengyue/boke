@@ -444,7 +444,7 @@ function fire(){
     ElMessage.error('发言为空')
   }else {
     proxy.$http.post("/message/send", {content:data.text}).then(res=>{
-      console.log(res.data)
+      // console.log(res.data)
       const newMessage = {
         avatar: res.data.headImg,
         text: res.data.content,

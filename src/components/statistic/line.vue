@@ -33,7 +33,7 @@ onMounted(()=>{
       numberList.push(0)
     }
   }
-  console.log(ipList,numberList)
+  // console.log(ipList,numberList)
   const option = {
     tooltip: {
       trigger: 'axis',

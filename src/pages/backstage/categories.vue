@@ -149,6 +149,7 @@ async function fetchCategorys() {
         pageSize: pageSize
       }
     })
+
     console.log(res.data)
     data.list = res.data.items
     data.meta = res.data.meta

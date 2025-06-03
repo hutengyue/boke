@@ -76,7 +76,7 @@ async function gotoArticle(id){
 }
 
 function fetchCategoryData(categoryId) {
-  proxy.$http.get(`/category/${categoryId}`).then((res) => {
+  proxy.$http.post(`/category`,categoryId).then((res) => {
     data.categoryId = res.data.categoryId
     data.categoryName = res.data.categoryName
     data.createAt = res.data.createAt
