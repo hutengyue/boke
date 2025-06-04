@@ -121,10 +121,10 @@ import Header from "../components/header.vue";
 import {getCurrentInstance, ref,isRef,reactive} from "vue";
 const {proxy} = getCurrentInstance()
 var game = [
-  {text:'摩尔勇士',image:proxy.$utils.getAssetsImg('about/moer.jpg'),icon:proxy.$utils.getAssetsImg('about/moer1.png')},
-  {text:'赛尔号',image:proxy.$utils.getAssetsImg('about/saier.png'),icon:proxy.$utils.getAssetsImg('about/saier1.png')},
-  {text:'300英雄',image:proxy.$utils.getAssetsImg('about/300.png'),icon:proxy.$utils.getAssetsImg('about/3001.png')},
-  {text:'永劫无间',image:proxy.$utils.getAssetsImg('about/yjwj.png'),icon:proxy.$utils.getAssetsImg('about/yjwj1.png')},
+  {text:'摩尔勇士',image:proxy.$utils.getAssetsImg('about/moer.jpeg'),icon:proxy.$utils.getAssetsImg('about/moer1.png')},
+  {text:'赛尔号',image:proxy.$utils.getAssetsImg('about/saier.jpeg'),icon:proxy.$utils.getAssetsImg('about/saier1.png')},
+  {text:'300英雄',image:proxy.$utils.getAssetsImg('about/300.jpg'),icon:proxy.$utils.getAssetsImg('about/3001.png')},
+  {text:'永劫无间',image:proxy.$utils.getAssetsImg('about/yjwj.png'),icon:proxy.$utils.getAssetsImg('about/yjwj1.webp')},
   {text:'崩坏3',image:proxy.$utils.getAssetsImg('about/benghuai.png'),icon:proxy.$utils.getAssetsImg('about/benghuai1.png')},
   {text:'原神',image:proxy.$utils.getAssetsImg('about/yuanshen.png'),icon:proxy.$utils.getAssetsImg('about/yuanshen1.png')},
 ]
@@ -169,6 +169,7 @@ function change(index){
   align-items: center;
   flex-direction: column;
   width: 100%;
+  padding: 20px;
   font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
   background-color: #f8f8fa;
 }
