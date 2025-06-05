@@ -54,7 +54,7 @@ const routes = [
     {
         path: '/openIM',
         name: 'openIM',
-        component:()=>import("../pages/openim.vue")
+        component:()=>import("../pages/openIM.vue")
     },
     {
         path: '/*',
