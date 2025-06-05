@@ -17,14 +17,6 @@ const routes = [
         component:()=>import("../pages/category.vue")
     },
     {
-        path: '/chat',
-        name:'chat',
-        component:()=>import("../pages/chat.vue"),
-        meta: {
-            requireAuth: true,
-        }
-    },
-    {
         name:'user',
         path: '/user',
         component:()=>import("../pages/user.vue")
