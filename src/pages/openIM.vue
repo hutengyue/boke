@@ -7,7 +7,6 @@ import {io} from 'socket.io-client'
 import {ElMessage} from "element-plus";
 import useStore from "../store/index.js";
 import {useRouter} from "vue-router";
-import global from "../util/global.js";
 
 const {proxy} = getCurrentInstance()
 //背景
@@ -113,7 +112,7 @@ const sendMessage = () => {
       toId: currentChat.id,
       message: messageInput.value
     }
-    console.log(data)
+    // console.log(data)
     ws.emit('privateMessage', data)
   }
   messageInput.value = ''
@@ -201,7 +200,7 @@ const handleKeyPress = (e) => {
 
 function initWebSocket(){
   if(window.WebSocket){
-    ws = io(`ws://${global.websocketUrl}`)
+    ws = io(`ws://${import.meta.env.VITE_WEBSOCKET_URL}`)
     ws.emit('connection',{userId:userId.value})
 
     ws.on('connection',async(data)=>{

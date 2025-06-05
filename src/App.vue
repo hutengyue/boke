@@ -11,6 +11,7 @@ const router = useRouter()
 const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 
 onMounted(()=>{
+
   window.addEventListener('storage', (e) => {
     localStorage.setItem(e.key, e.oldValue);
   });
