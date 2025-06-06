@@ -64,8 +64,9 @@ const routes = [
     
 ]
 
+const isProd = import.meta.env.MODE === 'production'
 const router = createRouter({
-    history:createWebHashHistory(),
+    history: isProd ? createWebHistory() : createWebHashHistory(),
     routes
 })
 router.beforeEach((to, from, next) => {
