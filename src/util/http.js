@@ -3,7 +3,7 @@ import useStore from "../store";
 import router from "../router/index.js";
 import {ElMessage} from "element-plus";
 
-axios.defaults.baseURL = `http://${import.meta.env.VITE_API_BASE_URL}`
+axios.defaults.baseURL = `${import.meta.env.VITE_API_BASE_URL}`
 axios.defaults.headers.common['Authorization'] = ''
 
 axios.interceptors.request.use(
