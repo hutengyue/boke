@@ -164,6 +164,16 @@ function change(index){
     transform: translateY(0);
   }
 }
+@media screen and (max-width: 768px) {
+  *{
+    font-size:50%
+  }
+}
+@media screen and (max-width: 480px) {
+  *{
+    font-size:10%
+  }
+}
 .all{
   display: flex;
   align-items: center;
@@ -284,8 +294,8 @@ function change(index){
 }
 .skill{
   margin-top: 30px;
-  width: 55%;
-  min-width: 600px;
+  max-width: 600px;
+  width: 100%;
 }
 .skill li{
   list-style: none;

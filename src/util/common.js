@@ -34,23 +34,47 @@ export default {
         }
     },
     browserType() {
-        var ua = navigator.userAgent.toLocaleLowerCase();
-        if (ua.indexOf('green') > -1) return '绿色浏览器';
-        if (ua.indexOf('qq') > -1) return 'QQ浏览器';
-        if (ua.indexOf('bidu') > -1) return '百度浏览器';
-        if (ua.indexOf('lb') > -1) return '猎豹浏览器';
-        if (ua.indexOf('world') > -1) return '世界之窗浏览器';
-        if (ua.indexOf('2345') > -1) return '2345浏览器';
-        if (ua.indexOf('maxthon') > -1) return '傲游浏览器';
-        if (ua.indexOf('tao') > -1) return '淘宝浏览器';
-        if (ua.indexOf('ubrowser') > -1) return 'UC浏览器';
-        if (ua.indexOf('coolnovo') > -1) return '枫叶浏览器';
-        if (ua.indexOf('opr') > -1) return 'opera浏览器';
-        if (ua.indexOf('se') > -1) return '搜狗浏览器';
-        if (ua.indexOf('firefox') > -1) return 'firefox浏览器';
-        if (ua.indexOf('safari') > -1 && ua.indexOf("version") > -1) return ('safari浏览器');
-        if (window.navigator.mimeTypes[40] || !window.navigator.mimeTypes.length) return '360浏览器';
-        if (ua.indexOf("chrome") > -1 && window.chrome) return ('chrome浏览器');
-        return '未记录浏览器';
+        const ua = navigator.userAgent.toLowerCase();
+    
+        if (ua.includes('micromessenger')) return '微信浏览器';
+        if (ua.includes('alipayclient')) return '支付宝浏览器';
+        if (ua.includes('dingtalk')) return '钉钉浏览器';
+    
+        if (ua.includes('qqbrowser')) return 'QQ浏览器';
+        if (ua.includes('2345explorer')) return '2345浏览器';
+        if (ua.includes('metasr') || ua.includes('sogou')) return '搜狗浏览器';
+        if (ua.includes('maxthon')) return '傲游浏览器';
+        if (ua.includes('taobrowser')) return '淘宝浏览器';
+        if (ua.includes('ubrowser')) return 'UC浏览器';
+        if (ua.includes('bidubrowser')) return '百度浏览器';
+        if (ua.includes('lbbrowser')) return '猎豹浏览器';
+        if (ua.includes('theworld')) return '世界之窗浏览器';
+        if (ua.includes('coolnovo')) return '枫叶浏览器';
+        if (ua.includes('greenbrowser')) return '绿色浏览器';
+        if (ua.includes('opera') || ua.includes('opr')) return 'Opera浏览器';
+        if (ua.includes('safari') && !ua.includes('chrome') && !ua.includes('chromium')) {
+            return 'Safari浏览器';
+        }
+    
+        const is360 = () => {
+            const mimeTypes = navigator.mimeTypes;
+            for (let mt in mimeTypes) {
+                if (/360se|360chrome/.test(mimeTypes[mt].type)) {
+                    return true;
+                }
+            }
+            if (typeof window.chrome !== 'undefined') {
+                if (navigator.plugins.length > 0) {
+                    const plugin = navigator.plugins[navigator.plugins.length - 1].name;
+                    if (plugin.includes('360') || plugin.includes('Qihu')) return true;
+                }
+            }
+            return false;
+        };
+        if (is360()) return '360浏览器';
+        if (ua.includes('chrome')) return 'Chrome浏览器';
+        if (ua.includes('firefox')) return 'Firefox浏览器';
+    
+        return '未知浏览器';
     }
 }

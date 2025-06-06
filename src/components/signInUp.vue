@@ -62,8 +62,8 @@ function register(){
   if(!re.test(data.regPsd)){
     return ElMessage.warning("密码只能是数字和字母")
   }
-  if(data.regName == '' || data.regPsd == ''){
-    return ElMessage.warning("用户名或密码为空")
+  if(data.regName == '' || data.regPsd == '' || data.email == ''){
+    return ElMessage.warning("请填写完整信息")
   }else{
     proxy.$http.post('/auth/register',{
       regCode:data.regCode,
@@ -75,8 +75,11 @@ function register(){
     }).then(res=>{
       if(res.data.type != "error"){
         data.logEmail = data.email
+        data.logPsd = data.regPsd
         data.email = '';data.regName='';data.regPsd='';data.regCode='';
+        data.logCode = data.text
         data.active = false
+        login()
       }
     })
   }
@@ -154,7 +157,7 @@ function checkMobile() {
           <p v-show="data.code" @click="reqEmail()">获取验证码</p>
 
           <p v-show="!data.code">{{data.count}}</p>
-          <button @click="register()" class="btn">注 册</button>
+          <button @click="register()" class="btn">自动登录</button>
         </div>
       </div>
 

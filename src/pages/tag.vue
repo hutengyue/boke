@@ -68,7 +68,7 @@ onMounted(()=>{
       }
     })
     TagCloud('.tagcloud', a.map(item => item.name), {
-      radius: 250,
+      radius: 200,
       maxSpeed: 'fast',
       initSpeed: 'fast',
       direction: 135,

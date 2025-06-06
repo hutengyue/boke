@@ -5,6 +5,10 @@ import useStore from "../store/index.js";
 const {proxy} = getCurrentInstance()
 const router = useRouter()
 const store = useStore()
+let scrollTimeout = null;
+let isScrollingDown = false;
+let lastScrollY = window.pageYOffset;
+
 
 // let props = defineProps({
 //   active:Boolean
@@ -14,38 +18,67 @@ let lastScrollPosition = ref(window.pageYOffset)
 let display = ref('1')
 let category = ref([])
 
+const isMenuOpen = ref(false)
+const isCategoryDropdownOpen = ref(false); // 新增：控制分类下拉菜单
+
+function toggleMenu() {
+  isMenuOpen.value = !isMenuOpen.value;
+  if (!isMenuOpen.value) {
+    // 如果主菜单关闭，也关闭分类下拉
+    isCategoryDropdownOpen.value = false;
+  }
+}
+
+function toggleCategoryDropdown(event) {
+  // 只在移动端（主菜单激活时）通过点击切换分类下拉
+  if (isMenuOpen.value) {
+    event.stopPropagation(); // 防止冒泡关闭主菜单或触发其他父级事件
+    isCategoryDropdownOpen.value = !isCategoryDropdownOpen.value;
+  }
+  // PC端依赖CSS hover，此处不作处理
+}
+
+// 关闭所有菜单
+function closeAllMenus() {
+  isMenuOpen.value = false;
+  isCategoryDropdownOpen.value = false;
+}
+
 function gotoHome(){
   router.push('/')
+  closeAllMenus();
 }
 function gotoChat(){
   router.push('/openIM')
+  closeAllMenus();
 }
 function gotoMessage(){
   router.push('/message')
+  closeAllMenus();
 }
 function gotoUser(){
   router.push('/user')
+  closeAllMenus();
 }
 function gotoCount(){
   router.push('/log')
+  closeAllMenus();
 }
 function gotoVisit(){
   router.push('/visit')
+  closeAllMenus();
 }
 function gotoAbout(){
   router.push('/about')
+  closeAllMenus();
 }
 function gotoTag(){
   router.push('/tag')
+  closeAllMenus();
 }
 function gotoCategory(categoryId){
   router.push(`/category?id=${categoryId}`)
-}
-
-const isMenuOpen = ref(false)
-
-function toggleMenu() {
-  isMenuOpen.value = !isMenuOpen.value
+  closeAllMenus(); // 点击具体分类项后，主菜单和分类下拉都关闭
 }
 
 const navFunctions = [gotoHome, gotoChat, gotoMessage, gotoTag, gotoCount, gotoVisit, gotoAbout]
@@ -59,14 +92,25 @@ navFunctions.forEach(func => {
 
 onMounted(()=>{
   window.addEventListener('scroll', () => {
-    const pageY = window.pageYOffset// 滚动条距离顶部的长度
-    if (lastScrollPosition.value < pageY) {
-      display.value = '0'
-    } else {
-      display.value = '1'
+    const currentScrollY = window.pageYOffset;
+    isScrollingDown = currentScrollY > lastScrollY;
+    if (isScrollingDown) {
+      display.value = '0';
     }
-    lastScrollPosition.value = pageY
-  },true)
+
+    clearTimeout(scrollTimeout);
+
+    scrollTimeout = setTimeout(() => {
+      const newScrollY = window.pageYOffset;
+      if (newScrollY <= lastScrollY) {
+        display.value = '1';
+      }
+
+      lastScrollY = newScrollY;
+    }, 100);
+  });
+
+
   headImg.value = store.getHeadImg
   proxy.$bus.on('headImg',()=>{
     headImg.value = store.getHeadImg
@@ -99,13 +143,13 @@ onBeforeUnmount(()=>{
           </svg>
           <span>首页</span>
         </li>
-        <li class="category-dropdown">
+        <li class="category-dropdown" @click="toggleCategoryDropdown">
           <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"/>
           </svg>
           <span>分类</span>
-          <ul class="dropdown-menu">
-            <li v-for="item in category" :key="item.categoryId" @click="gotoCategory(item.categoryId)">
+          <ul class="dropdown-menu" :class="{ 'active': isCategoryDropdownOpen }">
+            <li v-for="item in category" :key="item.categoryId" @click.stop="gotoCategory(item.categoryId)">
               {{ item.categoryName }}
             </li>
           </ul>
@@ -244,14 +288,24 @@ onBeforeUnmount(()=>{
 }
 
 .category-dropdown:hover .dropdown-menu {
-  display: block;
-  opacity: 1;
-  transform: translateY(0);
-  pointer-events: auto;
+  /* PC端hover效果，确保只在非移动端菜单激活时生效 */
+  /* 通过媒体查询来更精确控制 */
+}
+
+@media (min-width: 769px) {
+  .category-dropdown .dropdown-menu {
+    display: none; /* PC端默认隐藏，由hover控制 */
+  }
+  .category-dropdown:hover .dropdown-menu {
+    display: block;
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+  }
 }
 
 .dropdown-menu {
-  display: none;
+  display: none; /* 默认隐藏 */
   position: absolute;
   top: calc(100% + 2px);
   left: -50%;
@@ -265,6 +319,14 @@ onBeforeUnmount(()=>{
   transition: all 0.2s ease-out;
   z-index: 1000;
   pointer-events: none;
+}
+
+.dropdown-menu.active {
+  /* 这个.active主要给移动端用，确保能显示 */
+  display: block !important; 
+  opacity: 1 !important;
+  transform: translateY(0) !important;
+  pointer-events: auto !important;
 }
 
 .dropdown-menu li {
