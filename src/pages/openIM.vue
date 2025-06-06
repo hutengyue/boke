@@ -200,7 +200,7 @@ const handleKeyPress = (e) => {
 
 function initWebSocket(){
   if(window.WebSocket){
-    ws = io(`ws://${import.meta.env.VITE_WEBSOCKET_URL}`)
+    ws = io(`${import.meta.env.VITE_WEBSOCKET_URL}`)
     ws.emit('connection',{userId:userId.value})
 
     ws.on('connection',async(data)=>{
