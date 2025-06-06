@@ -1,4 +1,4 @@
-import {createRouter,createWebHashHistory} from 'vue-router'
+import {createRouter,createWebHashHistory,createWebHistory} from 'vue-router'
 import storage from "../util/storage.js";
 import useStore from "../store";
 import NProgress from 'nprogress'
