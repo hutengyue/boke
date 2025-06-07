@@ -224,4 +224,22 @@ onMounted(()=>{
   cursor: pointer;
   text-align: center;
 }
+@media screen and (max-width: 480px) {
+  .zhu{
+   height: 50vh;
+  }
+  .zhu h1{
+   font-size: 30px;
+  }
+  .zhu p{
+    font-size:15px;
+  }
+  .zhu span{
+   font-size: 15px;
+  }
+  .zhu-bottom{
+   width: 30px;
+   height: 30px;
+  }
+}
 </style>

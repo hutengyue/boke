@@ -55,7 +55,7 @@ onMounted(()=>{
             <p>{{data.number[0]}}</p>
           </div>
           <div class="user-card-item">
-            <p>标签</p>
+            <p>分类</p>
             <p>{{data.number[1]}}</p>
           </div>
           <div class="user-card-item">
@@ -141,15 +141,18 @@ onMounted(()=>{
 }
 .container{
   width: 100%;
-  background-image: linear-gradient(90deg,rgba(37,82,110,.1) 1px,#fff 0),
+  background-image: 
+    radial-gradient(circle at 50% 0%, rgba(255, 255, 255, 0.8) 0%, transparent 70%),
+    linear-gradient(90deg,rgba(37,82,110,.1) 1px,#fff 0),
     linear-gradient(180deg,rgba(37,82,110,.1) 1px,#fff 0);
-  background-size: 3rem 3rem;
+  background-size: 100% 100%, 3rem 3rem, 3rem 3rem;
+  background-position: center top, 0 0, 0 0;
   backdrop-filter: blur(20px);
   display: flex;
   flex-direction: row;
   justify-content: center;
   min-height: 100vh;
-  padding: 30px;
+  padding: 20px;
 }
 .aside{
   width: 30%;
@@ -157,10 +160,10 @@ onMounted(()=>{
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 0 0px 10px 5px;
+  padding: 0 0px 10px 0;
   margin-right: 50px;
   position: sticky; 
-  top: 10px;
+  top: 20px;
   align-self: flex-start; 
   height: fit-content; 
 }
@@ -256,7 +259,7 @@ onMounted(()=>{
 .aside-notice{
   margin-top: 20px;
   width: 100%;
-  height: 150px;
+  height: 130px;
   border-radius: 20px;
   background: url("../assets/image/notice.jpg") no-repeat;
   background-size: 100% 100%;
@@ -413,7 +416,7 @@ onMounted(()=>{
 @media screen and (max-width: 768px) {
   .container {
     flex-direction: column;
-    padding: 15px 15px 30px 15px;
+    padding: 20px 20px 30px 20px;
   }
 
   .aside {
@@ -490,8 +493,44 @@ onMounted(()=>{
 
 /* 小屏幕手机适配 */
 @media screen and (max-width: 480px) {
+
+  .aside-user{
+    height: 250px;
+    padding: 10px;
+  }
+  .user-img{
+    width: 50px;
+    height: 50px;
+    border-radius: 15px;
+  }
+  .user-name{
+    font-size: 18px;
+  }
+  .user-description{
+    font-size: 13px;
+  }
+  .user-card{
+    font-size: 10px;
+    width: 50%;
+  }
+  .user-pyq{
+    font-size: 15px;
+    padding: 5px;
+  }
+  .user-link{
+    width: 50%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    align-items: center;
+  }
+  .user-link a{
+    width: 25px;
+    height: 25px;
+  }
+
   .container {
-    padding: 10px 10px 30px 10px;
+    padding: 20px 20px 30px 20px;
   }
 
   .article-message-header {
@@ -508,13 +547,6 @@ onMounted(()=>{
     font-size: 12px;
   }
 
-  .user-name {
-    font-size: 20px;
-  }
-
-  .user-description {
-    font-size: 14px;
-  }
 
   .aside-notice p {
     font-size: 20px;

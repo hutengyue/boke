@@ -14,7 +14,6 @@ let lastScrollY = window.pageYOffset;
 //   active:Boolean
 // })
 var headImg = ref('')
-let lastScrollPosition = ref(window.pageYOffset)
 let display = ref('1')
 let category = ref([])
 
@@ -127,11 +126,13 @@ onBeforeUnmount(()=>{
 </script>
 
 <template>
+  <div @click="isMenuOpen = false" style="position: fixed;background-color: rgba(0, 0, 0, 0.5);
+    width: 100vw;height: 100vh;top: 0;left: 0; z-index: 1000;animation: all .3s;" v-if="isMenuOpen"></div>
   <div class="content" :style="{'opacity':display}">
     <h1>Cavalry</h1>
     <div class="content-background"></div>
     <div class="content-menu">
-      <div class="menu-toggle" :class="{ 'active': isMenuOpen }" @click="toggleMenu">
+      <div class="menu-toggle" @click="toggleMenu">
         <span></span>
         <span></span>
         <span></span>
@@ -417,7 +418,6 @@ onBeforeUnmount(()=>{
   .menu-toggle {
     display: flex;
     margin-right: 5px;
-    z-index: 100;
   }
 
   .menu-toggle span {
@@ -447,6 +447,9 @@ onBeforeUnmount(()=>{
   .content-menu ul.menu-active {
     right: 0;
     visibility: visible;
+    border-radius: 20px 0 0 20px;
+    width: 40%;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
   }
 
   .content-menu li {
@@ -467,6 +470,7 @@ onBeforeUnmount(()=>{
     transform: translateX(0);
     opacity: 1;
     transition-delay: 0.2s;
+    justify-content: center;
   }
 
   .content-menu li:hover {
@@ -523,17 +527,6 @@ onBeforeUnmount(()=>{
     transform: translateY(6px);
   }
 
-  .menu-toggle.active span:nth-child(1) {
-    transform: rotate(45deg);
-  }
-
-  .menu-toggle.active span:nth-child(2) {
-    opacity: 0;
-  }
-
-  .menu-toggle.active span:nth-child(3) {
-    transform: rotate(-45deg);
-  }
 }
 
 @media (max-width: 360px) {
