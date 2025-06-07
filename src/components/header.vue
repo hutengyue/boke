@@ -240,7 +240,7 @@ onBeforeUnmount(()=>{
   align-items: center;
 }
 
-.content-menu ul {
+.content-menu > ul {
   display: flex;
   align-items: center;
   gap: 10px;
@@ -425,7 +425,7 @@ onBeforeUnmount(()=>{
     box-shadow: none;
   }
 
-  .content-menu ul {
+  .content-menu > ul {
     position: fixed;
     top: 0;
     right: -80%;
@@ -444,11 +444,11 @@ onBeforeUnmount(()=>{
     
   }
 
-  .content-menu ul.menu-active {
+  .content-menu > ul.menu-active {
     right: 0;
     visibility: visible;
     border-radius: 20px 0 0 20px;
-    width: 40%;
+    width: 60%;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
   }
 

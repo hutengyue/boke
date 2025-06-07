@@ -142,11 +142,11 @@ function checkMobile() {
 
 <template>
   <div class="reg">
-    <div class="mobile-switch" v-show="isMobile">
-      <button :class="{ active: !data.active }" @click="data.active = false">登录</button>
-      <button :class="{ active: data.active }" @click="data.active = true">注册</button>
-    </div>
     <div :class="['container',{'right-panel-active':data.active == true}]">
+      <div class="mobile-switch" v-show="isMobile">
+        <button :class="{ active: !data.active }" @click="data.active = false">登录</button>
+        <button :class="{ active: data.active }" @click="data.active = true">注册</button>
+      </div>
       <div class="container__form container--signup">
         <div class="form" id="form1">
           <h2 class="form__title">注 册</h2>
@@ -448,6 +448,9 @@ function checkMobile() {
     box-shadow: none;
     background: transparent;
     overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
   }
 
   .container__form {
@@ -496,16 +499,14 @@ function checkMobile() {
   }
 
   .mobile-switch {
-    position: fixed;
-    top: 60px;
-    left: 50%;
-    transform: translateX(-50%);
+    position: relative;
     display: flex;
     gap: 8px;
     background: rgba(255, 255, 255, 0.9);
     backdrop-filter: blur(20px);
     padding: 4px;
     border-radius: 16px;
+    margin-top: 70px;
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
     width: 85%;
     max-width: 300px;

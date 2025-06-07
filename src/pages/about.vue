@@ -164,16 +164,6 @@ function change(index){
     transform: translateY(0);
   }
 }
-@media screen and (max-width: 768px) {
-  *{
-    font-size:50%
-  }
-}
-@media screen and (max-width: 480px) {
-  *{
-    font-size:10%
-  }
-}
 .all{
   display: flex;
   align-items: center;
@@ -541,5 +531,12 @@ function change(index){
 .introduce p{
   margin-top: 20px;
   font-size: 16px;
+}
+
+@media screen and (max-width: 768px) {
+
+}
+@media screen and (max-width: 480px) {
+
 }
 </style>

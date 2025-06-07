@@ -89,7 +89,13 @@ onMounted(()=>{
   const depthTexture = textureLoader.load(new URL('../assets/image/home/shader2.png',import.meta.url).href)
 
 // 创建屏幕
-  const geomery = new THREE.PlaneGeometry(19.2,10.8)
+  const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+  let geomery
+  if(isMobile){
+    geomery = new THREE.PlaneGeometry(9.6,5.4)
+  }else{
+    geomery = new THREE.PlaneGeometry(19.2,10.8)
+  }
 // 创建鼠标对象
   const mouse = new THREE.Vector2()
 // 设置着色器材质
