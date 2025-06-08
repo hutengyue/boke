@@ -2,13 +2,14 @@
 import {getCurrentInstance,ref,onMounted,onBeforeUnmount} from "vue";
 import {useRouter} from 'vue-router';
 import useStore from "../store/index.js";
+import MobileMenu from './MobileMenu.vue';
+
 const {proxy} = getCurrentInstance()
 const router = useRouter()
 const store = useStore()
 let scrollTimeout = null;
 let isScrollingDown = false;
 let lastScrollY = window.pageYOffset;
-
 
 // let props = defineProps({
 //   active:Boolean
@@ -129,31 +130,29 @@ onBeforeUnmount(()=>{
   <div @click="isMenuOpen = false" style="position: fixed;background-color: rgba(0, 0, 0, 0.5);
     width: 100vw;height: 100vh;top: 0;left: 0; z-index: 1000;animation: all .3s;" v-if="isMenuOpen"></div>
   <div class="content" :style="{'opacity':display}">
-    <h1>Cavalry</h1>
+    <h1 @click="gotoHome">Cavalry</h1>
     <div class="content-background"></div>
     <div class="content-menu">
-      <div class="menu-toggle" @click="toggleMenu">
-        <span></span>
-        <span></span>
-        <span></span>
-      </div>
-      <ul :class="{ 'menu-active': isMenuOpen }">
+      <!-- PC端菜单 -->
+      <ul class="pc-menu">
         <li @click="gotoHome()">
           <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
           </svg>
           <span>首页</span>
         </li>
-        <li class="category-dropdown" @click="toggleCategoryDropdown">
+        <li class="category-dropdown">
           <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"/>
           </svg>
           <span>分类</span>
-          <ul class="dropdown-menu" :class="{ 'active': isCategoryDropdownOpen }">
-            <li v-for="item in category" :key="item.categoryId" @click.stop="gotoCategory(item.categoryId)">
-              {{ item.categoryName }}
-            </li>
-          </ul>
+          <div class="dropdown-menu">
+            <div class="category-grid">
+              <li v-for="item in category" :key="item.categoryId" @click.stop="gotoCategory(item.categoryId)">
+                {{ item.categoryName }}
+              </li>
+            </div>
+          </div>
         </li>
         <li @click="gotoTag()">
           <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
@@ -192,9 +191,23 @@ onBeforeUnmount(()=>{
           <span>关于</span>
         </li>
       </ul>
-      <img class="content-head" @click="gotoUser" :src="headImg || proxy.$utils.getAssetsImg('Tom.jpg')">
+      <!-- 移动端菜单按钮 -->
+      <div class="mobile-controls">
+        <div class="menu-toggle" @click="toggleMenu">
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+        <img class="content-head" @click="gotoUser" :src="headImg || proxy.$utils.getAssetsImg('Tom.jpg')">
+      </div>
     </div>
   </div>
+  <!-- 移动端菜单组件 -->
+  <MobileMenu 
+    v-model:isOpen="isMenuOpen"
+    :category="category"
+    :headImg="headImg"
+  />
 </template>
 
 <style scoped>
@@ -240,134 +253,108 @@ onBeforeUnmount(()=>{
   align-items: center;
 }
 
-.content-menu > ul {
+.pc-menu {
   display: flex;
   align-items: center;
   gap: 10px;
   margin-right: 20px;
 }
 
-.content-menu li {
+.pc-menu li {
   padding: 8px 16px;
   border-radius: 20px;
   font-size: 15px;
-  color: #1d1d1f;  /* 改为深色 */
+  color: #1d1d1f;
   transition: all 0.3s;
   display: flex;
   align-items: center;
   gap: 6px;
-  background: rgba(255, 255, 255, 0.8);  /* 添加半透明背景 */
-  backdrop-filter: blur(8px);  /* 添加模糊效果 */
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);  /* 添加轻微阴影 */
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(8px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  cursor: pointer;
 }
 
-.content-menu li:hover {
+.pc-menu li:hover {
   background: rgba(255, 255, 255, 0.9);
-  transform: translateY(-1px);
+  transform: scale(1.1);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
   color: #0071e3;
-  transform: scale(1.1);
-  text-shadow: none;
 }
 
 .category-dropdown {
   position: relative;
-  display: flex;
-  align-items: center;
-  padding: 8px 16px;
-  border-radius: 20px;
-  background: rgba(255, 255, 255, 0.8);
-  backdrop-filter: blur(8px);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-  transition: all 0.3s;
-}
-
-.category-dropdown:hover {
-  background: rgba(255, 255, 255, 0.9);
-  transform: scale(1.1);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-}
-
-.category-dropdown:hover .dropdown-menu {
-  /* PC端hover效果，确保只在非移动端菜单激活时生效 */
-  /* 通过媒体查询来更精确控制 */
-}
-
-@media (min-width: 769px) {
-  .category-dropdown .dropdown-menu {
-    display: none; /* PC端默认隐藏，由hover控制 */
-  }
-  .category-dropdown:hover .dropdown-menu {
-    display: block;
-    opacity: 1;
-    transform: translateY(0);
-    pointer-events: auto;
-  }
 }
 
 .dropdown-menu {
-  display: none; /* 默认隐藏 */
   position: absolute;
-  top: calc(100% + 2px);
-  left: -50%;
-  min-width: 180px;
-  backdrop-filter: blur(20px);
-  background: rgba(255, 255, 255, 0.4);
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  min-width: 200px;
+  background: rgba(255, 255, 255, 0.98);
   border-radius: 12px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
-  padding: 8px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  padding: 10px;
   opacity: 0;
-  transition: all 0.2s ease-out;
-  z-index: 1000;
-  pointer-events: none;
+  visibility: hidden;
+  transition: all 0.3s ease;
+  z-index: 1001;
 }
 
-.dropdown-menu.active {
-  /* 这个.active主要给移动端用，确保能显示 */
-  display: block !important; 
-  opacity: 1 !important;
-  transform: translateY(0) !important;
-  pointer-events: auto !important;
+.category-dropdown:hover .dropdown-menu {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(5px);
+}
+
+.category-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
 .dropdown-menu li {
-  padding: 10px 16px;
-  margin: 2px 0;
+  width: 100%;
+  padding: 8px 16px;
+  margin: 0;
   font-size: 14px;
   font-weight: 500;
   color: #1d1d1f;
-  cursor: pointer;
-  transition: all 0.2s ease-out;
-  background: white;
+  transition: all 0.2s ease;
+  background: rgba(0, 0, 0, 0.03);
   border-radius: 8px;
-  display: block;
   text-align: center;
 }
 
 .dropdown-menu li:hover {
-  background: rgba(0, 113, 227, 0.08);
+  background: rgba(0, 113, 227, 0.1);
   color: #0071e3;
-  transform: none;
+  transform: translateX(5px);
 }
 
 .icon {
-  font-size: 18px;
   width: 20px;
   height: 20px;
   transition: all 0.3s ease;
   color: #1d1d1f;
 }
 
-.content-menu li:hover .icon {
+.pc-menu li:hover .icon {
   color: #0071e3;
-  transform: scale(1.1);
+}
+
+.mobile-controls {
+  display: none;
+  align-items: center;
+  gap: 10px;
+  margin-right: 10px;
 }
 
 .content-head {
   width: 34px;
   height: 34px;
   border-radius: 50%;
-  margin: 0 20px;
   cursor: pointer;
   transition: all 0.3s;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
@@ -379,26 +366,21 @@ onBeforeUnmount(()=>{
 }
 
 .menu-toggle {
-  display: none;
+  width: 30px;
+  height: 30px;
+  display: flex;
   flex-direction: column;
+  justify-content: center;
   gap: 6px;
-  padding: 10px;
   cursor: pointer;
-  margin-right: 10px;
 }
 
 .menu-toggle span {
   display: block;
   width: 24px;
   height: 2px;
-  background: #fff;
-  transition: all 0.3s;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.content:hover .menu-toggle span {
   background: #1d1d1f;
-  box-shadow: none;
+  transition: all 0.3s;
 }
 
 @media (max-width: 768px) {
@@ -415,131 +397,18 @@ onBeforeUnmount(()=>{
     text-shadow: none;
   }
 
-  .menu-toggle {
+  .pc-menu {
+    display: none;
+  }
+
+  .mobile-controls {
     display: flex;
-    margin-right: 5px;
   }
-
-  .menu-toggle span {
-    background: #1d1d1f;
-    box-shadow: none;
-  }
-
-  .content-menu > ul {
-    position: fixed;
-    top: 0;
-    right: -80%;
-    width: 50%;
-    height: 100vh;
-    backdrop-filter: blur(20px);
-    background: rgba(255, 255, 255, 1);
-    flex-direction: column;
-    padding: 80px 0 20px;
-    margin: 0;
-    gap: 0;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    visibility: hidden;
-    box-shadow: -4px 0 12px rgba(0, 0, 0, 0.1);
-    z-index: 99;
-    
-  }
-
-  .content-menu > ul.menu-active {
-    right: 0;
-    visibility: visible;
-    border-radius: 20px 0 0 20px;
-    width: 60%;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
-  }
-
-  .content-menu li {
-    width: 100%;
-    margin: 0;
-    padding: 15px 20px;
-    border-radius: 0;
-    justify-content: flex-start;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-    background: transparent;
-    box-shadow: none;
-    transform: translateX(20px);
-    opacity: 0;
-    transition: all 0.3s ease;
-  }
-
-  .menu-active li {
-    transform: translateX(0);
-    opacity: 1;
-    transition-delay: 0.2s;
-    justify-content: center;
-  }
-
-  .content-menu li:hover {
-    background: rgba(0, 113, 227, 0.08);
-    transform: translateX(5px);
-    color: #0071e3;
-  }
-
-  .content-menu li:last-child {
-    border-bottom: none;
-  }
-
-  .content-menu li:hover {
-    background: rgba(0, 0, 0, 0.03);
-    transform: none;
-    box-shadow: none;
-  }
-
-  .content-menu li .icon {
-    width: 24px;
-    margin-right: 12px;
-  }
-
-  .content-menu li span {
-    font-size: 16px;
-  }
-
-  .content-head {
-    width: 32px;
-    height: 32px;
-    margin: 0 5px;
-  }
-
-  .menu-toggle {
-    width: 30px;
-    height: 30px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-
-  .menu-toggle span {
-    position: absolute;
-    width: 20px;
-    height: 2px;
-    transition: all 0.3s ease;
-  }
-
-  .menu-toggle span:nth-child(1) {
-    transform: translateY(-6px);
-  }
-
-  .menu-toggle span:nth-child(3) {
-    transform: translateY(6px);
-  }
-
 }
 
 @media (max-width: 360px) {
   .content h1 {
     font-size: 18px;
-  }
-
-  .content-menu li {
-    padding: 12px 15px;
-  }
-
-  .content-menu li span {
-    font-size: 14px;
   }
 }
 </style>

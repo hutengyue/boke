@@ -52,6 +52,11 @@ const routes = [
         component:()=>import("../pages/tag.vue")
     },
     {
+        path: '/tag/:tagId/articles',
+        name: 'tagArticles',
+        component:()=>import("../pages/tagArticles.vue")
+    },
+    {
         path: '/openIM',
         name: 'openIM',
         component:()=>import("../pages/openIM.vue")
