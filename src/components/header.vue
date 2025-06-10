@@ -198,8 +198,9 @@ onBeforeUnmount(()=>{
           <span></span>
           <span></span>
         </div>
-        <img class="content-head" @click="gotoUser" :src="headImg || proxy.$utils.getAssetsImg('Tom.jpg')">
       </div>
+
+      <img class="avatar" @click="gotoUser" :src="headImg || proxy.$utils.getAssetsImg('Tom.jpg')">
     </div>
   </div>
   <!-- 移动端菜单组件 -->
@@ -383,6 +384,14 @@ onBeforeUnmount(()=>{
   transition: all 0.3s;
 }
 
+.avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  cursor: pointer;
+  margin-right: 20px;
+}
+
 @media (max-width: 768px) {
   .content {
     backdrop-filter: blur(20px);
@@ -403,6 +412,10 @@ onBeforeUnmount(()=>{
 
   .mobile-controls {
     display: flex;
+  }
+
+  .avatar{
+    margin-right: 0;
   }
 }
 
