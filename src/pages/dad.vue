@@ -130,8 +130,20 @@
         audioRef.value.play().catch(() => {})
     }
   }
+  function setFavicon(href) {
+  let link = document.querySelector("link[rel~='icon']")
+  if (!link) {
+    link = document.createElement('link')
+    link.rel = 'icon'
+    document.head.appendChild(link)
+  }
+  link.href = href
+  console.log(link.href)
+}
   onMounted(() => {
+    setFavicon('6.jpg') // 或 /dad-favicon.png
     document.title="父亲节快乐"
+
     audioRef.value.play().catch(() => {})
     timer = setInterval(() => {
       time.value = getTimeDiff()
