@@ -15,6 +15,16 @@
         </div>
         <div class="timer-footer">每一秒都值得珍惜</div>
       </div>
+      <div class="dad-music-card" style="display: none;">
+        <div class="music-title">🎵 父亲节特别歌曲</div>
+        <audio
+            ref="audioRef"
+            src="https://file.cavalry.xin/boke/2025/06/02/father.mp3"
+            controls
+            preload="auto"
+            class="music-audio"
+        ></audio>
+      </div>
       <div class="dad-timeline">
         <!-- 1-3 段：常规卡片 -->
         <div class="dad-section fancy-card fade-slide">
@@ -30,7 +40,7 @@
         <div class="dad-section fancy-card fade-slide">
           <div class="card-keyword kw-orange">热血</div>
           <div class="dad-photo-wrapper" style="transform: rotate(3deg);">
-            <img class="dad-photo" src="../assets/dad/2.jpg" v-slide-in alt="热血青春" />
+            <img class="dad-photo" src="../assets/dad/3.jpg" v-slide-in alt="热血青春" />
           </div>
           <div class="dad-section-content">
             <h2>热血青春</h2>
@@ -40,7 +50,7 @@
         <div class="dad-section fancy-card fade-slide">
           <div class="card-keyword kw-green">成长</div>
           <div class="dad-photo-wrapper" style="transform: rotate(-2deg);">
-            <img class="dad-photo" src="../assets/dad/3.jpg" v-slide-in alt="成长路上的你" />
+            <img class="dad-photo" src="../assets/dad/2.jpg" v-slide-in alt="成长路上的你" />
           </div>
           <div class="dad-section-content">
             <h2>成长路上的你</h2>
@@ -50,7 +60,7 @@
         <!-- 4：左右结构+合影标签 -->
         <div class="dad-section dad-section-row fade-slide special-bg">
           <div class="dad-photo-wrapper row-img" style="transform: rotate(2.5deg);">
-            <img class="dad-photo" src="../assets/dad/4.jpg" v-slide-in alt="现在的你" />
+            <img class="dad-photo" src="../assets/dad/6.jpg" v-slide-in alt="现在的你" />
             <span class="img-label"></span>
           </div>
           <div class="dad-section-content row-content">
@@ -74,12 +84,12 @@
           <div class="letter-content">
             <div class="letter-quote">"</div>
             <div class="letter-text">
-              时光流转，感谢你一直在身边。愿未来的日子里，我们都能平安喜乐。
+                您的扶搀相伴，让我健康成长；您的严厉教诲，让我不断进步；您的希望牵挂，让我成才成功；您的支持鼓励，让我不怕风雨。伟大的父亲，谢谢您，祝您父亲节快乐，愿您幸福一生，健康永随！
             </div>
             <div class="letter-quote right">"</div>
           </div>
           <div class="letter-img">
-            <img src="../assets/dad/6.jpg" alt="此刻的你" />
+            <img src="../assets/dad/4.jpg" alt="此刻的你" />
           </div>
         </div>
       </div>
@@ -112,14 +122,33 @@
   }
   const time = ref(getTimeDiff())
   let timer = null
+  const audioRef = ref(null)
+
+
+  function tryPlay() {
+    if (audioRef.value && audioRef.value.paused) {
+        audioRef.value.play().catch(() => {})
+    }
+  }
   onMounted(() => {
+    audioRef.value.play().catch(() => {})
     timer = setInterval(() => {
       time.value = getTimeDiff()
     }, 1000)
-  })
-  onUnmounted(() => {
+    // PC端部分浏览器可直接自动播放
+    tryPlay()
+    // 移动端：首次触摸或点击页面时自动播放
+    window.addEventListener('touchstart', tryPlay, { once: true })
+    window.addEventListener('click', tryPlay, { once: true })
+    })
+
+    onUnmounted(() => {
+    window.removeEventListener('touchstart', tryPlay)
+    window.removeEventListener('click', tryPlay)
     if (timer) clearInterval(timer)
-  })
+
+    })
+
   </script>
   
   <style scoped>
@@ -452,6 +481,29 @@
     color: #f7971e;
     font-weight: bold;
   }
+  .dad-music-card {
+    width: 100%;
+    max-width: 420px;
+    margin: 0 auto 18px auto;
+    background: linear-gradient(90deg, #f8fafc 0%, #e0e7ef 100%);
+    border-radius: 16px;
+    box-shadow: 0 2px 8px 0 rgba(33,147,176,0.08);
+    padding: 10px 12px 8px 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .music-title {
+    font-size: 1rem;
+    color: #2193b0;
+    margin-bottom: 4px;
+    font-weight: 500;
+    letter-spacing: 2px;
+  }
+  .music-audio {
+    width: 100%;
+    outline: none;
+  }
   @media (max-width: 600px) {
     .dad-header h1 {
       font-size: 1.3rem;
@@ -520,6 +572,10 @@
     }
     .timer-numbers {
       font-size: 1.1rem;
+    }
+    .dad-music-card {
+      max-width: 98vw;
+      padding: 8px 4px 6px 4px;
     }
   }
   </style>
