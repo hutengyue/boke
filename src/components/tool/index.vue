@@ -1,6 +1,6 @@
 <template>
   <div class="tool">
-    <music-player></music-player>
+    <!-- <music-player></music-player> -->
     <!-- <scroll-top></scroll-top> -->
   </div>
 </template>
