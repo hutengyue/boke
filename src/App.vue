@@ -17,16 +17,16 @@ onMounted(()=>{
   });
 
   document.title = "cavalry"
-  document.addEventListener("visibilitychange", ()=>{
-    if (document.hidden === true) {
-      document.title = "不要离开我😭"
-    }else{
-      document.title = "欢迎回来😊"
-      setTimeout(()=>{
-        document.title = "cavalry"
-      },3000)
-    }
-  });
+  // document.addEventListener("visibilitychange", ()=>{
+  //   if (document.hidden === true) {
+  //     document.title = "不要离开我😭"
+  //   }else{
+  //     document.title = "欢迎回来😊"
+  //     setTimeout(()=>{
+  //       document.title = "cavalry"
+  //     },3000)
+  //   }
+  // });
 
   document.addEventListener("contextmenu", function (e) {
     e.preventDefault();

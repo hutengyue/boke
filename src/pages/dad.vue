@@ -131,6 +131,7 @@
     }
   }
   onMounted(() => {
+    document.title="父亲节快乐"
     audioRef.value.play().catch(() => {})
     timer = setInterval(() => {
       time.value = getTimeDiff()
