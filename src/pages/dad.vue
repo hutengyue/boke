@@ -141,7 +141,7 @@
   console.log(link.href)
 }
   onMounted(() => {
-    setFavicon('6.jpg') // 或 /dad-favicon.png
+    // setFavicon('6.jpg') // 或 /dad-favicon.png
     document.title="父亲节快乐"
 
     audioRef.value.play().catch(() => {})
