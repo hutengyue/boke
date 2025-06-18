@@ -80,7 +80,7 @@ async function gotoArticle(id){
 }
 
 function fetchCategoryData(categoryId) {
-  proxy.$http.post(`/category`,categoryId).then((res) => {
+  proxy.$http.post(`/category`,{categoryId}).then((res) => {
     data.categoryId = res.data.categoryId
     data.categoryName = res.data.categoryName
     data.createAt = res.data.createAt
@@ -88,11 +88,15 @@ function fetchCategoryData(categoryId) {
   })
 }
 
-watch(() => route.query.id, (newId) => {
-  if (newId) {
-    fetchCategoryData(newId)
-  }
-})
+watch(
+  () => route.query.id,
+  (newId) => {
+    if (newId) {
+      fetchCategoryData(newId)
+    }
+  },
+  { immediate: true, deep: true }
+)
 
 onMounted(async () => {
   const categoryId = route.query.id

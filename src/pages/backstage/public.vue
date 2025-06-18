@@ -306,6 +306,7 @@ onMounted(()=>{
   display: flex;
   flex-direction: column;
   height: 100%;
+  width: 100%;
 }
 
 .write p, .read p {
