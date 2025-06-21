@@ -45,14 +45,25 @@
     </div>
     <div class="message">
       <div class="write">
-        <p>写文章</p>
+        <div class="write-header">
+          <p>写文章</p>
+          <el-button type="primary" @click="previewArticle">预览</el-button>
+        </div>
         <textarea v-model="data.message" class="writeText"></textarea>
       </div>
-      <div class="read">
-        <p>预览</p>
-        <div class="entryContent readText" v-html="data.text" id="content"></div>
-      </div>
     </div>
+
+    <el-dialog
+      v-model="data.previewVisible"
+      title="文章预览"
+      width="80%"
+      top="10"
+      :before-close="handleClose"
+    >
+      <div class="preview-content">
+        <div class="entryContent readText" v-html="data.text"></div>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
@@ -75,7 +86,8 @@ const data = reactive({
   fileInfo:'',
   imageUrl:'',
   tags:[],
-  tagOptions:[]
+  tagOptions:[],
+  previewVisible: false
 })
 
 async function beforeAvatarUpload(file) {
@@ -173,6 +185,15 @@ async function submit() {
   
   proxy.$http.post('/article/create', article).then(res => {
   });
+}
+
+const previewArticle = () => {
+  write(data.message)
+  data.previewVisible = true
+}
+
+const handleClose = () => {
+  data.previewVisible = false
 }
 
 watch(()=>data.message,(newVal)=>{
@@ -288,17 +309,14 @@ onMounted(()=>{
 }
 
 .message {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 24px;
   width: 100%;
   max-width: 1600px;
   flex: 1;
   margin-top: 0;
-  min-height: calc(100vh - 200px);
+  height: calc(100vh - 200px);
 }
 
-.write, .read {
+.write {
   background: rgba(255, 255, 255, 0.8);
   padding: 6px;
   border-radius: 16px;
@@ -316,7 +334,7 @@ onMounted(()=>{
   margin-bottom: 8px;
 }
 
-.writeText, .readText {
+.writeText {
   flex: 1;
   padding: 6px;
   font-size: 16px;
@@ -333,6 +351,27 @@ onMounted(()=>{
 .writeText:focus {
   border-color: #0071e3;
   box-shadow: 0 0 0 4px rgba(0, 113, 227, 0.1);
+}
+
+.write-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.preview-content {
+  max-height: 70vh;
+  overflow-y: auto;
+  padding: 20px;
+  background: #fff;
+  border-radius: 8px;
+}
+
+.preview-content :deep(.readText) {
+  font-size: 16px;
+  line-height: 1.8;
+  color: #1d1d1f;
 }
 
 :deep(.avatar-uploader) {
