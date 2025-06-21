@@ -46,7 +46,7 @@
     <div class="message">
       <div class="write">
         <div class="write-header">
-          <p>写文章</p>
+          <p>内容</p>
           <el-button type="primary" @click="previewArticle">预览</el-button>
         </div>
         <textarea v-model="data.message" class="writeText"></textarea>
@@ -57,8 +57,9 @@
       v-model="data.previewVisible"
       title="文章预览"
       width="80%"
-      top="10"
       :before-close="handleClose"
+      center
+      align-center
     >
       <div class="preview-content">
         <div class="entryContent readText" v-html="data.text"></div>
@@ -313,7 +314,9 @@ onMounted(()=>{
   max-width: 1600px;
   flex: 1;
   margin-top: 0;
-  height: calc(100vh - 200px);
+  display: flex;
+  flex-direction: column;
+  min-height: calc(100vh - 140px);
 }
 
 .write {
@@ -323,7 +326,7 @@ onMounted(()=>{
   box-shadow: 0 12px 36px rgba(0, 0, 0, 0.08);
   display: flex;
   flex-direction: column;
-  height: 100%;
+  flex: 1;
   width: 100%;
 }
 
@@ -361,7 +364,7 @@ onMounted(()=>{
 }
 
 .preview-content {
-  max-height: 70vh;
+  max-height: 80vh;
   overflow-y: auto;
   padding: 20px;
   background: #fff;
