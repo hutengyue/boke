@@ -171,15 +171,15 @@ function gotoAdmin(){
   border-radius: 0.7rem;
   box-shadow: 0 0.9rem 1.7rem rgba(0, 0, 0, 0.25),
   0 0.7rem 0.7rem rgba(0, 0, 0, 0.22);
-  height: 700px;
   max-width: 800px;
   overflow: hidden;
   position: relative;
-  width: 80%;
+  width: 95%;
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 50px;
+  padding: 40px;
+  margin-top: 20px;
 }
 .userBox img{
   border-radius: 100%;
@@ -194,6 +194,8 @@ function gotoAdmin(){
   margin-top: 30px;
   color: white;
   font-size: 20px;
+  display: flex;
+  align-items: center;
 }
 .userName input{
   background-color: rgb(255,255,255,0.5);
@@ -236,6 +238,43 @@ function gotoAdmin(){
   border-radius: 10px;
   padding: 10px;
   background-color: darkviolet;
+}
+
+@media screen and (max-width: 768px) {
+  .userBox {
+  }
+  .userBox img {
+    width: 60px;
+    height: 60px;
+  }
+  .userName,.email,.sex,.introdu {
+    font-size: 16px;
+    margin-top: 20px;
+  }
+  .userName input {
+    font-size: 16px;
+    padding: 8px;
+  }
+  .button,.exit,.admin {
+    font-size: 16px;
+    padding: 8px;
+    margin-top: 30px;
+  }
+  :deep(.el-radio__label) {
+    font-size: 16px;
+  }
+  :deep(.el-textarea__inner) {
+    font-size: 16px;
+  }
+  :deep(.el-input__count) {
+    font-size: 14px;
+  }
+  :deep(.avatar-uploader) {
+    width: 250px;
+  }
+  :deep(.el-upload-dragger) {
+    width: 250px;
+  }
 }
 
 

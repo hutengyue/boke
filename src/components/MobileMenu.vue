@@ -3,7 +3,10 @@
     <div class="mobile-menu-overlay" @click="close"></div>
     <div class="mobile-menu">
       <div class="mobile-menu-header">
-        <img class="avatar" :src="headImg || proxy.$utils.getAssetsImg('Tom.jpg')" @click="gotoUser">
+        <div style="display: flex;align-items: center;">
+          <img class="avatar" :src="headImg || proxy.$utils.getAssetsImg('Tom.jpg')" @click="gotoUser">
+          <p style="margin-left: 20px;font-weight: bold;font-size: 20px;">欢迎光临</p>
+        </div>
         <div class="close-btn" @click="close">
           <span></span>
           <span></span>
@@ -183,7 +186,7 @@ const gotoUser = () => {
   position: absolute;
   top: 0;
   right: -100%;
-  width: 80%;
+  width: 60%;
   height: 100%;
   background: #fff;
   transition: right 0.3s ease;
@@ -247,6 +250,7 @@ const gotoUser = () => {
   padding: 0;
   cursor: pointer;
   user-select: none;
+  color: black;
 }
 
 .menu-item-content {

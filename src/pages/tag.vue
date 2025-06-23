@@ -82,12 +82,12 @@ onBeforeUnmount(() => {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 90px 20px 40px;
+  padding: 90px 0 40px;
   font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
 }
 
 .tags {
-  width: 90%;
+  width: 99%;
   max-width: 1300px;
   text-align: center;
   animation: slide-up 0.8s cubic-bezier(0.16, 1, 0.3, 1);
@@ -97,7 +97,7 @@ onBeforeUnmount(() => {
 .tags a {
   color: #1d1d1f;
   font-size: 15px;
-  padding: 10px 18px;
+  padding: 10px 10px;
   margin: 8px;
   border-radius: 20px;
   background: rgba(255, 255, 255, 0.8);
