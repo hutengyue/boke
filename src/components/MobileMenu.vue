@@ -5,7 +5,7 @@
       <div class="mobile-menu-header">
         <div style="display: flex;align-items: center;">
           <img class="avatar" :src="headImg || proxy.$utils.getAssetsImg('Tom.jpg')" @click="gotoUser">
-          <p style="margin-left: 20px;font-weight: bold;font-size: 20px;">欢迎光临</p>
+          <p style="margin-left: 20px;font-weight: bold;font-size: 18px;">欢迎光临</p>
         </div>
         <div class="close-btn" @click="close">
           <span></span>

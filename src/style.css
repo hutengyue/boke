@@ -133,6 +133,10 @@ p code{
     text-indent: unset;
 }
 
+.entryContent > ol{
+    margin-left: 17px;
+}
+
 .entryContent ul {
     list-style: disc;
     padding: 0 10px 0 35px;
@@ -306,71 +310,24 @@ p code{
 .toc {
     position: fixed;
     top: 30%;
-    right: -250px; /* 初始状态隐藏 */
+    right: 2%;
     width: 250px;
-    margin-left: auto;
+    margin-left: auto;  /* 确保右对齐 */
     background-color: #F7F9Fe;
-    border-radius: 8px 0 0 8px;
+    border-radius: 8px;
     padding: 10px 10px 10px 5px;
     color: #595a5a;
     box-sizing: border-box;
     z-index: 100;
     margin-top: 2%;
-    transition: all 0.3s ease;
-}
-
-.toc::before {
-    content: '🏖️';
-    position: absolute;
-    left: -40px;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 40px;
-    height: 40px;
-    background-color: #F7F9Fe;
-    border-radius: 8px 0 0 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    font-size: 20px;
-    box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1);
-}
-
-.toc.active {
-    right: 0;
-    box-shadow: -2px 0 10px rgba(0, 0, 0, 0.1);
-}
-
-.toc-toggle.active {
-    right: 250px;
+    transition: all .2s;
 }
 
 
-.toc-toggle {
-    content: '🏖️';
-    position: fixed;
-    top: 30%;
-    right: 0;
-    width: 40px;
-    height: 40px;
-    background-color: #F7F9Fe;
-    border-radius: 8px 0 0 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    font-size: 20px;
-    box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1);
-    z-index: 101;
-}
-
-.toc:before {
-    content: '目录';
-    font-size: 20px;
+.toc:before{
+    content:'🏖️目录';
+    font-size: 24px;
     margin-left: 55px;
-    margin-bottom: 10px;
-    display: block;
 }
 .toc ol ol{
     padding-left: 20px;
@@ -408,65 +365,15 @@ p code{
 }
 
 @media screen and (max-width: 768px) {
-    .toc {
-        position: fixed;
-        top: unset;
-        bottom: -30vh;
-        right: 0;
-        left: 0;
-        width: 100%;
-        margin: 0;
-        padding: 10px;
-        border-radius: 15px 15px 0 0;
-        background-color: rgba(247, 249, 254, 0.95);
-        backdrop-filter: blur(10px);
-        box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
-        max-height: 30vh;
-        overflow-y: auto;
-        transition: bottom 0.3s ease;
-    }
-    
-    .toc.active {
-        bottom: 0;
-    }
-
-    .toc-toggle {
-        position: fixed;
-        bottom: 20px;
-        right: 20px;
-        width: 50px;
-        height: 50px;
-        border-radius: 25px;
-        background-color: #F7F9Fe;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-        font-size: 24px;
-        z-index: 1000;
-    }
-
-    .toc-toggle.active {
-        background-color: #e6e6e6;
-        right: 20px;
-    }
-    .toc::before {
-        position: absolute;
-        left: 50%;
-        transform: translateX(-50%);
-        top: -40px;
-        width: 60px;
-        height: 40px;
-        background-color: rgba(247, 249, 254, 0.95);
-        backdrop-filter: blur(10px);
-        border-radius: 15px 15px 0 0;
-        font-size: 18px;
-        margin: 0;
-        box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
-    }
-    .toc:hover {
-        bottom: 0;
-        right: 0;
-    }
     .toc-link{
         font-size: 12px;
+    }
+    .toc:before{
+        font-size: 18px;
+        margin-left: 55px;
+    }
+    .toc {
+        width: 200px;
     }
     .toc ol ol{
         padding-left: 15px;

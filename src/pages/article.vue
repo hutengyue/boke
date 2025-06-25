@@ -33,9 +33,6 @@
     <div class="articleBody">
       <div class="entryContent" v-html="data.article.articleMessage">
       </div>
-      <div class="toc-toggle" :class="{ active: data.tocVisible }" @click="toggleToc">
-        🏖️
-      </div>
       <div class="toc" :class="{ active: data.tocVisible }" v-html="data.article.toc"></div>
     </div>
     <div class="comment">
@@ -136,13 +133,8 @@ const data = reactive({
   message:'',
   comments:[],
   active:0,
-  commentMeta:{},
-  tocVisible: false
+  commentMeta:{}
 })
-
-function toggleToc() {
-  data.tocVisible = !data.tocVisible;
-}
 
 async function init(){
   await proxy.$http.post(`/article/${route.params.articleId}/heat`)
@@ -197,31 +189,17 @@ async function init(){
       permalinkSymbol:"",
       slugify:uslugify
     }).use(markdownItTocDoneRight,{
-      level: [1,2,3],
-      slugify: uslugify,
-      containerClass: 'toc-container',
-      listClass: 'toc-list',
-      itemClass: 'toc-list-item',
-      linkClass: 'toc-link',
-      format: function(x, htmlencode) {
-        return htmlencode(x)
+      level:1,
+      slugify:uslugify,
+      containerClass:'toc',
+      listClass:'toc-list',
+      itemClass:'toc-list-item',
+      linkClass:'toc-link',
+      callback(){
       }
     })
     data.article = res.data
-    // 先生成文章内容
-    data.article.articleMessage = md.render(data.article.articleMessage)
-    // 再单独生成TOC
-    const tocMd = new MarkdownIt()
-      .use(markdownItAnchor, { permalink: true, permalinkSymbol: "", slugify: uslugify })
-      .use(markdownItTocDoneRight, {
-        level: [1,2,3],
-        slugify: uslugify,
-        containerClass: 'toc-list',
-        listClass: 'toc-sublist',
-        itemClass: 'toc-item',
-        linkClass: 'toc-link'
-      })
-    data.article.toc = tocMd.render("{toc}\n" + data.article.articleMessage)
+    data.article.articleMessage = md.render("${toc}\n"+data.article.articleMessage)
     // let tokens = md.parse("${toc}"+data.article.articleMessage, {})
     // console.log(tokens)
     // tokens.forEach(token => {
