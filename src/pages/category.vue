@@ -24,12 +24,11 @@
 <script setup>
 import Header from '../components/header.vue'
 import { onMounted, reactive, getCurrentInstance, watch } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { useRoute } from 'vue-router'
 import ArticleItem from '../components/articleItem.vue'
 
 
 const route = useRoute()
-const router = useRouter()
 const { proxy } = getCurrentInstance()
 
 const data = reactive({

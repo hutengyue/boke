@@ -1,13 +1,11 @@
 <script setup>
 import Tool from './components/tool/index.vue'
 import {onMounted,getCurrentInstance,onUnmounted} from "vue";
-import {useRouter} from 'vue-router';
 import cookie from "js-cookie";
 import useStore from "./store";
 import { useRoute } from 'vue-router'
 const {proxy} = getCurrentInstance()
 const store = useStore()
-const router = useRouter()
 
 const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 const route = useRoute()
@@ -32,9 +30,6 @@ onMounted(()=>{
   window.addEventListener('storage', (e) => {
     localStorage.setItem(e.key, e.oldValue);
   });
-
-  document.title = "cavalry"
-
 
   document.addEventListener("contextmenu", function (e) {
     e.preventDefault();
