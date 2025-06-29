@@ -1,16 +1,20 @@
 <template>
-  <div class="mobile-menu-wrapper" :class="{ 'active': isOpen }">
-    <div class="mobile-menu-overlay" @click="close"></div>
+  <el-drawer
+    v-model="localIsOpen"
+    direction="rtl"
+    size="60%"
+    :show-close="false"
+    :with-header="false"
+  >
     <div class="mobile-menu">
       <div class="mobile-menu-header">
         <div style="display: flex;align-items: center;">
           <img class="avatar" :src="headImg || proxy.$utils.getAssetsImg('Tom.jpg')" @click="gotoUser">
           <p style="margin-left: 20px;font-weight: bold;font-size: 18px;">欢迎光临</p>
         </div>
-        <div class="close-btn" @click="close">
-          <span></span>
-          <span></span>
-        </div>
+        <el-icon class="close-icon" @click="close">
+          <Close />
+        </el-icon>
       </div>
       <div class="mobile-menu-content">
         <div class="menu-item" @click="gotoHome">
@@ -76,18 +80,31 @@
         </div>
       </div>
     </div>
-  </div>
+  </el-drawer>
 </template>
 
 <script setup>
-import { ref, defineEmits } from 'vue'
+import { ref, defineEmits, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { getCurrentInstance } from 'vue'
+import { Close } from '@element-plus/icons-vue'
+
+const localIsOpen = ref(false)
 
 const props = defineProps({
   isOpen: Boolean,
   category: Array,
   headImg: String
+})
+
+// 监听prop变化，更新本地状态
+watch(() => props.isOpen, (newVal) => {
+  localIsOpen.value = newVal
+})
+
+// 监听本地状态变化，通知父组件
+watch(localIsOpen, (newVal) => {
+  emit('update:isOpen', newVal)
 })
 
 const emit = defineEmits(['update:isOpen'])
@@ -97,7 +114,7 @@ const { proxy } = getCurrentInstance()
 const isCategoryOpen = ref(false)
 
 const close = () => {
-  emit('update:isOpen', false)
+  localIsOpen.value = false
   isCategoryOpen.value = false
 }
 
@@ -153,57 +170,17 @@ const gotoUser = () => {
 </script>
 
 <style scoped>
-.mobile-menu-wrapper {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 1000;
-  visibility: hidden;
-}
-
-.mobile-menu-wrapper.active {
-  visibility: visible;
-}
-
-.mobile-menu-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.5);
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
-
-.mobile-menu-wrapper.active .mobile-menu-overlay {
-  opacity: 1;
-}
-
 .mobile-menu {
-  position: absolute;
-  top: 0;
-  right: -100%;
-  width: 60%;
-  height: 100%;
-  background: #fff;
-  transition: right 0.3s ease;
   display: flex;
   flex-direction: column;
-  box-shadow: -4px 0 12px rgba(0, 0, 0, 0.1);
-}
-
-.mobile-menu-wrapper.active .mobile-menu {
-  right: 0;
+  height: 100%;
 }
 
 .mobile-menu-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 20px;
+  padding: 10px 0;
   border-bottom: 1px solid rgba(0, 0, 0, 0.1);
 }
 
@@ -214,34 +191,22 @@ const gotoUser = () => {
   cursor: pointer;
 }
 
-.close-btn {
-  width: 30px;
-  height: 30px;
-  position: relative;
+.close-icon {
+  font-size: 20px;
   cursor: pointer;
-}
-
-.close-btn span {
-  position: absolute;
-  width: 100%;
-  height: 2px;
-  background: #333;
-  top: 50%;
-  left: 0;
-}
-
-.close-btn span:first-child {
-  transform: rotate(45deg);
-}
-
-.close-btn span:last-child {
-  transform: rotate(-45deg);
+  color: #333;
 }
 
 .mobile-menu-content {
   flex: 1;
   overflow-y: auto;
   padding: 20px 0;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+}
+
+.mobile-menu-content::-webkit-scrollbar {
+  display: none; /* Chrome, Safari and Opera */
 }
 
 .menu-item {
@@ -294,7 +259,6 @@ const gotoUser = () => {
   max-height: 0;
   overflow: hidden;
   transition: max-height 0.3s ease;
-  background: #f8f9fa;
 }
 
 .submenu.open {
@@ -314,4 +278,4 @@ const gotoUser = () => {
 .has-submenu .menu-item-content {
   border-bottom: 1px solid rgba(0, 0, 0, 0.05);
 }
-</style> 
+</style>
