@@ -1,17 +1,33 @@
 import OSS from 'ali-oss';
-import http from '../util/http';
+import http from './http';
 
-/**
- * 上传文件到阿里云OSS
- * @param {File} file - 要上传的文件
- * @param {string} directory - 存储目录，例如：'boke'
- * @returns {Promise<string>} 返回文件的访问URL
- */
+export async function deleteOSS(fileUrl) {
+  const res = await http.get('/upload/getOssConfig');
+  const ossConfig = res.data;
+
+  const baseUrl = 'https://file.cavalry.xin/';
+  const filePath = fileUrl.replace(baseUrl, '');
+
+  // 初始化OSS客户端
+  const client = new OSS({
+    region: ossConfig.region,
+    accessKeyId: ossConfig.accessKeyId,
+    accessKeySecret: ossConfig.accessKeySecret,
+    bucket: ossConfig.bucket,
+    stsToken: ossConfig.security_token,
+    secure: true,
+    endpoint: ossConfig.endpoint, // 配置自定义域名
+    cname: true, // 开启CNAME
+  });
+
+  const result = client.delete(filePath)
+  return result
+}
+
 export async function uploadToOSS(file, directory = 'boke') {
   try {
     // 获取OSS配置
     const res = await http.get('/upload/getOssConfig');
-    console.log(res.data)
     const ossConfig = res.data;
 
     // 初始化OSS客户端
@@ -22,7 +38,7 @@ export async function uploadToOSS(file, directory = 'boke') {
       bucket: ossConfig.bucket,
       stsToken: ossConfig.security_token,
       secure: true,
-      endpoint: 'file.cavalry.xin', // 配置自定义域名
+      endpoint: ossConfig.endpoint, // 配置自定义域名
       cname: true, // 开启CNAME
     });
 

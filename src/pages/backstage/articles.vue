@@ -13,7 +13,7 @@
       <el-table :data="data.list" style="width: 100%" :border="false" :stripe="true"
                 @selection-change="select">
         <el-table-column width="50" type="selection" />
-        <el-table-column fixed="left" prop="articleId" label="编号" min-width="5%" />
+        <el-table-column fixed="left" prop="articleId" label="编号" width="60" />
         <el-table-column prop="articleTitle" label="标题" min-width="15%" />
         <el-table-column prop="articleLabel" label="封面" min-width="10%" >
           <template #default="{ row }">
@@ -31,11 +31,14 @@
         <el-table-column prop="heat" label="热度" min-width="8%" />
         <el-table-column prop="commentsCount" label="评论数" min-width="8%" />
         <el-table-column prop="createAt" label="创建时间" min-width="15%" />
-        <el-table-column fixed="right" align="center" label="操作" width="200">
+        <el-table-column fixed="right" align="center" label="操作" width="300">
           <template #default="{ row }">
             <div class="action-buttons">
               <el-button class="edit-button" type="primary" link @click="edit(row)">
                 <el-icon class="icon"><Edit /></el-icon>编辑
+              </el-button>
+              <el-button class="content-button" type="success" link @click="editContent(row)">
+                <el-icon class="icon"><Document /></el-icon>内容
               </el-button>
               <el-button class="delete-button" type="danger" link @click="del(row)">
                 <el-icon class="icon"><Delete /></el-icon>删除
@@ -58,15 +61,12 @@
 
     <el-dialog
       v-model="data.dialog"
-      :title="data.type === 1 ? '新增文章' : '编辑文章'"
-      width="500px"
+      :title="data.type === 3 ? '编辑文章内容' : (data.type === 1 ? '新增文章' : '编辑文章')"
+      :width="data.type === 3 ? '80%' : '500px'"
       align-center
       destroy-on-close
     >
-      <el-form
-        :model="data.target"
-        label-width="80px"
-      >
+      <el-form v-if="data.type !== 3" :model="data.target" label-width="80px">
         <el-form-item label="标题" prop="title">
           <el-input v-model="data.target.title" placeholder="请输入文章标题" />
         </el-form-item>
@@ -94,11 +94,19 @@
           </el-select>
         </el-form-item>
       </el-form>
+      <div v-else class="content-editor">
+        <el-input
+          v-model="data.content"
+          type="textarea"
+          :rows="20"
+          placeholder="加载中..."
+        />
+      </div>
       <template #footer>
         <div class="dialog-footer">
           <el-button @click="data.dialog = false">取消</el-button>
-          <el-button type="primary" @click="add()">
-            {{ data.type === 1 ? '确认添加' : '确认修改' }}
+          <el-button type="primary" @click="data.type === 3 ? saveContent() : add()">
+            {{ data.type === 3 ? '保存内容' : (data.type === 1 ? '确认添加' : '确认修改') }}
           </el-button>
         </div>
       </template>
@@ -109,11 +117,14 @@
 <script setup>
 import { ElMessageBox, ElMessage } from 'element-plus'
 import { getCurrentInstance, onMounted, reactive } from "vue";
-import { Plus, Delete, Edit } from '@element-plus/icons-vue'
+import { Plus, Delete, Edit, Document } from '@element-plus/icons-vue'
+import { deleteOSS, uploadToOSS } from '../../util/OSS';
 
 const { proxy } = getCurrentInstance()
 const pageSize = 8
 var data = reactive({
+  fileUrl:'',//编辑内容时的文件路径
+  content: '',//编辑内容
   target: {},
   select: [],
   list: [],
@@ -134,6 +145,40 @@ function edit(row) {
   data.target = { ...row }
   data.type = 2
   data.dialog = true
+}
+
+async function editContent(row) {
+  data.target = { ...row }
+  data.type = 3
+  data.dialog = true
+  data.content = ''
+  try {
+    const res = await proxy.$http.get(row.articleMessage)
+    data.content = res.data
+    data.fileUrl = row.articleMessage
+  } catch (error) {
+    ElMessage.error('获取文章内容失败')
+    data.dialog = false
+  }
+}
+
+async function saveContent() {
+  deleteOSS(data.fileUrl)
+
+  const blob = new Blob([data.content], { type: 'text/markdown' });
+  const file = new File([blob], `${Date.now()}.md`, { type: 'text/markdown' });
+  
+  const url = await uploadToOSS(file);
+
+  try {
+    await proxy.$http.post('/article/message/update', {
+      articleId: data.target.articleId,
+      articleMessage: url
+    })
+    data.dialog = false
+  } catch (error) {
+    ElMessage.error('保存失败')
+  }
 }
 
 async function del(row) {
@@ -332,7 +377,36 @@ onMounted(() => {
   background: rgba(255, 59, 48, 0.1);
 }
 
+.action-buttons .content-button {
+  color: #34c759;
+  background: rgba(52, 199, 89, 0.05);
+}
+
+.action-buttons .content-button:hover {
+  background: rgba(52, 199, 89, 0.1);
+}
+
 .action-buttons .icon {
   font-size: 14px;
+}
+
+.content-editor {
+  margin: 0 20px;
+}
+
+.content-editor :deep(.el-textarea__inner) {
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', 'source-code-pro', monospace;
+  font-size: 14px;
+  line-height: 1.6;
+  padding: 12px;
+  border-radius: 8px;
+  resize: none;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+  transition: all 0.3s ease;
+}
+
+.content-editor :deep(.el-textarea__inner:hover),
+.content-editor :deep(.el-textarea__inner:focus) {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 </style>

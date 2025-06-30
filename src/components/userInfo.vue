@@ -59,7 +59,7 @@
 
 <script setup>
 import {getCurrentInstance, reactive, toRef,onMounted} from "vue";
-import { uploadToOSS } from "../util/api.js";
+import { uploadToOSS } from "../util/OSS.js";
 import useStore from "../store/index.js";
 import {useRouter} from "vue-router";
 const props = defineProps({

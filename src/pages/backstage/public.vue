@@ -74,7 +74,7 @@ import {ElMessage} from "element-plus";
 import MarkdownIt from "markdown-it";
 import hljs from "highlight.js";
 import 'highlight.js/styles/atom-one-dark.css'
-import {uploadToOSS} from '../../util/api.js'
+import {uploadToOSS} from '../../util/OSS.js'
 
 const {proxy} = getCurrentInstance()
 const data = reactive({
