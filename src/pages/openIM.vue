@@ -263,7 +263,8 @@ function initWebSocket(){
     })
 
     ws.on('privateMessage',(data)=>{
-      if(currentChat.type == 'private' && currentChat.id == data.fromId){
+      if(currentChat.type == 'private' &&
+       (currentChat.id == data.fromId || currentChat.id == data.toId)){
         currentChat.messages.push(data)
         scrollToBottom(true)
       }
