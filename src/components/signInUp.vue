@@ -128,11 +128,23 @@ onMounted(() => {
   init()
   checkMobile()
   window.addEventListener('resize', checkMobile)
+  if ('visualViewport' in window) {
+    window.visualViewport.addEventListener('resize', handleViewportResize)
+  }
 })
 
+const handleViewportResize = () => {
+  if (window.visualViewport && isMobile.value) {
+    const viewport = window.visualViewport
+    document.documentElement.style.height = `${viewport.height}px`
+  }
+}
 onBeforeUnmount(() => {
   // 原有代码保持不变
   window.removeEventListener('resize', checkMobile)
+  if ('visualViewport' in window) {
+    window.visualViewport.removeEventListener('resize', handleViewportResize)
+  }
 })
 
 function checkMobile() {

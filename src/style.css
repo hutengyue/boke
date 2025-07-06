@@ -365,6 +365,9 @@ p code{
 }
 
 @media screen and (max-width: 768px) {
+    .toc{
+        display: none;
+    }
     .toc-link{
         font-size: 12px;
     }
