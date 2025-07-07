@@ -17,13 +17,10 @@ const {proxy} = getCurrentInstance()
 
 // 动态路由配置
 const routes = computed(() => {
-  // 获取所有路由
   const allRoutes = router.getRoutes()
-  // 获取 admin 主路由
   const adminRoute = allRoutes.find(r => r.path === '/admin')
   if (!adminRoute) return []
 
-  // 获取所有子路由并构建菜单
   return adminRoute.children.map(route => ({
     path: `/admin/${route.path}`,
     name: route.meta?.title,  // 使用 meta.title 替代 name
@@ -91,6 +88,11 @@ watch(route, (to) => {
     addVisitedView(to)
   }
 }, { immediate: true })
+
+onMounted(()=>{
+  proxy.$http.get('/user').then(res => {
+  })
+})
 </script>
 
 <template>
