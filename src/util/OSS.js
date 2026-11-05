@@ -5,7 +5,7 @@ export async function deleteOSS(fileUrl) {
   const res = await http.get('/upload/getOssConfig');
   const ossConfig = res.data;
 
-  const baseUrl = 'https://file.cavalry.xin/';
+  const baseUrl = 'https://file.hutengyue.cn/';
   const filePath = fileUrl.replace(baseUrl, '');
 
   // 初始化OSS客户端

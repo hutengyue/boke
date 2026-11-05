@@ -19,7 +19,7 @@
         <div class="music-title">🎵 父亲节特别歌曲</div>
         <audio
             ref="audioRef"
-            src="https://file.cavalry.xin/boke/2025/06/02/father.mp3"
+            src="https://file.hutengyue.cn/boke/2025/06/02/father.mp3"
             controls
             preload="auto"
             class="music-audio"
