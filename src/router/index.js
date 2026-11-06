@@ -67,6 +67,11 @@ const routes = [
         component:()=>import("../pages/dad.vue")
     },
     {
+        path: '/love',
+        name: 'love',
+        component:()=>import("../pages/love.vue")
+    },
+    {
         path: '/*',
         name:'404',
         component:()=>import("../pages/404.vue")
