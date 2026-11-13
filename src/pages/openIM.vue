@@ -138,6 +138,7 @@ const searchFriends = () => {
 }
 
 const selectTarget = async(target) => {
+  if(!target) return
   if(target.type == 'group' && target.type){
     currentChat.type = target.type
     currentChat.id = target.id
@@ -201,7 +202,10 @@ const handleKeyPress = (e) => {
 function initWebSocket(){
   if(window.WebSocket){
     ws = io(`${import.meta.env.VITE_WEBSOCKET_URL}`)
-    ws.emit('connection',{userId:userId.value})
+    // 放进 connect 回调: 首次连接和断线重连都会重新触发 connection 握手
+    ws.on('connect',()=>{
+      ws.emit('connection',{userId:userId.value})
+    })
 
     ws.on('connection',async(data)=>{
       data.message.forEach((item)=>{
@@ -241,7 +245,7 @@ function initWebSocket(){
     ws.on('groupMessage',(data)=>{
       if(currentChat.type == 'group'){
         currentChat.messages.push(data)
-        chatList.value[0].message = data.message
+        if(chatList.value[0]) chatList.value[0].message = data.message
         scrollToBottom(true)
       }
     })

@@ -126,9 +126,14 @@ function submit(){
   }).then(res => {
     // 提交成功后清空临时文件信息
     data.fileInfo = '';
+    // 同步全局 store 里的头像, 让顶部导航栏立即更新
+    if(user.value.headImg) {
+      store.setHeadImg(user.value.headImg);
+      proxy.$bus.emit('headImg');
+    }
     return ElMessage({
-      message: res.data.msg,
-      type: res.data.type
+      message: '修改成功',
+      type: 'success'
     });
   });
 }
